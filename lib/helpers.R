@@ -77,6 +77,22 @@ load_microarray <- function(dataset) {
     nakayama$x <- nakayama$x[idx, ]
     nakayama$y <- factor(nakayama$y[idx])
     data_out <- nakayama
+  } else if (dataset == 'su') {
+    # The Witten and Tibshirani classifier results in an error from features that
+    # have within-class standard deviation of 0. I double-checked the data, and it
+    # turns out there are features within a class that have the same value observed,
+    # hence the error. I resolve the issue by removing all features that have 0
+    # variance before I begin the simulation. Here is the error from Witten's code:
+    # Error in PenalizedLDA(x = xtr, y = ytr, xte = xte, lambda = lambdas[i],  :
+    #   Some features have 0 within-class standard deviation.
+    data('su', package = 'datamicroarray')
+    class_var <- tapply(seq_along(su$y), su$y, function(i) apply(su$x[i,], 2, var))
+    class_var <- do.call(rbind, class_var)
+    features_kept <- which(apply(class_var, 2, function(x) all(x != 0)))
+
+    su$x <- su$x[, features_kept]
+    data_out <- su
+
   } else {
     data(list = dataset, package = "datamicroarray")
     data_out <- get(dataset)
