@@ -36,7 +36,7 @@
 
 \title{A Generalization of Regularized Discriminant Analysis with Applications to High-dimensional Microarray Data}
 
-\author{John A. Ramey and Dean M. Young}
+\author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
 
 \begin{document}
 
@@ -143,26 +143,6 @@ covariance-matrix estimator with matrix function
 \end{align}
 for class $\omega_k$, where $\gamma \in [0, 1]$, $e_{jk}$ be the $j$th largest eigenvalue of $\widehat{\bm\Sigma}_k(\lambda)$ in \eqref{eq:sig-lambda}, $\bm v_{jk}$ be the corresponding eigenvector, and $\bar{e}_k = p^{-1} \sum_{j=1}^p e_{jk}$ is the average of the eigenvalues of \eqref{eq:sig-lambda}. In summary, the \emph{pooling} parameter $\lambda$ controls the amount that we borrow from $\widehat{\bm\Sigma}$ to estimate $\bm \Sigma_k$, and the \emph{shrinkage} parameter $\gamma$ determines the amount of applied shrinkage.
 
-\subsection{Minimum Distance Empirical Bayes}
-
-As an alternative shrinkage approach, we first consider the minimum distance empirical Bayes (\emph{MDEB}) classifier from \cite{Srivastava:2007ww}, who incorporate a similar regularized covariance-matrix estimator that shrinks a covariance-matrix estimator towards a scaled identity, where the shrinkage factor is approximately equal to the average of the nonzero eigenvalues of the original estimator. Furthermore, \cite{Srivastava:2007ww} claim that the \emph{MDEB} classifier is best regularization method they have encountered in the literature. When $p \le n$, the shrinkage factors of the \emph{RDA} and \emph{MDEB} classifiers are equal, but for $p > n$ this shrinkage can differ substantially. In fact, \cite{Ramey:2011ji} show empirically that the \emph{MDEB} classifier can yield superior classification accuracy to the \emph{RDA} classifier. Moreover, as the number of features incorporated in the model is increased, the \emph{MDEB} covariance-matrix estimator remains positive definite and is not nearly singular like the \emph{RDA} classifier. However, for $p \gg n$, the eigenvalue adjustment employed in the \emph{MDEB} covariance-matrix estimator can be too large, thereby dominating the distance of an unlabeled observation to the sample mean.
-
-\cite{Srivastava:2007ww} derive an empirical-Bayes covariance-matrix estimator under the assumption that the data are independent and identically distributed multivariate normal observations. \cite{Srivastava:2007ww} then substitute the estimator into the \eqref{eq:lda} to attain the \emph{MDEB} classifier. To derive the empirical-Bayes covariance-matrix estimator, the authors first assume that $\bm \Sigma_k^{-1}$ follows a Wishart distribution \emph{a priori} with mean $\lambda^{-1} \bm I_p$, $\lambda > 0$, and degrees of freedom, $l \ge p$. The resulting posterior estimator for $\bm \Sigma_k^{-1}$ is $\frac{n_k + l}{n_k}(n_k^{-1}\lambda \bm I_p + \widehat{\bm \Sigma}_k)^{-1}$. Using an empirical Bayes argument to estimate $\lambda$ for $p > n_k$, \cite{Srivastava:2007ww} propose an empirical-Bayes covariance-matrix estimator with matrix function
-\begin{align}
-	\phi(e_{jk}) = \left(e_{jk} + n_k^{-1} \sum_{j = 1}^p e_{jk}\right)^{-1},\label{eq:cov-mdeb}
-\end{align}
-where the shrinkage factor in \eqref{eq:cov-mdeb} is approximately equal to the average of the nonzero eigenvalues of $\widehat{\bm \Sigma}_k$. Substituting \eqref{eq:cov-mdeb} into \eqref{eq:generalized-qda}, we have the \emph{MDEB} classifier. We note that \cite{Srivastava:2007ww} set assumed that $\bm \Sigma_k = \bm \Sigma$ so that $\phi(e_{jk}) = \phi(e_k)$, $k = 1, \ldots, K$. We will return to this assumption below.
-
-\subsection{New LDA}
-
-We also consider the covariance-matrix shrinkage method from \cite{Thomaz:2006ef}, who propose the New \emph{LDA} (\emph{NLDA}) classifier. \cite*{Xu:2009fl} and \cite{Ramey:2011ji} demonstrate that the \emph{NLDA} classifier can attain classification accuracies comparable to the \emph{RDA} and \emph{MDEB} classifiers for small-sample, high-dimensional microarray data sets. These results are surprising because the \emph{NLDA} covariance matrix estimator employs a simple eigenvalue-replacement method, where any eigenvalue smaller than the average of the eigenvalues is replaced with the average of the eigenvalues.
-
-Whereas shrinkage methods often have the form given in \eqref{eq:ridge-estimator}, the covariance matrix estimator employed in the \emph{NLDA} classifier stabilizes the inverse by replacing the smallest eigenvalues of \eqref{eq:pooled-cov} with the average of the eigenvalues of \eqref{eq:pooled-cov}. Let $e_{jk}$ denote the $j$th largest eigenvalue of $\widehat{\bm \Sigma}_k$, and let $\bar{e}_k$ be the average of the eigenvalues of \eqref{eq:pooled-cov}. Then, the inverse of the \emph{NLDA} covariance-matrix estimator has the matrix function
-\begin{align}
-	\phi(e_{jk}) = (\bar{e}_k + \{e_j - \bar{e}_k\}_+)^{-1},\label{eq:cov-nlda}
-\end{align}
-with $z_+ = z$ if $z > 0$ and 0 otherwise. Substituting \eqref{eq:cov-nlda} into \eqref{eq:generalized-qda}, we have the \emph{NLDA} classifier. Similar to the \emph{MDEB} classifier, \cite{Thomaz:2006ef} assume that $\bm \Sigma_k = \bm \Sigma$ so that $\phi(e_{jk}) = \phi(e_k)$, $k = 1, \ldots, K$. 
-
 \section{Regularized Discriminant Analysis with Eigenvalue Thresholding}
 
 \subsection{The Hard-ETRDA Classifier}
@@ -193,10 +173,45 @@ For small values of $\gamma$, the eigenvalue thresholding employed in the \emph{
 
 (\textbf{TODO: Emphasize that for small $\Delta$, Soft and Hard are approximately equal. This provides a connection between NLDA and RDA.})
 
+\section{Special Cases}
+
+\subsection{Minimum Distance Empirical Bayes}
+
+\cite{Srivastava:2007ww} derive an empirical-Bayes covariance-matrix estimator under the assumption that the data are independent and identically distributed multivariate normal observations. \cite{Srivastava:2007ww} then substitute the estimator into the \eqref{eq:lda} to attain the minimum distance empirical Bayes (\emph{MDEB}) classifier. To derive the empirical-Bayes covariance-matrix estimator, \cite{Srivastava:2007ww} first assume that $\bm \Sigma_k^{-1}$ follows a Wishart distribution \emph{a priori} with mean $\lambda^{-1} \bm I_p$, $\lambda > 0$, and degrees of freedom, $l \ge p$. The resulting posterior estimator for $\bm \Sigma_k^{-1}$ is $\frac{n_k + l}{n_k}(n_k^{-1}\lambda \bm I_p + \widehat{\bm \Sigma}_k)^{-1}$. Using an empirical Bayes argument to estimate $\lambda$ for $p > n_k$, \cite{Srivastava:2007ww} propose an empirical-Bayes covariance-matrix estimator with matrix function
+\begin{align}
+	\phi(e_{jk}) = \left(e_{jk} + n_k^{-1} \sum_{j = 1}^p e_{jk}\right)^{-1},\label{eq:cov-mdeb}
+\end{align}
+where the shrinkage factor in \eqref{eq:cov-mdeb} is approximately equal to the average of the nonzero eigenvalues of $\widehat{\bm \Sigma}_k$. Substituting \eqref{eq:cov-mdeb} into \eqref{eq:generalized-qda}, we have the \emph{MDEB} classifier. We note that \cite{Srivastava:2007ww} set assumed that $\bm \Sigma_k = \bm \Sigma$ so that $\phi(e_{jk}) = \phi(e_k)$, $k = 1, \ldots, K$.
+
+\cite{Srivastava:2007ww} claim that the \emph{MDEB} classifier is best regularization method they have encountered in the literature. When $p \le n$, the shrinkage factors of the \emph{RDA} and \emph{MDEB} classifiers are equal, but for $p > n$ this shrinkage can differ substantially. In fact, \cite{Ramey:2011ji} show empirically that the \emph{MDEB} classifier can yield superior classification accuracy to the \emph{RDA} classifier.
+
+
+\subsection{New LDA}
+Whereas shrinkage methods often have the form given in \eqref{eq:ridge-estimator}, the covariance matrix estimator from \cite{Thomaz:2006ef} stabilizes the inverse by replacing the smallest eigenvalues of \eqref{eq:pooled-cov} with the average of the eigenvalues of \eqref{eq:pooled-cov}. Let $e_{jk}$ denote the $j$th largest eigenvalue of $\widehat{\bm \Sigma}_k$, and let $\bar{e}_k$ be the average of the eigenvalues of \eqref{eq:pooled-cov}. Then, the inverse of the covariance-matrix estimator has the matrix function
+\begin{align}
+	\phi(e_{jk}) = (\bar{e}_k + \{e_j - \bar{e}_k\}_+)^{-1},\label{eq:cov-nlda}
+\end{align}
+with $z_+ = z$ if $z > 0$ and 0 otherwise. \cite*{Xu:2009fl} and \cite{Ramey:2011ji} demonstrate that the substituting \eqref{eq:cov-nlda} into \eqref{eq:generalized-qda} yields classification accuracies comparable to the \emph{RDA} and \emph{MDEB} classifiers for small-sample, high-dimensional microarray data sets. Similar to the \emph{MDEB} classifier, \cite{Thomaz:2006ef} assume that $\bm \Sigma_k = \bm \Sigma$ so that $\phi(e_{jk}) = \phi(e_k)$, $k = 1, \ldots, K$.  
+
 
 \section{Monte Carlo Simulations}
 
 TODO
+
+\section{Data Sets}
+
+\subsection{\cite{Burczynski:2006ik} Data Set}
+
+\cite{Burczynski:2006ik} acquired the peripheral blood mononuclear cells (PBMC) through hybridization to microarrays from 127 individuals resulting in 22,283 sequences. Of the 127 individuals, 42 were healthy, 59 had Crohn's disease (CD), and 26 had ulcerative colitis (UC). The goal of \cite{Burczynski:2006ik} was to improve accuracy in the discrimination of Inflammatory Bowel Disease (IBD) using the PBMC-based gene expression signature of a patient.
+
+\subsection{\cite{Nakayama:2007fl} Data Set}
+
+\cite{Nakayama:2007fl} acquired the gene expression through an oligonucleotide microarray from 105 samples of 10 types of soft tissue tumors. This included 16 samples of synovial sarcoma (SS), 19 samples of myxoid/round cell liposarcoma (MLS), 3 samples of lipoma, 3 samples of well-differentiated liposarcoma (WDLS), 15 samples of dedifferentiated liposarcoma (DDLS), 15 samples of myxofibrosarcoma (MFS), 6 samples of leiomyosarcoma (LMS), 3 samples of malignant nerve sheathe tumor (MPNST), 4 samples of fibrosarcoma (FS), and 21 samples of malignant fibrous histiocytoma (MFH). \cite{Nakayama:2007fl} determined from their data that these 10 types fell into 4 broader groups: (1) SS; (2) MLS; (3) Lipoma, WDLS, and part of DDLS; (4) Spindle cell and pleomorophic sarcomas including DDLS, MFS, LMS, MPNST, FS, and MFH. Following \cite{Witten:2011kc}, we restrict our analysis to the five tumor types having at least 15 samples observed.
+
+\subsection{\cite{Singh:2002fh} Data Set}
+
+\cite{Singh:2002fh} have examined 235 radical prostatectomy specimens from surgery patients between 1995 and 1997. The authors used oligonucleotide microarrays containing probes for approximately 12,600 genes and expressed sequence tags. They have reported that 102 of the radical prostatectomy specimens are of high quality: 52 prostate tumour samples and 50 non-tumour prostate samples.
+
 
 \section{Discussion}
 
