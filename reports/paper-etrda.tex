@@ -34,7 +34,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-\title{A Generalization of Regularized Discriminant Analysis with Applications to High-dimensional Microarray Data}
+\title{Another Look at Regularized Discriminant Analysis for High-dimensional Classification}
 
 \author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
 
@@ -52,7 +52,7 @@
 
 
 \begin{abstract}
-\cite{Friedman:1989tm} proposed the popular regularized discriminant analysis (\emph{RDA}) classifier for the small-sample, high-dimensional setting by employing a regularized covariance matrix estimator, which is shrunken towards a scaled identity matrix. We demonstrate empirically, however, that the RDA classifier is often numerically incalculable or unstable for small-sample, high-dimensional data because the shrinkage factor is a function of the average of the eigenvalues, which tends to zero in this setting. Alternatively, \cite{Srivastava:2007ww} propose an empirical-Bayesian estimator that employs a similar shrinkage factor using the average of the nonzero eigenvalues.  Because the eigenvalues are often highly skewed, this average is often excessively large, so that the near-zero eigenvalues are substantially overcompensated. A comparable eigenvalue adjustment method from \cite{Thomaz:2006ef} often yields a shrinkage factor that is approximately equal to the average of the eigenvalues. By writing each shrinkage method as a matrix function, we generalize the shrinkage method of \cite{Thomaz:2006ef} to allow a powerful estimation technique that does not over inflate the near-zero eigenvalues. By incorporating our proposed covariance-matrix regularization with the RDA classifier, we overcome the numerical incalculability issues of the \emph{RDA} classifier. Moreover, we show that our proposed classifier is often superior to the regularized classifiers mentioned above in terms of classification accuracy using three simulated and five small-sample, high-dimensional microarray data sets. Additionally, we provide implementations of the competing classifiers in the {\tt regdiscrim} R package, available on CRAN.
+\cite{Friedman:1989tm} proposed the popular regularized discriminant analysis (\emph{RDA}) classifier for the small-sample, high-dimensional setting by employing a regularized covariance matrix estimator, which employs a ridge-like shrinkage factor to ensure positive definiteness. We demonstrate that the \emph{RDA} classifier, in its original form, is inadequate for the small-sample, high-dimensional setting. We redefine the \emph{RDA} classifier to increase its computational runtime and its interpretation. We show that this new definition includes several well-known regularized classifiers as special cases. We also consider several properties of the newly defined \emph{RDA} classifier. Alternatively, \cite{Srivastava:2007ww} propose an empirical-Bayesian estimator that employs a similar shrinkage factor using the average of the nonzero eigenvalues.  Because the eigenvalues are often highly skewed, this average is often excessively large, so that the near-zero eigenvalues are substantially overcompensated. A comparable eigenvalue adjustment method from \cite{Thomaz:2006ef} often yields a shrinkage factor that is approximately equal to the average of the eigenvalues. By writing each shrinkage method as a matrix function, we generalize the shrinkage method of \cite{Thomaz:2006ef} to allow a powerful estimation technique that does not over inflate the near-zero eigenvalues. By incorporating our proposed covariance-matrix regularization with the RDA classifier, we overcome the numerical incalculability issues of the \emph{RDA} classifier. Moreover, we show that our proposed classifier is often superior to the regularized classifiers mentioned above in terms of classification accuracy using three simulated and three small-sample, high-dimensional microarray data sets. Additionally, we provide implementations of the competing classifiers in the {\tt regdiscrim} R package, available on CRAN.
 \end{abstract}
 
 \section{Introduction}
@@ -63,26 +63,23 @@ Alternatively, several researchers, including \cite*{Zhang:2010va}, \cite*{Guo:2
 
 Here, we consider specifically the  popular regularized discriminant analysis (\emph{RDA}) classifier from \cite{Friedman:1989tm} that incorporates a convex combination of the sample covariance matrices from the \emph{LDA} and \emph{QDA} classifiers. Because the resulting biased covariance-matrix estimator often remains singular in the small-sample, high-dimensional setting, \cite{Friedman:1989tm} applies covariance-matrix shrinkage, where the resulting covariance-matrix estimator is shrunken towards a scaled identity matrix. \cite{Friedman:1989tm} have shown that the \emph{RDA} classifier can attain improved classification accuracy, compared to the \emph{LDA} and \emph{QDA} classifiers when $n > p$.
 
-(\textbf{Remove this paragraph?})
-Despite its popularity, we demonstrate empirically that the covariance-matrix shrinkage employed in the \emph{RDA} classifier is often ineffective in adjusting the eigenvalues of the \emph{RDA} covariance-matrix estimator when $p \gg n$. The \emph{RDA} classifier is numerically unstable as the number of features incorporated into the \emph{RDA} classifier is increased because the covariance-matrix estimator is nearly singular. Specifically, the shrinkage applied in the \emph{RDA} classifier is a function of the average eigenvalues of the convex combination of the class sample covariance matrix and the sample covariance matrix pooled across all classes. Because the average of the eigenvalues is often nearly zero when $p \gg n$, the resulting covariance-matrix estimator has two issues. First, the determinant of the covariance-matrix estimator approaches zero, suggesting that the \emph{RDA} covariance-matrix estimator is nearly singular in the small-sample, high-dimensional setting. Second, the smallest eigenvalues are near zero, which causes the \emph{RDA} classifier to have an incalculable or numerically unstable discriminant function.
-
 In this paper we present a generalization of the \emph{RDA} classifier in terms of matrix functions. We show that several common covariance-matrix regularization methods can be specified in terms of a matrix function including the \emph{RDA} classifier as well as methods from \cite{Srivastava:2007ww} and \cite*{Thomaz:2006ef} and several sparse diagonal classifiers, including the diagonal \emph{LDA} (\emph{DLDA}) and \emph{QDA} (\emph{DQDA}) classifiers from \cite{Dudoit:2002ev}, and some of its variants including those proposed by \cite{Pang:2009ik}.  Our generalization elucidates some properties of these covariance-regularization methods and the relationships among them. Moreover, our generalization allows us to view the covariance-matrix regularization methods in terms of eigenvalue thresholds, which further allows us to identify situations where each method is ineffective and ineffective. From a perspective of eigenvalue thresholds, we propose two new classifiers that are often superior to the \emph{RDA} classifier in terms of classification performance because both methods employ a more robust eigenvalue thresholding to regularize the convex combination of covariance matrix estimators employed in the \emph{RDA} classifier. Our two proposed methods also have an advantage over the \emph{RDA} classifier because both methods employ dimension reduction by reducing the number of basis functions included in the \emph{RDA} classifier, thereby reducing the variance of the resulting classifiers.
 
 In our first classifier we generalize the eigenvalue replacement employed in the \emph{NLDA} classifier and apply a soft threshold to the eigenvalues of the \emph{RDA} covariance-matrix estimator. We refer to our first classifier as the \emph{RDA} with soft eigenvalue-thresholding (\emph{Soft-ETRDA}) classifier.  As we show, the eigenvalue replacement employed in the \emph{NLDA} classifier is often approximately equal to the shrinkage applied in the \emph{RDA} classifier for small-sample, high-dimensional data. Furthermore, a special case of the \emph{Soft-ETRDA} classifier is the \emph{NLDA} classifier as well as the \emph{RDA} classifier.  We remark that our soft eigenvalue threshold is similar to and partially motivated by the shrunken centroids classifier from \cite*{Tibshirani:2002ht}. 	In our second proposed classifier, we apply a hard threshold to the eigenvalues of the \emph{RDA} covariance-matrix estimator, so that the number of covariance parameters incorporated into the \emph{RDA} classifier is reduced substantially. We refer to this classifier as the \emph{RDA} with hard eigenvalue-thresholding (\emph{Hard-ETRDA}) classifier. We remark that the inverse of \emph{Hard-ETRDA} covariance-matrix estimator includes as a special case, the Moore-Penrose pseudo inverse of the \emph{RDA} covariance-matrix estimator.
 
-Using \textbf{five} small-sample, high-dimensional microarray data sets, we demonstrate that our two proposed classifiers often yield superior classification accuracy to the \emph{RDA}, \emph{MDEB}, and \emph{NLDA} classifiers. We also include in our comparison the alternatively-defined \emph{RDA} classifier from \cite*{Hastie:2008dt}, the regularized \emph{LDA} classifier from \cite{Guo:2007te}, a recently proposed variant of diagonal discriminant analysis from \cite*{Tong:2012hw}, and the penalized \emph{LDA} classifier from \cite{Witten:2011kc}. Additionally, we examine the classification accuracy of the classifiers considered using \textbf{three} simulation configurations. Furthermore, we show that our proposed eigenvalue-threshold methods are more numerically stable than the other considered regularization methods using the simulated configurations.
+Using three small-sample, high-dimensional microarray data sets, we demonstrate that our two proposed classifiers often yield superior classification accuracy to the \emph{RDA}, \emph{MDEB}, and \emph{NLDA} classifiers. We also include in our comparison the alternatively-defined \emph{RDA} classifier from \cite*{Hastie:2008dt}, the regularized \emph{LDA} classifier from \cite{Guo:2007te}, a recently proposed variant of diagonal discriminant analysis from \cite*{Tong:2012hw}, and the penalized \emph{LDA} classifier from \cite{Witten:2011kc}. Additionally, we examine the classification accuracy of the classifiers considered using \textbf{three} simulation configurations. Furthermore, we show that our proposed eigenvalue-threshold methods are more numerically stable than the other considered regularization methods using the simulated configurations.
 
-We have organized the remainder of the paper as follows. In Section 2 we review the \emph{RDA}, the \emph{MDEB}, and \emph{NLDA} classifiers and define each in terms of matrix functions. In Section 3 we generalize the eigenvalue adjustment employed in the \emph{NLDA} classifier and define our proposed \emph{Soft-ETRDA} and \emph{Hard-ETRDA} classifiers. In Section 4 we describe the \textbf{three} simulation configurations and \textbf{five} small-sample, high-dimensional microarray data sets and then demonstrate that our two proposed classifiers are superior to the competing classifiers in terms of classification accuracy. We then conclude with a brief discussion in Section 6.
+We have organized the remainder of the paper as follows. In Section 2 we review the \emph{RDA}, the \emph{MDEB}, and \emph{NLDA} classifiers and define each in terms of matrix functions. In Section 3 we generalize the eigenvalue adjustment employed in the \emph{NLDA} classifier and define our proposed \emph{Soft-ETRDA} and \emph{Hard-ETRDA} classifiers. In Section 4 we describe the \textbf{three} simulation configurations and three small-sample, high-dimensional microarray data sets and then demonstrate that our two proposed classifiers are superior to the competing classifiers in terms of classification accuracy. We then conclude with a brief discussion in Section 6.
 
-\section{Covariance-Matrix Regularization in Discriminant Analysis}
+\section{Regularized Discriminant Analysis}
 
-In discriminant analysis we wish to correctly assign an unlabeled $p$-dimensional observation vector $\bm x$ to one of $K$ unique, known classes (or populations) by constructing a classifier from $n$ training observations that can accurately predict the class membership of $\bm x$. Let $\bm x_i = (x_{i1}, x_{i2}, \ldots, x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots, n)$ with true, unique membership $y_i \in \mathcal{K} = \{\omega_1, \ldots, \omega_K\}$, where $\mathbb{R}_{m \times n}$ denotes the matrix space of all $m \times n$ matrices over the real field $\mathbb{R}$. We assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$ is the probability density function (PDF) of the $k$th class, $p(\omega_k)$ is prior probability of class membership of the $k$th class.
+We\footnote{Define the majority of notation here, including $z^+$, $z_+$, and $I[z]$.} wish to assign correctly an unlabeled $p$-dimensional observation vector $\bm x$ to one of $K$ unique, known classes (or populations) by constructing a classifier from $n$ training observations that can accurately predict the class membership of $\bm x$. Let $\bm x_i = (x_{i1}, x_{i2}, \ldots, x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots, n)$ with true, unique membership $y_i \in \mathcal{K} = \{\omega_1, \ldots, \omega_K\}$, where $\mathbb{R}_{m \times n}$ denotes the matrix space of all $m \times n$ matrices over the real field $\mathbb{R}$. We assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$ is the probability density function (PDF) of the $k$th class, $p(\omega_k)$ is prior probability of class membership of the $k$th class.
 
 The \emph{QDA} classifier is the optimal Bayesian decision rule with respect to a $0-1$ loss function when $p(\bm x | \omega_k)$ is the PDF of the multivariate normal distribution with known mean vector  $\bm\mu_k \in \mathbb{R}_{p \times 1}$ and known covariance matrix $\bm\Sigma_k \in \mathbb{R}_{p \times p}^{>}$, $k = 1, 2, \ldots, K$, where $\mathbb{R}_{p \times p}^{>}$ denotes the cone of real $p \times p$ positive-definite matrices. Because the parameters are typically unknown, we estimate the unknown parameters $\bm \mu_k$ and $\bm\Sigma_k$ with their maximum likelihood estimators (MLEs) and substitute the MLEs into the \emph{QDA} classifier. Assuming, for simplicity, that the prior probabilities of class membership $p(\omega_k)$ are equal for $k = 1, \ldots, K$, we assign an unlabeled observation $\bm x$ to class $\omega_k$ using the sample \emph{QDA} classifier:
 \begin{align}
 	D_{QDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)'\widehat{\bm\Sigma}_k^{-1}(\bm x - \xbar_k)  + \ln |\widehat{\bm\Sigma}_k|, \label{eq:qda}
 \end{align}
-where $\xbar_k$ is the MLE for $\bm \mu_k$ and  $\widehat{\bm\Sigma}_k$ is the MLE for $\bm \Sigma_k$. Notice that if we assume further that the covariance matrix parameters are equal for each class (i.e., $\bm\Sigma_k = \bm\Sigma$ for all $k$), then \eqref{eq:qda} reduces to Fisher's linear discriminant analysis (LDA) classifier,
+where $\xbar_k$ and $\widehat{\bm\Sigma}_k$ are the MLEs for $\bm \mu_k$ and $\bm \Sigma_k$, respectively. If we assume further that the covariance matrix parameters are equal for each class (i.e., $\bm\Sigma_k = \bm\Sigma$ for all $k$), then \eqref{eq:qda} reduces to Fisher's linear discriminant analysis (LDA) classifier,
 \begin{align}
 	D_{LDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)'\widehat{\bm\Sigma}^{-1}(\bm x - \xbar_k), \label{eq:lda}
 \end{align}
@@ -91,57 +88,101 @@ where $\widehat{\bm\Sigma}$ is the pooled sample covariance matrix
 	\widehat{\bm\Sigma} = \frac{1}{n} \sum_{k=1}^K n_k \widehat{\bm\Sigma}_k. \label{eq:pooled-cov}
 \end{align}
 
-In the small-sample, high-dimensional setting, if $p > n_k$ for any $k$, \eqref{eq:qda} is incalculable because the sample covariance matrix $\widehat{\bm\Sigma}_k$ for class $\omega_k$ is singular, and, thus, its inverse $\widehat{\bm\Sigma}_k^{-1}$ does not exist.
+\subsection{Original Definition of Regularized Discriminant Analysis}
 
-
-Although \eqref{eq:qda} is in a standard form, we prefer to express the \emph{QDA} classifier explicitly in terms of the eigenvalues and eigenvectors of $\widehat{\bm \Sigma}_k$. Let $e_{jk}$ denote the $j$th largest eigenvalue of $\widehat{\bm\Sigma}_k$ and $\bm v_{jk}$ be the corresponding eigenvector such that $e_{1k} \ge e_{2k} \ge \ldots \ge e_{pk} \ge 0$. Equivalently, we write \eqref{eq:qda} as
+\cite{Friedman:1989tm} has proposed the \emph{RDA} classifier by incorporating a weighted average of the sample covariance matrix $\widehat{\bm \Sigma}_k$ for class $\omega_k$ and the pooled sample covariance matrix $\widehat{\bm\Sigma}$ to estimate the covariance matrix for class $\omega_k$ with
 \begin{align}
-  D(\bm x) = \argmin_{k} \sum_{j = 1}^p \frac{[\bm v_{jk}' (\bm x - \bm \xbar_k)]^2}{e_{jk}} + \sum_{j=1}^p \ln e_{jk}. \label{eq:qda-eigen}
+  \widehat{\bm\Sigma}_k(\lambda) = n_k^{-1}(\lambda) \bm S_k(\lambda),\label{eq:sig-lambda}
 \end{align}
-The smallest eigenvalues and the directions associated with their eigenvectors highly influence \eqref{eq:qda-eigen} . In fact, the eigenvalues of $\widehat{\bm \Sigma}_k$ are well-known to be biased if $p \ge n_k$ such that the smallest eigenvalues are underestimated \citep{Seber:2004uh}. This bias increases as $p$ increases relative to $n_k$ \citep{TODONeedCitation}. Moreover, if $p > n_k$, then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which implies that the last $p - n_k$ eigenvalues of $\widehat{\bm \Sigma}_k$ are 0, which implies that \eqref{eq:qda-eigen} is incalculable. Thus, although more feature information is available to discriminate among the $K$ classes as $p$ increases, classification accuracy decreases unless one obtains enough training-sample observations to reliably estimate the increased number of parameters.
+where $\lambda \in [0, 1]$, $n_k(\lambda) = (1 - \lambda) n_k + \lambda n$, $\bm S_k = n_k \widehat{\bm\Sigma}_k$, $\bm S = \sum_{k=1}^K \bm S_k$, and $\bm S_k(\lambda) = (1 - \lambda) \bm S_k + \lambda \bm S$. We can interpret \eqref{eq:sig-lambda} as a covariance matrix estimator for class $\omega_k$ that borrows from $\widehat{\bm\Sigma}$ in \eqref{eq:pooled-cov} to better estimate $\bm \Sigma_k$. If $\lambda = 0$, \eqref{eq:sig-lambda} is equal to $\widehat{\bm\Sigma}_k$ used in the \emph{QDA} classifier in \eqref{eq:qda}. Alternatively, if $\lambda = 1$, \eqref{eq:sig-lambda} is equal to $\widehat{\bm\Sigma}$ used in the \emph{LDA} classifier in \eqref{eq:lda}, in which case we assume implicitly that $\bm\Sigma_k = \bm \Sigma$ for $k = 1, \ldots, K$.
+
+To further improve the estimation of $\bm \Sigma_k$ and to stabilize the inverse of \eqref{eq:sig-lambda}, \cite{Friedman:1989tm} has proposed the biased \emph{RDA} covariance-matrix estimator
+\begin{align}
+	\widehat{\bm\Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm\Sigma}_k(\lambda) + \gamma \frac{\tr\{\widehat{\bm\Sigma}_k(\lambda)\}}{p} \bm I_p,\label{eq:sig-rda}
+\end{align}
+for class $\omega_k$, where $\gamma \in [0, 1]$ is a regularization parameter that controls the shrinkage of \eqref{eq:sig-rda}  towards the $p$-dimensional identity matrix $\bm I_p$, which is weighted by the the average of the eigenvalues of \eqref{eq:sig-lambda}. Thus, the \emph{pooling} parameter $\lambda$ controls the amount that we borrow from $\widehat{\bm\Sigma}$ to estimate $\bm \Sigma_k$, and the \emph{shrinkage} parameter $\gamma$ determines the amount of shrinkage applied.
+
+Substituting \eqref{eq:sig-rda} into \eqref{eq:qda}, we have the \emph{RDA} classifier, where we assign an unlabeled observation $\bm x$ to class $\omega_k$:
+\begin{align}
+	D_{RDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)'\widehat{\bm\Sigma}_k(\lambda, \gamma)^{-1}(\bm x - \xbar_k)  + \ln |\widehat{\bm\Sigma}_k(\lambda, \gamma)|. \label{eq:rda}
+\end{align}
+
+\subsection{An Alternative Approach to Regularized Discriminant Analysis}
+
+Here, we present a more straightforward, alternative parameterization of the \emph{RDA} classifier. We first define explicitly
+\begin{align}
+  \widehat{\bm\Sigma}_k(\lambda) = (1 - \lambda) \widehat{\bm\Sigma}_k + \lambda \widehat{\bm\Sigma}.\label{eq:sig-lambda-alternative}
+\end{align}
+as a convex combination of the MLEs of $\bm \Sigma_k$ and $\bm \Sigma$, where $\lambda \in [0, 1]$ is the \emph{pooling} parameter. Thus, we no longer have need for the convex combination of $n_k$ and $N$ as defined by \cite{Friedman:1989tm}. Before examining the shrinkage applied to \eqref{eq:sig-lambda-alternative}, we examine some of its properties and write \eqref{eq:sig-lambda-alternative} as
+\begin{align}
+	\widehat{\bm\Sigma}_k(\lambda) &= \widehat{\bm\Sigma}_k + \lambda (\widehat{\bm\Sigma} - \widehat{\bm\Sigma}_k) \nonumber\\
+	&= \widehat{\bm\Sigma}_k + \lambda \left(\sum_{k' = 1}^K \frac{n_k}{N} \widehat{\bm\Sigma}_{k'}  - \widehat{\bm\Sigma}_k \right) \nonumber\\
+	&= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right) \widehat{\bm\Sigma}_k +  \frac{\lambda}{N} \sum_{\substack{k' = 1\\k' \ne k}} n_{k'} \widehat{\bm\Sigma}_{k'}.\label{eq:sig-lambda-alternative2}
+\end{align}
+From \eqref{eq:sig-lambda-alternative2}, we see the weight $\lambda$ places on the covariance matrices from the remaining $K - 1$ classes. The interesting part here is that $\lambda$ controls the contribution of each of the $N$ observations to estimating $\Sigma_k$. Effectively, this states that for $0 < \lambda \le 1$, we use $N$ observations to estimate $\bm \Sigma_k$ rather than $n_k$ as done in the \emph{QDA} classifier. As we will discuss in-depth later, the pooling operation is advantageous in increasing the rank of each $\widehat{\bm\Sigma}_k(\lambda)$ from $n_k - 1$ to $N - 1$ for $0 < \lambda \le 1$. Moreover, suppose that we have centered each observation $\bm x_i$, $i = 1, \ldots, N$, by its class sample mean. Then, we write \eqref{eq:sig-lambda-alternative2} as
+\begin{align}
+	\widehat{\bm\Sigma}_k(\lambda) &= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right)\sum_{i=1}^N I(y_i = k) \bm x_i \bm x_i' +  \frac{\lambda}{N} \sum_{i=1}^N I(y_i \ne k) \bm x_i \bm x_i' \nonumber \\
+	&= \sum_{i=1}^N c_{ik}(\lambda) \bm x_i \bm x_i',\label{eq:sig-lambda-alternative3}
+\intertext{where}
+	c_{ik}(\lambda) &= \begin{cases}
+		(1 - \lambda)n_k^{-1} + \lambda N^{-1}, & y_i = k,\\
+		\lambda N^{-1}, & y_i \ne k.\\
+	\end{cases}\nonumber
+\end{align}
+Therefore, after centering each observation by its corresponding class sample mean, we have that $\widehat{\bm\Sigma}_k(\lambda)$ in \eqref{eq:sig-lambda-alternative3} incorporates each centered observation into the estimation of $\bm \Sigma_k$. Notice that if $\lambda  = 0$, then the observations from the remaining $K - 1$ classes do not contribute to the estimation of $\bm \Sigma_k$, corresponding to $\widehat{\bm \Sigma}_k$. Furthermore, if $\lambda = 1$, the weights in \eqref{eq:sig-lambda-alternative3} reduce to $1/N$, corresponding to $\widehat{\bm\Sigma}$.
+
+\subsection{Covariance Matrix Regularization}
+
+Although \eqref{eq:qda} is in a standard form, we prefer to express the \emph{QDA} classifier explicitly in terms of the eigenvalues and eigenvectors of $\widehat{\bm \Sigma}_k$. Let $e_{jk}(\lambda)$ denote the $j$th largest eigenvalue of $\widehat{\bm\Sigma}_k$ and $\bm v_{jk}(\lambda)$ be the corresponding eigenvector such that $e_{1k}(\lambda) \ge e_{2k}(\lambda) \ge \ldots \ge e_{pk}(\lambda) \ge 0$. Equivalently, we write \eqref{eq:qda} as
+\begin{align}
+  D(\bm x) = \argmin_{k} \sum_{j = 1}^p \frac{[\bm v_{jk}(\lambda)' (\bm x - \bm \xbar_k)]^2}{e_{jk}(\lambda)} + \sum_{j=1}^p \ln \{e_{jk}(\lambda)\}. \label{eq:rda-eigen}
+\end{align}
+The smallest eigenvalues and the directions associated with their eigenvectors highly influence \eqref{eq:rda-eigen}. In fact, the eigenvalues of $\widehat{\bm \Sigma}_k(\lambda)$ are well-known to be biased if $p \ge n_k$ such that the smallest eigenvalues are underestimated \citep{Seber:2004uh}. This bias increases as $p$ increases relative to $n_k$ \citep{TODONeedCitation}. Moreover, if $p > n_k$, then rank$(\widehat{\bm \Sigma}_k(\lambda)) \le n_k$, which implies that the last $p - n_k$ eigenvalues of $\widehat{\bm \Sigma}_k(\lambda)$ are 0, which implies that \eqref{eq:rda-eigen} is incalculable. Thus, although more feature information is available to discriminate among the $K$ classes as $p$ increases, classification accuracy decreases unless one obtains enough training-sample observations to reliably estimate the increased number of parameters.
 
 Several regularization methods, such as the methods considered by \citet*{Guo:2007te}, \cite{Mkhadri:1995jp}, and \citet*{Xu:2009fl}, have been proposed in the literature to stabilize the eigenvalues of $\widehat{\bm \Sigma}_k$ used in \eqref{eq:qda}. These methods often can be written concisely as a matrix function, which we define here using the notation of \cite{Izenman:2008gm}. Let $\bm A \in \mathbb{R}_{p \times p}$ be symmetric, and let $\phi:\mathbb{R} \rightarrow \mathbb{R}$. Then
 \begin{align}
 	\phi(\bm A) = \sum_{j = 1}^p \phi(e_j) \bm v_j \bm v_j'\label{eq:spectral-decomp}
 \end{align}
-is a matrix function defined explicitly in terms of the eigenvalues of $\bm A$. For this reason, $\phi$ is often called a spectral transform. Special case of \eqref{eq:spectral-decomp} include the spectral decomposition of $\bm A$ when $\phi(e_j) = e_j$, the matrix square-root of $\bm A$ when $\phi(e_j) = e_j^{1/2}$, and, if it exists, the inverse of $\bm A$ when $\phi(e_j) = e_j^{-1}$ \citep{Harville:2008wja}.
+is a matrix function defined explicitly in terms of the eigenvalues of $\bm A$. For this reason, $\phi$ is often called a spectral transform \citep{Ch15SSLBook} or a transfer function \citep{Ye:2009gd, Chapelle2002SSLChapter15Reference} . Special case of \eqref{eq:spectral-decomp} include the spectral decomposition of $\bm A$ when $\phi(e_j) = e_j$, the matrix square-root of $\bm A$ when $\phi(e_j) = e_j^{1/2}$, and, if it exists, the inverse of $\bm A$ when $\phi(e_j) = e_j^{-1}$ \citep{Harville:2008wja}.
 
 Viewing regularized covariance-matrix estimators as matrix functions, we can write a more general form of the \emph{QDA} classifier as
 \begin{align}
-  D(\bm x) = \argmin_{k} \sum_{j = 1}^p \phi(e_{jk})[\bm v_{jk}' (\bm x - \bm \mu_k)]^2 + \sum_{j=1}^p \ln \{ \phi(e_{jk}) \}. \label{eq:generalized-qda}
+  D(\bm x) = \argmin_{k} \sum_{j = 1}^p \phi(e_{jk}(\lambda))[\bm v_{jk}(\lambda)' (\bm x - \bm \mu_k)]^2 + \sum_{j=1}^p \ln \{ \phi(e_{jk}(\lambda)) \}. \label{eq:generalized-qda}
 \end{align}
-The generalized \emph{QDA} classifier in \eqref{eq:generalized-qda} includes several common regularized classifiers. Notice that if  $\phi(e_{jk}) = e_{jk}$, $k = 1, \ldots, K$, \eqref{eq:generalized-qda} reduces to the \emph{QDA} classifier in \eqref{eq:qda-eigen}. Furthermore, if $\phi(e_{jk}) = e_{j}$, $k = 1, \ldots, K$, \eqref{eq:generalized-qda} reduces to the \emph{LDA} classifier in \eqref{eq:lda}, and the second summand in \eqref{eq:generalized-qda} is constant across all classes and can be omitted. Additionally, one common approach is to ignore the zero eigenvalues when $p > n$ by employing the Moore-Penrose pseudoinverse $\widehat{\bm \Sigma}_k^{+}$, which employs the matrix function $\phi(e_j) = e_j^{+}$, where $z^{+} = 1/z$ if $z > 0$ and $0$ otherwise. As noted by \cite{Hoyle:2011vt}, \cite{Raudys:1998dd}, and \cite{Ramey:2011ji}, the pseudoinverse is often inadvisable because the resulting classifier often yields a sharp decrease in classification accuracy if $p \approx n$.
+The\footnote{In \eqref{eq:generalized-qda} we have a slight issue in the formulation of the log-determinant in the second sum. The eigenvalue function $\phi$ in the first sum should be the inverse of the function in the second sum. Furthermore, we need to define the log-determinant so that the last $p - q$ terms are ignored when we reduce the dimension to $q$.} generalized \emph{QDA} classifier in \eqref{eq:generalized-qda} includes several common regularized classifiers. Notice that if  $\phi(e_{jk}(\lambda)) = e_{jk}(\lambda)$, $k = 1, \ldots, K$, \eqref{eq:generalized-qda} reduces to the \emph{QDA} classifier in \eqref{eq:rda-eigen}. Furthermore, if $\phi(e_{jk}(\lambda)) = e_{j}$, $k = 1, \ldots, K$, \eqref{eq:generalized-qda} reduces to the \emph{LDA} classifier in \eqref{eq:lda}, and the second summand in \eqref{eq:generalized-qda} is constant across all classes and can be omitted. Additionally, one common approach is to ignore the zero eigenvalues when $p > n$ by employing the Moore-Penrose pseudoinverse $\widehat{\bm \Sigma}_k^{+}$, which employs the matrix function $\phi(e_j) = e_j^{+}$, where $z^{+} = 1/z$ if $z > 0$ and $0$ otherwise. As noted by \cite{Hoyle:2011vt}, \cite{Raudys:1998dd}, and \cite{Ramey:2011ji}, the pseudoinverse is often inadvisable because the resulting classifier often yields a sharp decrease in classification accuracy if $p \approx n$.
 
 Another common form of the covariance-matrix regularization applies a shrinkage factor $\gamma_k > 0$, so that
 \begin{align}
-	\phi(e_{jk}) = (e_{jk} + \gamma_k)^{-1}, \label{eq:ridge-estimator}
+	\phi(e_{jk}(\lambda)) = (e_{jk}(\lambda) + \gamma_k)^{-1}, \label{eq:ridge-estimator}
 \end{align}
-is a ridge-like estimator, similar to a method employed in ridge regression. The estimator in \eqref{eq:ridge-estimator} effectively \emph{shrinks} the sample covariance matrix $\widehat{\bm\Sigma}_k$ towards the $p$-dimensional identity matrix $\bm I_p$, thereby increasing the eigenvalues of $\widehat{\bm\Sigma}_k$ by $\gamma_k$ so that they are positive, resulting in $\widehat{\bm \Sigma}_k(\gamma_k)$ being positive definite.
+is a ridge-like estimator, similar to a method employed in ridge regression. The estimator in \eqref{eq:ridge-estimator} effectively \emph{shrinks} the sample covariance matrix $\widehat{\bm\Sigma}_k(\lambda)$ towards the $p$-dimensional identity matrix $\bm I_p$, thereby increasing the eigenvalues of $\widehat{\bm\Sigma}_k(\lambda)$ by $\gamma_k$ so that they are positive, resulting in $\widehat{\bm \Sigma}_k(\lambda) + \gamma_k \bm I_p$ being positive definite.
 
 We emphasize the regularized estimator in \eqref{eq:ridge-estimator} because the \emph{RDA} and \emph{MDEB} classifiers can be written in this form as we show below. Also, we present the \emph{NLDA} and \emph{ETRDA} classifiers in terms of matrix functions using \eqref{eq:generalized-qda}. For additional covariance-matrix regularization methods, see \cite{Ye:2009gd} and \cite{Ramey:2011ji}.
 
-\subsection{Regularized Discriminant Analysis}
+\section{Properties of the Redefined RDA Classifier}
 
-\cite{Friedman:1989tm} has extended the shrinkage technique by first computing a
-weighted average of the sample covariance matrix $\widehat{\bm \Sigma}_k$ for class
-$\omega_k$ and the pooled sample covariance matrix $\widehat{\bm\Sigma}$ to
-estimate the covariance matrix for class $\omega_k$ with $\widehat{\bm\Sigma}_k(\lambda)$,
-where $\lambda \in [0, 1]$, $n_k(\lambda) = (1 - \lambda) n_k + \lambda n$, $\bm S_k = n_k \widehat{\bm\Sigma}_k$, $\bm S = \sum_{k=1}^K \bm S_k$, $\bm S_k(\lambda) = (1 - \lambda) \bm S_k + \lambda \bm S$, and
-\begin{align}
-  \widehat{\bm\Sigma}_k(\lambda) = n_k^{-1}(\lambda) \bm S_k(\lambda).\label{eq:sig-lambda}
-\end{align}
-We can interpret \eqref{eq:sig-lambda} as a
-covariance matrix estimator for class $\omega_k$ that borrows from $\widehat{\bm\Sigma}$ in \eqref{eq:pooled-cov} to better estimate $\bm \Sigma_k$. Notice that for $\lambda = 0$,
-\eqref{eq:sig-lambda} is equal to $\widehat{\bm\Sigma}_k$ used in the \emph{QDA} classifier in \eqref{eq:qda}. Similarly, notice that for $\lambda = 1$, \eqref{eq:sig-lambda} is equal to $\widehat{\bm\Sigma}$ used in the \emph{LDA} classifier in \eqref{eq:lda}, in which case we assume implicitly that $\bm\Sigma_k = \bm \Sigma$ for $k = 1, \ldots, K$.
+\subsection{Computational Advantages}
 
-\cite{Friedman:1989tm} also uses a regularization parameter $\gamma$ to shrink the
-eigenvalues of \eqref{eq:sig-lambda} towards the $p$-dimensional identity matrix $\bm I_p$
-in order to stabilize the inverse of \eqref{eq:sig-lambda}, resulting in a biased
-covariance-matrix estimator with matrix function
+Thus far, our alternative parameterization simplifies the definition of the \emph{RDA} classifier and has an improved interpretation in terms of the contribution of each observation. Here, we demonstrate that our parameterization yields significant computational advantages over the originally proposed \emph{RDA} classifier from \cite{Friedman:1989tm} by writing \eqref{eq:sig-lambda-alternative3} as
+\begin{align*}
+	\widehat{\bm\Sigma}_k(\lambda) &= \bm X_k(\lambda)' \bm X_k(\lambda),
+\end{align*}
+where $\bm X_k(\lambda) = [\sqrt{c_{1k}(\lambda)} \bm x_1', \ldots,  \sqrt{c_{Nk}(\lambda)} \bm x_N']'$. Now, we can apply the Fast SVD to compute the eigenvalue decomposition of $\widehat{\bm\Sigma}_k(\lambda)$ efficiently. By writing the SVD of $\bm X_k(\lambda) = \bm U_k \bm D_k \bm V_k'$, we have the spectral decomposition $\widehat{\bm\Sigma}_k(\lambda) = \bm X_k(\lambda)' \bm X_k(\lambda) = \bm V_k \bm D_k^2 \bm V_k'$, where $\bm U_k \in \mathbb{R}_{N \times N}$ is orthogonal, $\bm D_k \in \mathbb{R}_{N \times N}$ is a diagonal matrix consisting of the singular values of $\bm X_k(\lambda)$, and $\bm V_k \in \mathbb{R}_{p \times N}$ is orthogonal. Notice that $\bm X_k(\lambda)\bm X_k(\lambda)' = \bm U_k \bm D_k^2 \bm U_k'$, so that the eigenvalue decomposition of $\bm X_k(\lambda)\bm X_k(\lambda)'$ yields $\bm U_k$ and $\bm D_k$. This is much faster when $p \gg N$ because $\bm X_k(\lambda)\bm X_k(\lambda)' \in \mathbb{R}_{N \times N}$. Also, notice that the singular values of $\bm D_k$ are nonzero, so that $\bm D_k^{-1}$ exists. After obtaining $\bm U_k$ and $\bm D_k$, we compute the matrix consisting of the first $N$ eigenvectors of $\widehat{\bm\Sigma}_k(\lambda)$ by simply computing\footnote{TODO: Update this paragraph to theorem/proof.}
+\begin{align*}
+	\bm V_k = \bm X_k(\lambda)' \bm U_k \bm D_k^{-1}.
+\end{align*}
+
+\subsection{Covariance-Matrix Regularization}
+
+We are now ready to discuss the shrinkage employed in the \emph{RDA} covariance-matrix estimator. As we are interested primarily in the case that $p \gg N$, rank$\{\widehat{\bm\Sigma}_k(\lambda)\} = q_k < p$, which implies that $p - q_k$ of the eigenvalues of $\widehat{\bm\Sigma}_k(\lambda)$ are equal to zero. Thus, for $\gamma > 0$, shrinking $\widehat{\bm\Sigma}_k(\lambda)$ towards $\bm I_p$ as in \eqref{eq:sig-rda} increases the rank of $\widehat{\bm\Sigma}_k(\lambda)$ from $q_k$ to $p$. However, \cite{Ye:2009gd} and \cite{YeOtherPaperCitedInTheFirst} have shown that shrinking the zero eigenvalues does not improve the classification performance of the \emph{RDA} classifier. Consequently, we instead shrink only the nonzero eigenvalues of $\widehat{\bm\Sigma}_k(\lambda)$, which has two additional benefits. First, by considering only the nonzero eigenvalues of $\widehat{\bm\Sigma}_k(\lambda)$, we effectively ignore the eigenvectors corresponding to the zero eigenvalues, which reduces significantly the number of parameters that we incorporate into our \emph{RDA} classifier because $p \gg q_k$ if $p \gg N$. Furthermore, the size of the matrix $\bm V_k$ is $p \times N$ as opposed to a $p \times p$ matrix in the original definition of the \emph{RDA} classifier. For significantly large $p$, the reduced size of $\bm V_k$ expedites calculation of the \emph{RDA} classifier and reduces its memory usage.\footnote{TODO: Provide an example for a realistic $p$ and $N$.}
+
+Specifically, we shrink only the nonzero eigenvalues of $\widehat{\bm \Sigma}_k(\lambda)$ by utilizing the estimator
+
 \begin{align}
-	\phi(e_{jk}) = (\{1 - \gamma\} e_{jk} + \gamma \bar{e}_k)^{-1},\label{eq:rda-eigenvalue-function}
+	\widehat{\bm\Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm\Sigma}_k(\lambda) + \gamma \frac{\tr\{\widehat{\bm\Sigma}_k(\lambda)\}}{p} (\bm I_{q_k} \oplus \bm 0_{p - q_k}),\label{eq:sig-rda-alternative}
 \end{align}
-for class $\omega_k$, where $\gamma \in [0, 1]$, $e_{jk}$ be the $j$th largest eigenvalue of $\widehat{\bm\Sigma}_k(\lambda)$ in \eqref{eq:sig-lambda}, $\bm v_{jk}$ be the corresponding eigenvector, and $\bar{e}_k = p^{-1} \sum_{j=1}^p e_{jk}$ is the average of the eigenvalues of \eqref{eq:sig-lambda}. In summary, the \emph{pooling} parameter $\lambda$ controls the amount that we borrow from $\widehat{\bm\Sigma}$ to estimate $\bm \Sigma_k$, and the \emph{shrinkage} parameter $\gamma$ determines the amount of applied shrinkage.
+where $\bm A \oplus \bm B$ denote the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in \mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Therefore, substituting \eqref{eq:sig-rda-alternative} into \eqref{eq:rda}, we have our alternative parameterization of the \emph{RDA} classifier.
+
 
 \section{Regularized Discriminant Analysis with Eigenvalue Thresholding}
 
@@ -171,9 +212,18 @@ Notice that \eqref{eq:cov-soft-etrda} has a form similar to the soft thresholdin
 
 For small values of $\gamma$, the eigenvalue thresholding employed in the \emph{Soft-ETRDA} and \emph{Hard-ETRDA} classifiers are approximately equal. Both methods are effective regularization methods in stabilizing the smallest eigenvalues. The soft eigenvalue threshold employed in the \emph{Soft-ETRDA} classifier has the distinct advantage that the largest eigenvalues are reduced, which smooths the distribution of sample eigenvalues, yielding an effective classifier that is often superior to the proposed sparse and regularized classifiers considered.
 
-(\textbf{TODO: Emphasize that for small $\Delta$, Soft and Hard are approximately equal. This provides a connection between NLDA and RDA.})
-
 \section{Special Cases}
+
+\subsection{RDA}
+
+\cite{Friedman:1989tm} also uses a regularization parameter $\gamma$ to shrink the
+eigenvalues of \eqref{eq:sig-lambda} towards the $p$-dimensional identity matrix $\bm I_p$
+in order to stabilize the inverse of \eqref{eq:sig-lambda}, resulting in a biased
+covariance-matrix estimator with matrix function
+\begin{align}
+	\phi(e_{jk}(\lambda)) = (\{1 - \gamma\} e_{jk}(\lambda) + \gamma \bar{e}_k)^{-1},\label{eq:rda-eigenvalue-function}
+\end{align}
+for class $\omega_k$, where $\gamma \in [0, 1]$, $e_{jk}(\lambda)$ be the $j$th largest eigenvalue of $\widehat{\bm\Sigma}_k(\lambda)$ in \eqref{eq:sig-lambda}, $\bm v_{jk}(\lambda)$ be the corresponding eigenvector, and $\bar{e}_k = p^{-1} \sum_{j=1}^p e_{jk}(\lambda)$ is the average of the eigenvalues of \eqref{eq:sig-lambda}.
 
 \subsection{Minimum Distance Empirical Bayes}
 
@@ -196,9 +246,16 @@ with $z_+ = z$ if $z > 0$ and 0 otherwise. \cite*{Xu:2009fl} and \cite{Ramey:201
 
 \section{Monte Carlo Simulations}
 
-TODO
+\begin{itemize}
+	\item TODO: Design an experiment similar to Friedman's initial simulations, where the the majority of the variances are nearly 0. Fix the sample size. Consider the error rate as a function of $p$. This should cause the RDA regularization to be ineffective because the average eigenvalue is near 0.
+	
+	\item TODO: Design an experiment where the average eigenvalue goes to 0, but the average nonzero eigenvalue blows up for a fixed sample size. Consider the error rate as a function of $p$. This should cause the RDA and MDEB regularizations to be ineffective. However, I am banking on the ETRDA methods doing well.
 
-\section{Data Sets}
+\end{itemize}
+
+\section{High-Dimensional Microarray Data Sets}
+
+In this section, we describe three high-dimensional microarray data sets and compare our proposed \emph{ETRDA} classifier with two recently proposed classifiers for small-sample, high-dimensional data: the penalized \emph{LDA} (\emph{PLDA}) classifier from \cite{Witten:2011kc}  and the shrinkage-mean-based DLDA (\emph{SmDLDA}) classifier from \cite{Tong:2012hw}. We calculated 10-fold cross-validation error rates \citep{Hastie:2008dt} to evaluate the performance of each classifier considered. Because the \emph{PLDA} classifier has a built-in variable selection method, for fair comparison we compared each of the classifiers using the variables selected from each cross-validation fold.
 
 \subsection{\cite{Burczynski:2006ik} Data Set}
 
@@ -212,66 +269,14 @@ TODO
 
 \cite{Singh:2002fh} have examined 235 radical prostatectomy specimens from surgery patients between 1995 and 1997. The authors used oligonucleotide microarrays containing probes for approximately 12,600 genes and expressed sequence tags. They have reported that 102 of the radical prostatectomy specimens are of high quality: 52 prostate tumour samples and 50 non-tumour prostate samples.
 
+\subsection{Classification Results}
+
+TODO\footnote{TODO: Add results discussion and table here.}
+
 
 \section{Discussion}
 
 It is interesting to note that our approach is similar to an aside made by Friedman (1989) in the case that the RDA covariance matrix estimator is singular. Friedman (1989) recommended that the zero eigenvalues be replaced with a small value such as 0.001. However, in Theorem 1, we saw that even small adjustments can be inappropriate because they result in ineffective shrinkage.
-
-\section{Next Steps}
-
-\subsection{Simulations}
-
-\begin{itemize}
-	\item  Design an experiment similar to Friedman's initial simulations, where the the majority of the variances are nearly 0. Fix the sample size. Consider the error rate as a function of $p$. This should cause the RDA regularization to be ineffective because the average eigenvalue is near 0.
-	
-	\item  Design an experiment where the average eigenvalue goes to 0, but the average nonzero eigenvalue blows up for a fixed sample size. Consider the error rate as a function of $p$. This should cause the RDA and MDEB regularizations to be ineffective. However, I am banking on the ETRDA methods doing well.
-	
-	\item In our simulations, we need to report the estimated values of $c$, the average of the eigenvalues, and the average of the nonzero eigenvalues.
-
-\end{itemize}
-
-\subsection{Notation}
-
-\begin{itemize}
-	\item Define the majority of notation at the beginning of Section 2, including $z^+$, $z_+$, and $I[z]$.
-	\item Define the generalization of RDA in terms of the eigenvectors and eigenvalues of the RDA estimator using $\lambda$ as an index. This should remove the need to redefine the eigendecomposition each time we change regularization methods. A possible formulation is $\bm v_{jk}^{(\lambda)}$ and $e_{jk}^{(\lambda)}$.
-	\item In \eqref{eq:generalized-qda} we have a slight issue in the formulation of the log-determinant in the second sum. The eigenvalue function $\phi$ in the first sum should be the inverse of the function in the second sum. Furthermore, we need to define the log-determinant so that the last $p - q$ terms are ignored when we reduce the dimension to $q$.
-\end{itemize}
-
-\subsection{Integrate Section 4 Better}
-
-We should create another figure that shows the shrinkage factor as a function of $q$ for each of the shrinkage factors using one or two data microarray data sets with the Dudoit variable selection method. Show that as more features are incorporated into the model, the competing shrinkage methods fail.
-
-Moreover, show the determinants or log-determinants of each covariance matrix. Then discuss the near-equivalence of the shrinkage in both NLDA and RDA.
-
-Perhaps, we should not consider the NLDA classifier at all. Alternatively, we recall simply the regularization method of the authors and use that as motivation for the Soft-ETRDA classifier.
-
-\subsection{ETRDA}
-
-\begin{itemize}
-	\item Look at the shrinkage factors as a function of $q$. We may find that the optimal value for $c$ is approximately equal to the average of the nonzero eigenvalues. If this is the case, we could note in the discussion that to improve the speed, simply use the average of the nonzero eigenvalues.
-	\item Investigate a quick way to calculate the ETRDA classifier for each value of $c$, similar to RDA. For instance, use the Fast SVD with Hard-ETRDA and write enough squiggles to explain this thoroughly.
-\end{itemize}
-
-\subsection{Discuss Replacing RDA Shrinkage with MDEB Shrinkage}
-
-The next step could be to discuss replacing the RDA shrinkage with the MDEB shrinkage, which uses essentially the average nonzero eigenvalues rather than the average eigenvalues. However, as DMY and I have discovered, the average of the nonzero eigenvalues often can be too large, resulting in extremely inflated denominators in \eqref{eq:generalized-qda}. This has the negative effect of decreasing the scaled differences in the means. Show a histogram of the eigenvalues for a data set, such as the Alon data set. Draw vertical lines showing the average of the 1) eigenvalues and 2) nonzero eigenvalues.
-
-Discuss that the MDEB approach to regularizing the RDA estimator is inappropriate. While it works for the linear case, it does not for the quadratic case because of the determinant. Because the average of the nonzero eigenvalues is often very large, the last $p - q$ terms in the sum in \eqref{eq:generalized-qda} are approximately 0 (perhaps, not quite 0). In the linear case, the second sum is ignored, so that the MDEB estimator results in a classifier very similar to the one where the M-P pseudo inverse is used. However, the rank does not need to be estimated using the MDEB estimator, and the terms in the first sum with eigenvalues near 0 are no longer stable.
-
-Previously, I investigated applying MDEB to the QDA classifier as well but was discouraged because the classification accuracy was quite poor. It seems that the second sum in \eqref{eq:generalized-qda} is likely to be blamed. Letting rank$(\widehat{\bm\Sigma}_k) = q_k$ and $\gamma_k$ be the average of the nonzero eigenvalues of $\widehat{\bm \Sigma}_k$, the second sum in \eqref{eq:generalized-qda} can be partitioned as
-\begin{align*}
-	\sum_{j=1}^p \ln (e_{jk} + \gamma_k) &= \sum_{j=1}^{q_k} \ln (e_{jk} + \gamma) + \sum_{j=q_k + 1}^p \ln (\gamma_k)\\
-	&= \sum_{j=1}^{q_k} \ln (e_{jk} + \gamma_k) + (p - q_k - 1) \ln (\gamma_k).
-\end{align*}
-My guess is that $(p - q_k - 1) \ln (\gamma_k)$ tends to dominate for the class with either the largest or the smallest sample size. Thus, the shrinkage has too much influence on the classification. With this in mind, our proposed selection of $c$ may yield a significant improvement to the QDA classifier compared with MDEB applied to the QDA classifier.
-
-
-
-
-While the \emph{RDA} classifier suffers from numerical incalculability as the data dimensionality $p$ increases, the shrinkage factor of the \emph{MDEB} classifier tends to dominate the estimator. Because the trace of the covariance-matrix estimator is equal to the sum of its eigenvalues, the average of the nonzero eigenvalues can become very large. For each feature added, the variance of that feature must be positive, so it adds to the trace.  Even if the average of the nonzero eigenvalues yields a convergent series, the shrinkage factor is substantially large.
-
-
 	
 
 \bibliographystyle{plainnat}
