@@ -1,4 +1,4 @@
-%% Created using Papers on Mon, 04 Feb 2013.
+%% Created using Papers on Mon, 11 Feb 2013.
 %% http://mekentosj.com/papers/
 
 @article{Antoniadis:2003bk,
@@ -131,6 +131,16 @@ year = {2008},
 series = {Springer Texts in Statistics},
 address = {New York},
 annote = {Regression, classification, and manifold learning}
+}
+
+@book{Kollo:2005vp,
+author = {Kollo, T{\~o}nu and von Rosen, Dietrich},
+title = {{Advanced Multivariate Statistics with Matrices}},
+publisher = {Springer},
+year = {2005},
+volume = {579},
+series = {Mathematics and Its Applications (New York)},
+address = {Dordrecht}
 }
 
 @book{Lutkepohl:1996uz,
@@ -354,6 +364,44 @@ address = {Hoboken, NJ, USA},
 month = oct
 }
 
+@inproceedings{Ye:2006jm,
+author = {Ye, Jieping and Xiong, Tao and Li, Qi and Janardan, Ravi and Bi, Jinbo and Cherkassky, Vladimir and Kambhamettu, Chandra},
+title = {{Efficient model selection for regularized linear discriminant analysis}},
+booktitle = {Proceedings of the 15th ACM International Conference on Information and Knowledge Management},
+year = {2006},
+pages = {532--539},
+publisher = {ACM},
+address = {Arlington, VA, USA},
+annote = {* Notes that the "Classicial LDA is equivalent to maximum likelihood classification assuming normal{\ldots}" (page 3)
+* Shows that a solution to the classical LDA optimization problem in Equation 9 is given by the solution to the generalized eigenvalue problem: S{\_}b x = \lambda S{\_}t x
+* Because this involves the inverse of S{\_}t, which is singular for p {\&}gt; N, S{\_}t needs to be regularized
+* In Section 3, shows that the solution to the generalized eigenvalue problem has a low-rank representation. 
+* Derives explicitly the eigendecomposition of the solution to the generalized eigenvalue problem with regularization
+* Shows that ULDA is the limiting case of RLDA
+* Shows that ULDA maps all points from the same class to a common point; perfect class separation but leads to overfitting. RLDA fixes this.
+* Uses a grid of size m = 1000. It is not clear what the maximum tuning parameter value is.}
+}
+
+@inproceedings{Ye:2006tq,
+author = {Ye, Jieping and Wang, Tie},
+title = {{Regularized Discriminant Analysis for High Dimensional, Low Sample Size Data}},
+booktitle = {The 12th ACM SIGKDD International Conference},
+year = {2006},
+pages = {454},
+publisher = {ACM Press},
+address = {New York, New York, USA},
+annote = {Here's an outline of the paper:
+
+* Replace pooled sample covariance matrix in Friedman's RDA with the total scatter matrix
+* Shows Null(S{\_}t) is a subset of Null(S{\_}b) and Null(S{\_}t) is a subset of Null(\Sigma{\_}k)
+* Decompose the RDA matrix
+* Rewrite the RDA classification rule in terms of the decomposed RDA matrix
+* Shows that the second sum in the RDA decision rule is constant for all classes
+* Derives efficient expressions for the remaining inverses and determinants
+* Notes that a new test point is independent of the inverses and determinants
+* Uses a tuning-parameter grid of 900 parameters b/c the search is fast!}
+}
+
 @article{Zhang:2010va,
 author = {Zhang, Zhihua and Dai, Guang and Xu, Congfu and Jordan, Michael I},
 title = {{Regularized Discriminant Analysis, Ridge Regression and Beyond}},
@@ -361,5 +409,16 @@ journal = {The Journal of Machine Learning Research},
 year = {2010},
 volume = {11},
 month = mar
+}
+
+@incollection{Zhu:2010vu,
+author = {Zhu, Xiaojin and Kandola, Jaz and Lafferty, John and Ghahramani, Zoubin},
+title = {{Graph Kernels by Spectral Transforms}},
+booktitle = {Semi-Supervised Learning},
+year = {2010},
+editor = {Chapelle, Olivier and Sch{\"o}lkopf, Bernhard},
+pages = {277--291},
+publisher = {The MIT Press},
+address = {Cambridge, MA, USA}
 }
 
