@@ -74,7 +74,7 @@ We have organized the remainder of the paper as follows. In Section 2 we present
 \section{Regularized Discriminant Analysis}
 \label{sec:rda}
 
-In\footnote{TODO: Add paragraph of other notation here, including null space, orthogonal complement, and direct sum. Example: $\bm A \oplus \bm B$ denote the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in \mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}.} discriminant analysis we wish to assign correctly an unlabeled $p$-dimensional observation vector $\bm x$ to one of $K$ unique, known classes (or populations) by constructing a classifier from $n$ training observations that can accurately predict the class membership of $\bm x$. Let $\bm x_i = (x_{i1}, x_{i2}, \ldots, x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots, n)$ with true, unique membership $y_i \in \{\omega_1, \ldots, \omega_K\}$, where $\mathbb{R}_{a \times b}$ denotes the matrix space of all $a \times b$ matrices over the real field $\mathbb{R}$. We assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$ is the probability density function (PDF) of the $k$th class, $p(\omega_k)$ is prior probability of class membership of the $k$th class.
+In discriminant analysis we wish to assign correctly an unlabeled $p$-dimensional observation vector $\bm x$ to one of $K$ unique, known classes (or populations) by constructing a classifier from $n$ training observations that can accurately predict the class membership of $\bm x$. Let $\bm x_i = (x_{i1}, x_{i2}, \ldots, x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots, n)$ with true, unique membership $y_i \in \{\omega_1, \ldots, \omega_K\}$, where $\mathbb{R}_{a \times b}$ denotes the matrix space of all $a \times b$ matrices over the real field $\mathbb{R}$. We assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$ is the probability density function (PDF) of the $k$th class, $p(\omega_k)$ is prior probability of class membership of the $k$th class.
 
 The \emph{QDA} classifier is the optimal Bayesian decision rule with respect to a $0-1$ loss function when $p(\bm x | \omega_k)$ is the PDF of the multivariate normal distribution with known mean vector  $\bm\mu_k \in \mathbb{R}_{p \times 1}$ and known covariance matrix $\bm\Sigma_k \in \mathbb{R}_{p \times p}^{>}$, $k = 1, 2, \ldots, K$, where $\mathbb{R}_{p \times p}^{>}$ denotes the cone of real $p \times p$ positive-definite matrices. Because the parameters are typically unknown, we estimate the unknown parameters $\bm \mu_k$ and $\bm\Sigma_k$ with their maximum likelihood estimators (MLEs) and substitute the MLEs into the \emph{QDA} classifier. Assuming that the prior probabilities of class membership $p(\omega_k)$ are equal for $k = 1, \ldots, K$, we assign an unlabeled observation $\bm x$ to class $\omega_k$ with the sample \emph{QDA} classifier
 \begin{align}
@@ -152,7 +152,7 @@ As we have discussed, several eigenvalue adjustment methods have been proposed t
 The specification of $\phi_k$ in \eqref{eq:grda} allows for a large family of eigenvalue shrinkage methods to be examined and for their relationships to be examined in depth.
 
 \section{The Generalized RDA Classifier}
-In this section, we demonstrate that our proposed generalization of the \emph{RDA} classifier facilitates an efficient calculation of \eqref{eq:grda} as well as a rapid model selection of the pooling parameter $\lambda$. Our approach is to decompose \eqref{eq:grda} into a sum of two summands, where the first summand consists of matrix operations applied to low-dimensional matrices. The second summand corresponds to the null space of $\widehat{\bm \Sigma}$ in \eqref{eq:pooled-cov}. For $p \gg N$, the operation applied to this null space involve determinants and inverses of high-dimensional matrices. We show that these operations are constant across all classes and can be omitted. A byproduct of this omission is that adjustments to the associated eigenvalues have no effect on \eqref{eq:grda}. That is, \eqref{eq:grda} is invariant to adjustments of these eigenvalues. We then proceed by showing that matrix operations applied to the low-dimensional matrices in the first summand can be further improved to yield significantly lower computational costs than the \emph{RDA} classifier originally proposed by \cite{Friedman:1989tm}. Lastly, we exploit the so-called Fast singular value decomposition (SVD) to construct the eigenvalue decomposition of $\widehat{\bm \Sigma}$.
+In this section, we demonstrate that our proposed generalization of the \emph{RDA} classifier facilitates an efficient calculation of \eqref{eq:grda} and a rapid model selection of the pooling parameter $\lambda$. Our approach is to decompose \eqref{eq:grda} into a sum of two components, where the first summand consists of matrix operations applied to low-dimensional matrices and the second summand corresponds to the null space of $\widehat{\bm \Sigma}$ in \eqref{eq:pooled-cov}. We show that the matrix operations performed on the null space of $\widehat{\bm \Sigma}$ yield constant quadratic forms across all classes and can be omitted. For $p \gg N$, the constant component involves determinants and inverses of high-dimensional matrices, and by ignoring these calculations, a substantial reduction in computational costs is achieved relative to the \emph{RDA} classifier originally proposed by \cite{Friedman:1989tm}. Furthermore, a byproduct of this omission is that adjustments to the associated eigenvalues have no effect on \eqref{eq:grda}. Lastly, we exploit the so-called Fast singular value decomposition (SVD) to construct the eigenvalue decomposition of $\widehat{\bm \Sigma}$, further reducing the computational costs of our proposed \emph{RDA} classifier.
 
 First, we require the following relationship regarding the null spaces of $\widehat{\bm \Sigma}_k(\lambda)$, $\widehat{\bm \Sigma}$, and $\widehat{\bm \Sigma}_k$.
 
@@ -163,24 +163,14 @@ Let $\widehat{\bm \Sigma}_k$ and $\widehat{\bm \Sigma}$ be the MLEs of $\bm \Sig
 Let $\bm z \in \mathcal{N}(\widehat{\bm \Sigma}_k(\lambda))$ for some $k = 1, \ldots, K$. Hence, $0 = \bm z' \widehat{\bm \Sigma}_k(\lambda) \bm z = (1 - \lambda) \bm z' \widehat{\bm \Sigma}_k \bm z + \lambda \bm z' \widehat{\bm \Sigma} \bm z$. Because $\widehat{\bm \Sigma}_k, \widehat{\bm \Sigma}\in \mathbb{R}_{p \times p}^{\ge}$, we have $\bm z \in \mathcal{N}(\widehat{\bm \Sigma})$ and $\bm z \in \mathcal{N}(\widehat{\bm \Sigma}_k)$. In particular, we have that $\mathcal{N}(\widehat{\bm \Sigma}_k(\lambda)) \subset \mathcal{N}(\widehat{\bm \Sigma})$. Now, suppose $\bm z \in \mathcal{N}(\widehat{\bm \Sigma})$. Similarly, we have that $0 = \bm z' \widehat{\bm \Sigma} \bm z = N^{-1} \sum_{k = 1}^K n_k \bm z' \widehat{\bm \Sigma}_k \bm z$, which implies that $z \in \mathcal{N}(\widehat{\bm \Sigma}_k)$ because $\widehat{\bm \Sigma}_k \in \mathbb{R}_{p \times p}^{\ge}$ for $k = 1, \ldots, K$. Therefore, $\mathcal{N}(\widehat{\bm \Sigma}) \subset \mathcal{N}(\widehat{\bm \Sigma}_k)$.
 \end{proof}
 
-Here, we derive an alternative expression for $\tilde{\bm \Sigma}_k$ to decompose the decision rule of our proposed classifier. In particular, the alternative expression is terms of the first $q$ regularized eigenvalues of $\tilde{\bm \Sigma}_k$ and the adjustments applied to the $p - q$ zero eigenvalues.
+In Lemma \ref{lemma:rda-tilde-Sigma_k} below, we derive an alternative expression for $\tilde{\bm \Sigma}_k$ in terms of the eigenvectors of $\widehat{\bm \Sigma}$. Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U'$ be the eigendecomposition of $\widehat{\bm \Sigma}$ such that $\bm D \in \mathbb{R}_{p \times p}$ is the diagonal matrix of eigenvalues of $\widehat{\bm \Sigma}$ with $\bm D = \bm D_q \oplus \bm 0_{p-q}$, the columns of $\bm U \in \mathbb{R}_{p \times p}$ are the corresponding eigenvectors of $\widehat{\bm \Sigma}$, and rank$(\widehat{\bm \Sigma}) = q$, where $\bm A \oplus \bm B$ denotes the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in \mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Then, partitioning $\bm U = (\bm U_1, \bm U_2)$ such that $\bm U_1 \in \mathbb{R}_{p \times q}$ and $\bm U_2 \in \mathbb{R}_{p \times (p - q)}$, we see that the component of $\tilde{\bm \Sigma}_k$ corresponding to the null space of $\widehat{\bm \Sigma}$ is in terms of the matrix function $\phi_k$ alone.
 
 \begin{lemma}\label{lemma:rda-tilde-Sigma_k}
-Suppose that rank$(\widehat{\bm \Sigma}) = q \le p$. Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U'$ be the eigendecomposition of $\widehat{\bm \Sigma}$ such that $\bm D \in \mathbb{R}_{p \times p}$ is the diagonal matrix of eigenvalues of $\widehat{\bm \Sigma}$ with
-\begin{align*}
-	\bm D = \begin{bmatrix}
-		\bm D_q & 0\\
-		\bm 0 & \bm 0
-	\end{bmatrix}
-\end{align*}
-and $\bm U \in \mathbb{R}_{p \times p}$ is the matrix whose columns are the corresponding eigenvectors of $\widehat{\bm \Sigma}$. Then, partitioning $\bm U = (\bm U_1, \bm U_2)$ so that $\bm U_1 \in \mathbb{R}_{p \times q}$ and $\bm U_2 \in \mathbb{R}_{p \times (p - q)}$, we have the equivalent expression\footnote{To generalize the shrinkage, we define the diagonal matrix of adjusted eigenvalues as $\bm \Phi$ and partition it into two parts: $\bm \Phi_1$ corresponding to the first $q$ eigenvalues of $\widehat{\bm \Sigma}$, and $\bm \Phi_2$ corresponding to the remaining $p - q$ eigenvalues of $\widehat{\bm \Sigma}$.}
+Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U'$ be the eigendecomposition of $\widehat{\bm \Sigma}$ as above, and suppose that rank$(\widehat{\bm \Sigma}) = q \le p$. Then, we have
 \begin{align}
-	\tilde{\bm \Sigma}_k &= \bm U \begin{bmatrix}
-		\bm W_k & \bm 0\\
-		\bm 0 & \gamma \bm I_{p - q}
-	\end{bmatrix}\bm U',\label{eq:rda-matrix}
+	\tilde{\bm \Sigma}_k &= \bm U(\bm W_k \oplus \gamma \bm I_{p - q})\bm U',\label{eq:rda-matrix}
 \intertext{where}
-\bm W_k &= (1-\gamma) \{(1 - \lambda) \bm U_1' \widehat{\bm \Sigma}_k \bm U_1 + \lambda \bm D_q\} + \gamma \bm I_q.
+\bm W_k &= (1-\gamma) \{(1 - \lambda) \bm U_1' \widehat{\bm \Sigma}_k \bm U_1 + \lambda \bm D_q\} + \gamma \bm I_q.\label{eq:Wk}
 \end{align}
 \end{lemma}
 \begin{proof}
@@ -188,23 +178,10 @@ First, notice that
 \begin{align*}
 	\bm U' \tilde{\bm \Sigma}_k \bm U = (1-\gamma) \{(1 - \lambda) \bm U_1' \widehat{\bm \Sigma}_k \bm U_1 + \lambda \bm D_q\} + \gamma \bm U' \bm U.
 \end{align*}
-From Lemma \ref{lemma:null-spaces}, we have that $\widehat{\bm \Sigma}_k \bm U_2 = \bm 0$, which implies that 
-\begin{align*}
-	\bm U' \widehat{\bm \Sigma}_k \bm U = \begin{bmatrix}
-		\bm U_1' \widehat{\bm \Sigma}_k \bm U_1 & \bm 0\\
-		\bm 0 & \bm 0
-	\end{bmatrix},
-\end{align*}
-for $k = 1, \ldots, K$. Thus, recalling that $\bm U$ is orthogonal, we have that 
-\begin{align*}
-	\tilde{\bm \Sigma}_k = \bm U \begin{bmatrix}
-		\bm W_k & \bm 0\\
-		\bm 0 & \gamma \bm I_{p - q}
-	\end{bmatrix}\bm U'.
-\end{align*}
+From Lemma \ref{lemma:null-spaces}, we have that the columns of $\bm U_2$ span the null space of $\widehat{\bm \Sigma}$, which implies that $\widehat{\bm \Sigma}_k \bm U_2 = \bm 0$. Hence, for $k = 1, \ldots, K$, $\bm U' \widehat{\bm \Sigma}_k \bm U = \bm U_1' \widehat{\bm \Sigma}_k \bm U_1 \oplus \bm 0_{p-q}$. Thus, \eqref{eq:rda-matrix} follows because $\bm U$ is orthogonal.
 \end{proof}
 
-An immediate consequence of Lemma \ref{lemma:rda-tilde-Sigma_k} is that ranks of the \emph{RDA} covariance matrices for all classes are each equal to the rank of the pooled sample covariance matrix if the pooling parameter $\lambda$ is positive. Thus, by incorporating each $\bm x_i$ into the estimation of $\bm \Sigma_k$, we increase the rank. We state this formally here.
+An immediate consequence of Lemma \ref{lemma:rda-tilde-Sigma_k} is rank$(\widehat{\bm \Sigma}_k(\lambda)) = q$, $k = 1, \ldots, K$ if the pooling parameter $\lambda \ne 0$. Thus, by incorporating each $\bm x_i$ into the estimation of $\bm \Sigma_k$, we increase the rank of $\widehat{\bm \Sigma}_k(\lambda)$ and, therefore, $\tilde{\bm \Sigma}_k$. We state this formally here.
 
 \begin{cor}
 Let $\widehat{\bm \Sigma}_k(\lambda)$ be defined as in \eqref{eq:sig-lambda-alternative}. Then, for $\lambda \in (0, 1]$, rank$(\widehat{\bm \Sigma}_k(\lambda)) = q$ for all $k = 1, \ldots, K$.
@@ -213,43 +190,36 @@ Let $\widehat{\bm \Sigma}_k(\lambda)$ be defined as in \eqref{eq:sig-lambda-alte
 The proof follows by setting $\gamma = 0$ in Lemma \ref{lemma:rda-tilde-Sigma_k}.
 \end{proof}
 
-The following result is essential to our main result. Here, we show that the difference of a vector $\bm x \in \mathbb{R}_{p \times 1}$ to each class sample mean is constant across all classes by showing that the difference is in the null space of $\bm U_2'$.
+Also from Lemma 2, we see that $\tilde{\bm \Sigma}_k$ has a similar form, even if the matrix function $\phi_k$ is unique.  Next, we provide an essential result that will allow us to prove that for any unlabeled observation $\bm x \in \mathbb{R}_{p \times 1}$ that \eqref{eq:grda} is invariant to adjustments to the eigenvalues of $\tilde{\bm \Sigma}_k$ corresponding to the null space of $\widehat{\bm \Sigma}$.
 
 \begin{lemma}\label{lemma:RDA-constant-term}
 Let $\bm U_2$ be defined as above. Then, for all $\bm x \in \mathbb{R}_{p \times 1}$, $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$, $1 \le k, k' \le K$.
 \end{lemma}
 \begin{proof}
-	First, we have that $\xbar_k - \xbar_{k'} = \sum_{i=1}^N \alpha_i \bm x_i$, where $\alpha_i = (n_k n_{k'})^{-1} \{ I(y_i = k) n_{k'} - I(y_i = k') n_k \}$. Let $\bm x \in \mathbb{R}_{p \times 1}$. Then, $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$ is equivalent to $\bm U_2'(\xbar_k - \xbar_{k'}) = \sum_{i=1}^N \alpha_i \bm U_2' \bm x_i$. Recall that $\bm U_2 \in \mathcal{N}(\widehat{\bm \Sigma})$, which implies that $\bm U_2' \in \mathcal{C}(\widehat{\bm \Sigma})^{\perp}$ \citep[Lemma 1.2.5]{Kollo:2005vp}. Now, because $\bm x_i \in \mathcal{C}(\widehat{\bm \Sigma})$, for $i = 1, \ldots, N$, we have that $\bm U_2' \bm x_i = \bm 0$, which implies that $\bm U_2'(\xbar_k - \xbar_{k'}) = \bm 0$.
+Let $\bm x \in \mathbb{R}_{p \times 1}$, and suppose that $1 \le k, k' \le K$. Then, $\xbar_k - \xbar_{k'} = \sum_{i=1}^N \alpha_i \bm x_i$, where $\alpha_i = (n_k n_{k'})^{-1} \{ I(y_i = k) n_{k'} - I(y_i = k') n_k \}$.  Then, $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$ is equivalent to $\bm U_2'(\xbar_k - \xbar_{k'}) = \sum_{i=1}^N \alpha_i \bm U_2' \bm x_i$. Recall that $\bm U_2 \in \mathcal{N}(\widehat{\bm \Sigma})$, which implies that $\bm U_2' \in \mathcal{C}(\widehat{\bm \Sigma})^{\perp}$ \citep[Lemma 1.2.5]{Kollo:2005vp}. Now, because $\bm x_i \in \mathcal{C}(\widehat{\bm \Sigma})$, for $i = 1, \ldots, N$, we have that $\bm U_2' \bm x_i = \bm 0$, which implies that $\bm U_2'(\xbar_k - \xbar_{k'}) = \bm 0$. Therefore, $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$.
 \end{proof}
 
-Here, we present our main result. We partition the \emph{RDA} decision rule into a sum.
+Lemma 2 is essential to our main result below because we decompose \eqref{eq:grda} into two components, one of which involves the constant term given in Lemma 3. The remaining components involve $\bm U_1$, a much smaller matrix than $\bm U_2$. Now, we present our main result, where we partition our generalized \emph{RDA} decision rule and show that the component requiring the largest computational costs does not contribute to the classification performed. Hence, we are able to omit the term and apply the reduced decision rule as follows.
 
 \begin{thm}
-	The \emph{RDA} decision rule in \eqref{eq:rda} is equivalent to
+Let $\tilde{\bm \Sigma}_k$ be defined as in \eqref{eq:rda-matrix} and $\bm W_k$ be defined as in \eqref{eq:Wk}. Also, let $\bm U_1$ be defined as above. Then, the generalized \emph{RDA} decision rule in \eqref{eq:grda} is equivalent to the reduced form
 	\begin{align}
-		D_{RDA}(\bm x) &= \argmin_k (\bm x - \xbar_k)' \bm U_1 \bm W_k^{-1} \bm U_1' (\bm x - \xbar_k)' + \ln |\bm Q_k| + (p - q) \ln \gamma + q \ln \{ (1 - \gamma) \lambda \} \label{eq:rda-decomposed}
+		D_{RDA}(\bm x) &= \argmin_k  (\bm x - \xbar_k)' \bm U_1 \bm W_k^{-1} \bm U_1' (\bm x - \xbar_k)' + \ln | \bm W_k | + (p - q) \ln \gamma. \label{eq:rda-decomposed}
 	\end{align}
 	
 \end{thm}
 \begin{proof}
-	From \eqref{eq:rda-matrix}, we have that
-	\begin{align*}
-		\tilde{\bm \Sigma}_k^{-1} = \bm U \begin{bmatrix}
-			\bm W_k^{-1} & \bm 0\\
-			\bm 0 & \gamma^{-1} \bm I_{p - q}
-		\end{bmatrix} \bm U'
-	\end{align*}
-	and $|\tilde{\bm \Sigma}_k| = \gamma^{p-q} | \bm W_k |$. Therefore, for all $\bm x \in \mathbb{R}_{p \times 1}$, we have that
+	From \eqref{eq:rda-matrix}, we have that $\tilde{\bm \Sigma}_k^{-1} = \bm U(\bm W_k^{-1} \oplus\gamma^{-1} \bm I_{p - q})\bm U'$ and $|\tilde{\bm \Sigma}_k| = \gamma^{p-q} | \bm W_k |$. Therefore, for all $\bm x \in \mathbb{R}_{p \times 1}$, we have that
 	\begin{align*}
 	(\bm x - \xbar_k)' \tilde{\bm\Sigma}_k^{-1}(\bm x - \xbar_k)  + \ln |\tilde{\bm\Sigma}_k| &= (\bm x - \xbar_k)' \bm U_1 \bm W_k^{-1} \bm U_1' (\bm x - \xbar_k)'\\
 	&+ \gamma^{-1} (\bm x - \xbar_k)' \bm U_2 \bm U_2' (\bm x - \xbar_k) + \ln | \bm W_k | + (p - q) \ln \gamma.
 	\end{align*}
-Applying Lemma \ref{lemma:RDA-constant-term}, $\bm U_2' (\bm x - \xbar_k)$ is constant for all $k = 1, \ldots, K$. Also, from Lemma \ref{lemma:rda-W_k}, we have that $\ln |\bm W_k| = \ln |\bm \Gamma_k| + \ln |\bm Q_k|$, and because \eqref{eq:rda-decomposed} is independent of $\ln |\bm D_q|$, the proof follows.
+From Lemma \ref{lemma:RDA-constant-term}, $\bm U_2' (\bm x - \xbar_k)$ is constant for all $k = 1, \ldots, K$, and the proof follows.
 \end{proof}
 
 \subsection{Model Selection}
 
-In our following result we show that the inverse and determinants of $\bm W_k$ can be written so that they are performed on $n_k \times n_k$ matrices rather than $q \times q$ matrices. Given that $n_k$ is often quite small, say, between 15 and 50, this can reduce the amount of computation substantially. We apply the well-known Woodbury formula and a related determinant lemma.
+Thus far we have seen that the generalized \emph{RDA} classifier in \eqref{eq:rda-decomposed} is invariant to the $\bm U_2$ term, yielding a substantial reduction in the computational costs. While the classifier is much improved in terms of computational performance compared to the \emph{RDA} classifier originally proposed by \cite{Friedman:1989tm}, we provide two additional results that further improve the computational performance of our generalized \emph{RDA} classifier. First, we show that the inverse and determinants of $\bm W_k$ can be written so that they are performed on $n_k \times n_k$ matrices rather than $q \times q$ matrices. Given that $n_k$ is often quite small, say, between 15 and 50, the following result facilitates a further reduction in the computational costs.
 
 \begin{proposition}\label{proposition:rda-W_k}
 Let $\bm W_k$ be defined as above. Then, $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$ and
@@ -262,25 +232,11 @@ where $\bm Q_k = \bm I_{n_k} + (1 - \gamma)(1- \lambda) \bm X_k \bm U_1 \bm \Gam
 	Set $\bm A = \bm \Gamma_k$, $\bm B = (1 - \gamma)(1 - \lambda) \bm U_1' \bm X_k'$, $\bm T = \bm I_{n_k}$, and $\bm C = \bm X_k \bm U_1$. To calculate $|\bm W_k|$, from \cite{Harville:2008wja} we apply Theorem 18.1.1, which states that $|\bm A + \bm B \bm T \bm C| = |\bm A| |\bm T| |\bm T^{-1} + \bm C \bm A^{-1} \bm B|$. Thus, we have $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$. Also from Theorem 18.2.8 in \cite{Harville:2008wja}, we apply the Woodbury formula $(\bm A + \bm B \bm C)^{-1} = \bm A^{-1} - \bm A^{-1} \bm B(\bm I + \bm C \bm A^{-1} \bm B)^{-1} \bm C \bm A^{-1}$, which implies that $\bm W_k^{-1} = \bm \Gamma_k^{-1} - (1 - \gamma)(1 - \lambda) \bm \Gamma_k^{-1} \bm U_1' \bm X_k' \bm Q_k^{-1} \bm X_k \bm U_1 \bm \Gamma_k^{-1}$.
 \end{proof}
 
-
-Note that we can write the pooled sample covariance matrix in \eqref{eq:pooled-cov} as
-\begin{align*}
-	\widehat{\bm\Sigma} = \bm X' \bm X,
-\end{align*}
-where we define $\bm X = [\sqrt{c_{1k}(1)} \bm x_1', \ldots,  \sqrt{c_{Nk}(1)} \bm x_N']'$. Now, we can apply the Fast SVD to compute the eigenvalue decomposition of $\widehat{\bm\Sigma}$ efficiently. By writing the SVD of $\bm X = \bm U \bm D \bm V'$, we have the spectral decomposition $\widehat{\bm\Sigma} = \bm X' \bm X = \bm V \bm D^2 \bm V'$, where $\bm U \in \mathbb{R}_{N \times N}$ is orthogonal, $\bm D \in \mathbb{R}_{N \times N}$ is a diagonal matrix consisting of the singular values of $\bm X$, and $\bm V \in \mathbb{R}_{p \times N}$ is orthogonal. Notice that $\bm X \bm X' = \bm U \bm D^2 \bm U'$, so that the eigenvalue decomposition of $\bm X \bm X'$ yields $\bm U$ and $\bm D$. This is much faster when $p \gg N$ because $\bm X \bm X' \in \mathbb{R}_{N \times N}$. Also, notice that rank$(\widehat{\bm \Sigma}) = q < N$ so that $\bm D^{-1}$ does not exist.  After obtaining $\bm U$ and $\bm D$, we compute the matrix consisting of the first $N$ eigenvectors of $\widehat{\bm\Sigma}$ by simply computing\footnote{TODO: Update this paragraph to a proposition along with proof.}
-\begin{align*}
-	\bm V = \bm X' \bm U \bm D^{-1}.
-\end{align*}
-
-We can determine $q$ efficiently by computing the number of nonzero eigenvalues. However, in our experience, we must take care because the $N-q$ smallest eigenvalues are numerically nonzero, albeit they are near zero. Thus, we select $q$ to be the number of eigenvalues that exceeds some pre specified tolerance value, say, $10^{-6}$.
-
-As noted by \cite{Hoyle:2011vt}, \cite{Raudys:1998dd}, and \cite{Ramey:2011ji}, the pseudoinverse is often inadvisable because the resulting classifier often yields a sharp decrease in classification accuracy if $p \approx N$.\footnote{TODO: Mention that the care recommended above is related to the pseudoinverse and the issue with the smallest eigenvalues.}
-
-Cross-Validation\footnote{TODO: Use the Sherman-Morrison formula for cross-validation.}
+Thus far, we have construction each $\tilde{\bm \Sigma}_k$ in terms of the first $q$ eigenvectors of $\widehat{\bm \Sigma}$. In practice, we would usually require a costly eigendecomposition of $\widehat{\bm \Sigma}$, but by utilizing a technique similar to the so-called kernel trick, we can obtain $\bm U_1$ by computing the eigendecomposition of a much smaller $N \times N$ matrix when $p \gg N$ \citep{Hastie:2008dt}. We begin our derivation by writing the pooled sample covariance matrix in \eqref{eq:pooled-cov} as $\widehat{\bm\Sigma} = \bm X' \bm X$, where we define $\bm X = [\sqrt{c_{1k}(1)} \bm x_1', \ldots,  \sqrt{c_{Nk}(1)} \bm x_N']'$. Then, by writing the SVD of $\bm X = \bm M \bm D \bm U'$, we have the spectral decomposition $\widehat{\bm\Sigma} = \bm U \bm D^2 \bm U'$, where $\bm M \in \mathbb{R}_{N \times N}$ is orthogonal, $\bm D \in \mathbb{R}_{N \times N}$ is a diagonal matrix consisting of the singular values of $\bm X$, and $\bm U \in \mathbb{R}_{p \times N}$ is orthogonal. Now, we see that $\bm X \bm X' = \bm M \bm D^2 \bm M'$ is the eigenvalue decomposition of $\bm X \bm X'$, where $\bm D^2$ is the matrix of eigenvalues of $\bm X \bm X'$ and the columns of $\bm M$  are the corresponding eigenvectors. Hence, after a much faster matrix multiplication, we can obtain $\bm M$ and $\bm D$ from a quick eigendecomposition of $\bm X \bm X' \in \mathbb{R}_{N \times N}$. Next, we compute $\bm U = \bm X' \bm M \bm D^{+}$, where $\bm D^{+} = \bm D_q^{-1} \oplus \bm 0_{N-q}$ is the Moore-Penrose pseudoinverse of $\bm D$. We can determine $q$ efficiently by computing the number of nonzero eigenvalues present in $\bm D^2$. However, in our experience, we must take care because the $N-q$ smallest eigenvalues are numerically nonzero, albeit they are near zero. Thus, we select $q$ to be the number of eigenvalues that exceeds some given tolerance value, say, $1 \times 10^{-6}$. After calculating $q$, we need only retain the first $q$ columns of $\bm U$ to extract $\bm U_1$.
 
 \section{Monte Carlo Simulations}
 
-Our\footnote{TODO: Look at Ye's (2005) JMLR paper on his choice of the $\bm M$ matrix. He has a nice way of saying that he considers special cases.} generalization of the \emph{RDA} classifier facilitates a large number of potential models based on the specification of the matrix functions to shrink the eigenvalues. In our simulations below, we consider two such eigenvalue value functions. First, ...  Second, we consider the matrix function from \cite{Srivastava:2007ww}, who derive an empirical-Bayes covariance-matrix estimator under the assumption that the data are independent and identically distributed multivariate normal observations. \cite{Srivastava:2007ww} then substitute the estimator into the \eqref{eq:lda} to attain the minimum distance empirical Bayes (\emph{MDEB}) classifier. To derive the empirical-Bayes covariance-matrix estimator, \cite{Srivastava:2007ww} first assume that $\bm \Sigma_k^{-1}$ follows a Wishart distribution \emph{a priori} with mean $\lambda^{-1} \bm I_p$, $\lambda > 0$, and degrees of freedom, $l \ge p$. The resulting posterior estimator for $\bm \Sigma_k^{-1}$ is $\frac{n_k + l}{n_k}(n_k^{-1}\lambda \bm I_p + \widehat{\bm \Sigma}_k)^{-1}$. Using an empirical Bayes argument to estimate $\lambda$ for $p > n_k$, \cite{Srivastava:2007ww} propose an empirical-Bayes covariance-matrix estimator with matrix function
+Our generalization of the \emph{RDA} classifier facilitates a large number of potential models based on the specification of the matrix functions to shrink the eigenvalues. In our simulations below, we consider two such eigenvalue value functions. First, ...  Second, we consider the matrix function from \cite{Srivastava:2007ww}, who derive an empirical-Bayes covariance-matrix estimator under the assumption that the data are independent and identically distributed multivariate normal observations. \cite{Srivastava:2007ww} then substitute the estimator into the \eqref{eq:lda} to attain the minimum distance empirical Bayes (\emph{MDEB}) classifier. To derive the empirical-Bayes covariance-matrix estimator, \cite{Srivastava:2007ww} first assume that $\bm \Sigma_k^{-1}$ follows a Wishart distribution \emph{a priori} with mean $\lambda^{-1} \bm I_p$, $\lambda > 0$, and degrees of freedom, $l \ge p$. The resulting posterior estimator for $\bm \Sigma_k^{-1}$ is $\frac{n_k + l}{n_k}(n_k^{-1}\lambda \bm I_p + \widehat{\bm \Sigma}_k)^{-1}$. Using an empirical Bayes argument to estimate $\lambda$ for $p > n_k$, \cite{Srivastava:2007ww} propose an empirical-Bayes covariance-matrix estimator with matrix function
 \begin{align}
 	\phi(e_{jk}) = e_{jk} + n_k^{-1} \sum_{j = 1}^p e_{jk},\label{eq:cov-mdeb}
 \end{align}
@@ -306,14 +262,29 @@ In this section, we describe three high-dimensional microarray data sets and com
 
 \subsection{Classification Results}
 
-TODO\footnote{TODO: Add results discussion and table here.}
-
 
 \section{Discussion}
 
 Question to answer: What do we do when $\lambda = 0$, corresponding to \emph{QDA}?
 
 It is interesting to note that our approach is similar to an aside made by Friedman (1989) in the case that the RDA covariance matrix estimator is singular. Friedman (1989) recommended that the zero eigenvalues be replaced with a small value such as 0.001. However, in Theorem 1, we saw that even small adjustments can be inappropriate because they result in ineffective shrinkage.
+
+\section{Next Actions}
+
+\begin{itemize}
+\item Add paragraph of other notation, including null space, orthogonal complement, and direct sum.
+\item Generalize the shrinkage. Define the diagonal matrix of adjusted eigenvalues as $\bm \Phi$ and partition it into two parts: $\bm \Phi_1$ corresponding to the first $q$ eigenvalues of $\widehat{\bm \Sigma}$, and $\bm \Phi_2$ corresponding to the remaining $p - q$ eigenvalues of $\widehat{\bm \Sigma}$.
+\item Look at Ye's (2005) JMLR paper on his choice of the $\bm M$ matrix. He has a nice way of saying that he considers special cases
+\item Implement classifier
+\item Run simulations
+\item Add simulation results
+\item Discussion simulation results
+\item Use the Sherman-Morrison formula for cross-validation
+\item Discuss choice of $\lambda$ and eigenvalue shrinkage, if necessary
+\item Question to answer: What do we do when $\lambda = 0$, corresponding to \emph{QDA}?
+\item Show a timing comparison between our implementation and that of the {\tt klaR} package.
+\end{itemize}
+
 	
 
 \bibliographystyle{plainnat}
