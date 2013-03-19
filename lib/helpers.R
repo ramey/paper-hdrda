@@ -117,3 +117,57 @@ dudoit <- function(train_x, train_y, test_x = NULL, q) {
   out
 }
 
+# Classifier from Clemmensen, Hastie, Witten and Ersbøll (2012) - Technometrics
+Clemmensen <- function(train_x, train_y, test_x, normalize_data = FALSE, cv_variables = FALSE, num_folds = 10, ...) {
+  if (normalize_data) {
+    normalize_out <- normalize(train_x)
+    train_x <- normalize_out$Xc
+    test_x <- normalizetest(test_x, normalize_out)
+  }
+
+  # Selects the number of variables by cross-validation.
+  # The candidate values are 10 to p in increments of 10.
+  # If there is a tie, we choose the smallest value.
+  # The code often results in the following error:
+  # Error in lda.default(x, grouping, ...)
+  #  variable 1 appears to be constant within groups
+  # We ignore any cases where this occurs.
+  if (cv_variables) {
+    num_vars <- seq.int(10, ncol(train_x), by = 10)
+    cv_folds <- cv_partition(y = train_y, num_folds = num_folds)
+
+    # Traverse through each cross-validation fold and compute the number of
+    # cross-validation errors for each reduced dimension
+    cv_errors <- lapply(cv_folds, function(cv_fold) {
+      trn_x <- train_x[cv_fold$training, ]
+      trn_y <- train_y[cv_fold$training]
+      tst_x <- train_x[cv_fold$test, ]
+      tst_y <- train_y[cv_fold$test]
+
+      # For each reduced dimension considered, we calculate the number of test errors
+      # resulting for the current cross-validation fold.
+      cv_num_vars <- sapply(num_vars, function(q) {
+        sda_predict <- try_default(predict(sda(x = trn_x, y = trn_y, stop = -q), tst_x)$class, NA, quiet = TRUE)
+        sum(sda_predict != tst_y)
+      })
+    })
+    cv_errors <- colSums(do.call(rbind, cv_errors))
+
+    # Determines the optimal value of 'num_vars' to be the one that yielded the minimized
+    # the cross-validation error rate. If there is a tie, we break the tie by
+    # choosing the smallest value of 'num_vars' for parsimony.
+    num_vars <- num_vars[which.min(cv_errors)]
+  } else {
+    num_vars <- ncol(train_x)
+  }
+     
+  predict(sda(x = train_x, y = train_y, stop = -num_vars), test_x)$class
+}
+
+# Classifier from Cao, Boitard, and Besse (2011) - BMC Bioinformatics
+# We use the 'max.dist' 
+Cao <- function(train_x, train_y, test_x) {
+  plsda_out <- plsda(X = train_x, Y = train_y)
+  plsda_predict <- predict(plsda_out, test_x, method = "max.dist")
+  factor(plsda_predict$class$max.dist[, 2], levels = c(1, 2), labels = levels(train_y))
+}
