@@ -174,4 +174,35 @@ Cao <- function(train_x, train_y, test_x) {
 }
 
 
+# Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
+scrda_train <- function(x, y) {
+  x <- t(x)
+  rda_out <- rda(x = x, y = y)
+  rda_cv_out <- rda.cv(rda_out, x = x, y = y)
+
+  # Which alpha and delta give min cv error?
+  min_cv_error <- with(rda_cv_out, which(cv.err == min(cv.err), arr.ind = TRUE))
+
+  # Out of the minima, what are the gene dimensions?
+  num_genes <- rda_cv_out$ngene[min_cv_error]
+
+  # Which alpha-delta has smallest dimension? If there's still a tie, choose one
+  # at random.
+  min_alpha_delta <- sample(which(num_genes == min(num_genes)), size = 1)
+
+  # Now we determine the corresponding alpha-delta pair.
+  alpha_delta <- min_cv_error[min_alpha_delta,]
+  alpha <- as.numeric(rownames(rda_cv_out$cv.err)[alpha_delta[1]])
+  delta <- as.numeric(colnames(rda_cv_out$cv.err)[alpha_delta[2]])
+
+  list(rda_out = rda_out, rda_cv_out = rda_cv_out, alpha = alpha, delta = delta)
+}
+
+# Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
+scrda_predict <- function(rda_out, train_x, train_y, test_x, alpha, delta) {
+  group_names <- levels(train_y)
+  factor(
+    predict(rda_out, x = t(train_x), y = train_y, xnew = t(test_x), alpha = alpha, delta = delta),
+    levels = seq_along(group_names), labels = group_names)
+}
 

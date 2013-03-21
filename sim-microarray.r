@@ -42,6 +42,12 @@ results <- mclapply(data_sets, function(data_set) {
     # train_x <- train_x[, Witten_out$variables]
     # test_x <- test_x[, Witten_out$variables]
 
+    # Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
+    Guo_out <- scrda_train(x = train_x, y = train_y)
+    Guo_pred <- with(Guo_out, scrda_predict(rda_out, train_x, train_y, test_x,
+                                            alpha, delta))
+    Guo_errors <- sum(Guo_pred != test_y)
+
     # GRDA
     cv_out <- grda_cv(x = train_x, y = train_y, prior = prior_probs)
     grda_out <- with(cv_out, grda(x = train_x, y = train_y, lambda = lambda, gamma = gamma, prior = prior_probs))
@@ -63,6 +69,7 @@ results <- mclapply(data_sets, function(data_set) {
       dlda = dlda_errors,
       dqda = dqda_errors,
       grda = grda_errors,
+      Guo = Guo_errors,
       Tong = Tong_errors,
       Witten = Witten_errors
       )
