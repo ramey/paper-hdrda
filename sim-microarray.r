@@ -14,7 +14,9 @@ results <- mclapply(data_sets, function(data_set) {
 
   cv_folds <- cv_partition(y = data$y, num_folds = 10)
 
-  cv_results <- lapply(cv_folds, function(cv_fold) {
+  cv_results <- lapply(seq_along(cv_folds), function(i) {
+    message("Dataset: ", data_set, " -- Fold ", i)
+    cv_fold <- cv_folds[[i]]
     train_x <- as.matrix(data$x[cv_fold$training, ])
     train_y <- data$y[cv_fold$training]
     test_x <- as.matrix(data$x[cv_fold$test, ])
@@ -24,18 +26,21 @@ results <- mclapply(data_sets, function(data_set) {
     num_classes <- nlevels(train_y)
     prior_probs <- rep(1, num_classes) / num_classes
 
+    # For now, I've commented out the Technometrics method because it's too slow.
+    # As in, it took about 12 hours for a single fold in my 10-fold CV simulations
+    # of several data sets.
     # Clemmensen, Hastie, Witten and Ersbøll (2012) - Technometrics
-    Clemmensen_out <- Clemmensen(train_x, train_y, test_x, cv_variables = TRUE,
-                                 normalize_data = TRUE)
-    Clemmensen_errors <- sum(Clemmensen_out != test_y)
+    # Clemmensen_out <- Clemmensen(train_x, train_y, test_x, cv_variables = TRUE,
+    #                             normalize_data = TRUE)
+    # Clemmensen_errors <- sum(Clemmensen_out != test_y)
 
     # Witten and Tibshirani (2011) - JRSS B
     Witten_out <- Witten_Tibshirani(train_x, train_y, test_x)
     Witten_errors <- sum(Witten_out$predictions != test_y)
 
     # Applies the variable selection from Witten and Tibshirani (2011)
-    train_x <- train_x[, Witten_out$variables]
-    test_x <- test_x[, Witten_out$variables]
+    # train_x <- train_x[, Witten_out$variables]
+    # test_x <- test_x[, Witten_out$variables]
 
     # GRDA
     cv_out <- grda_cv(x = train_x, y = train_y, prior = prior_probs)
@@ -55,7 +60,6 @@ results <- mclapply(data_sets, function(data_set) {
 
     list(
       Cao = Cao_errors,
-      Clemmensen = Clemmensen_errors,
       dlda = dlda_errors,
       dqda = dqda_errors,
       grda = grda_errors,

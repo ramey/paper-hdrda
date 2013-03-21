@@ -169,5 +169,9 @@ Clemmensen <- function(train_x, train_y, test_x, normalize_data = FALSE, cv_vari
 Cao <- function(train_x, train_y, test_x) {
   plsda_out <- plsda(X = train_x, Y = train_y)
   plsda_predict <- predict(plsda_out, test_x, method = "max.dist")
-  factor(plsda_predict$class$max.dist[, 2], levels = c(1, 2), labels = levels(train_y))
+  factor(plsda_predict$class$max.dist[, 2], levels = seq_len(nlevels(train_y)),
+         labels = levels(train_y))
 }
+
+
+
