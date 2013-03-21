@@ -42,7 +42,7 @@ results <- mclapply(data_sets, function(data_set) {
     # train_x <- train_x[, Witten_out$variables]
     # test_x <- test_x[, Witten_out$variables]
 
-    # Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
+    # Guo, Hastie, and Tibshirani (2007) - Biostatistics
     Guo_out <- scrda_train(x = train_x, y = train_y)
     Guo_pred <- with(Guo_out, scrda_predict(rda_out, train_x, train_y, test_x,
                                             alpha, delta))
@@ -57,7 +57,11 @@ results <- mclapply(data_sets, function(data_set) {
     dlda_errors <- sum(predict(dlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
     dqda_errors <- sum(predict(dqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
 
-    # Tong et al. (2012) - Bioinformatics
+    # Pang, Tong, and Zhao (2009) - Biometrics
+    sdlda_errors <- sum(predict(sdlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
+    sdqda_errors <- sum(predict(sdqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
+
+    # Tong, Chen, and Zhao (2012) - Bioinformatics
     Tong_out <- dlda(x = train_x, y = train_y, est_mean = "tong", prior = prior_probs)
     Tong_errors <- sum(predict(Tong_out, test_x)$class != test_y)
 
@@ -70,6 +74,8 @@ results <- mclapply(data_sets, function(data_set) {
       dqda = dqda_errors,
       grda = grda_errors,
       Guo = Guo_errors,
+      sdlda = sdlda_errors,
+      sdqda = sdqda_errors,
       Tong = Tong_errors,
       Witten = Witten_errors
       )
