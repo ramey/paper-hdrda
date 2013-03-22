@@ -4,13 +4,17 @@ load.project()
 set.seed(42)
 num_cores <- 12
 
+# Problem Data Sets
+# burczynski
+# chiaretti
 data_sets <- c("alon", "burczynski", "chiaretti", "christensen", "gordon",
-               "gravier", "khan", "nakayama", "shipp", "singh", "sorlie", "su",
-               "yeoh")
+               "gravier", "khan", "nakayama", "shipp", "singh", "sorlie", "yeoh")
 
 results <- mclapply(data_sets, function(data_set) {
   data <- load_microarray(data_set)
   data$x <- as.matrix(data$x)
+
+  set.seed(42)
 
   cv_folds <- cv_partition(y = data$y, num_folds = 10)
 
@@ -35,38 +39,34 @@ results <- mclapply(data_sets, function(data_set) {
     # Clemmensen_errors <- sum(Clemmensen_out != test_y)
 
     # Witten and Tibshirani (2011) - JRSS B
-    Witten_out <- Witten_Tibshirani(train_x, train_y, test_x)
+    Witten_out <- try_default(Witten_Tibshirani(train_x, train_y, test_x), NA)
     Witten_errors <- sum(Witten_out$predictions != test_y)
 
-    # Applies the variable selection from Witten and Tibshirani (2011)
-    # train_x <- train_x[, Witten_out$variables]
-    # test_x <- test_x[, Witten_out$variables]
-
     # Guo, Hastie, and Tibshirani (2007) - Biostatistics
-    Guo_out <- scrda_train(x = train_x, y = train_y)
-    Guo_pred <- with(Guo_out, scrda_predict(rda_out, train_x, train_y, test_x,
-                                            alpha, delta))
+    Guo_out <- try_default(scrda_train(x = train_x, y = train_y), NA)
+    Guo_pred <- try_default(with(Guo_out, scrda_predict(rda_out, train_x, train_y, test_x,
+                                            alpha, delta)), NA)
     Guo_errors <- sum(Guo_pred != test_y)
 
     # GRDA
-    cv_out <- grda_cv(x = train_x, y = train_y, prior = prior_probs)
-    grda_out <- with(cv_out, grda(x = train_x, y = train_y, lambda = lambda, gamma = gamma, prior = prior_probs))
-    grda_errors <- sum(predict(grda_out, test_x)$class != test_y)
+    cv_out <- try_default(grda_cv(x = train_x, y = train_y, prior = prior_probs), NA)
+    grda_out <- try_default(with(cv_out, grda(x = train_x, y = train_y, lambda = lambda, gamma = gamma, prior = prior_probs)), NA)
+    grda_errors <- try_default(sum(predict(grda_out, test_x)$class != test_y), NA)
 
     # DLDA and DQDA
-    dlda_errors <- sum(predict(dlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
-    dqda_errors <- sum(predict(dqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
+    dlda_errors <- try_default(sum(predict(dlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
+    dqda_errors <- try_default(sum(predict(dqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
 
     # Pang, Tong, and Zhao (2009) - Biometrics
-    sdlda_errors <- sum(predict(sdlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
-    sdqda_errors <- sum(predict(sdqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y)
+    sdlda_errors <- try_default(sum(predict(sdlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
+    sdqda_errors <- try_default(sum(predict(sdqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
 
     # Tong, Chen, and Zhao (2012) - Bioinformatics
-    Tong_out <- dlda(x = train_x, y = train_y, est_mean = "tong", prior = prior_probs)
-    Tong_errors <- sum(predict(Tong_out, test_x)$class != test_y)
+    Tong_out <- try_default(dlda(x = train_x, y = train_y, est_mean = "tong", prior = prior_probs), NA)
+    Tong_errors <- try_default(sum(predict(Tong_out, test_x)$class != test_y), NA)
 
     # Cao, Boitard, and Besse (2011) - BMC Bioinformatics
-    Cao_errors <- sum(Cao(train_x, train_y, test_x) != test_y)
+    Cao_errors <- try_default(sum(Cao(train_x, train_y, test_x) != test_y), NA)
 
     list(
       Cao = Cao_errors,
