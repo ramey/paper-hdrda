@@ -26,21 +26,9 @@ results <- mclapply(data_sets, function(data_set) {
     num_classes <- nlevels(train_y)
     prior_probs <- rep(1, num_classes) / num_classes
 
-    # For now, I've commented out the Technometrics method because it's too slow.
-    # As in, it took about 12 hours for a single fold in my 10-fold CV simulations
-    # of several data sets.
-    # Clemmensen, Hastie, Witten and Ersbøll (2012) - Technometrics
-    # Clemmensen_out <- Clemmensen(train_x, train_y, test_x, cv_variables = TRUE,
-    #                             normalize_data = TRUE)
-    # Clemmensen_errors <- sum(Clemmensen_out != test_y)
-
     # Witten and Tibshirani (2011) - JRSS B
     Witten_out <- Witten_Tibshirani(train_x, train_y, test_x)
     Witten_errors <- sum(Witten_out$predictions != test_y)
-
-    # Applies the variable selection from Witten and Tibshirani (2011)
-    # train_x <- train_x[, Witten_out$variables]
-    # test_x <- test_x[, Witten_out$variables]
 
     # Guo, Hastie, and Tibshirani (2007) - Biostatistics
     Guo_out <- scrda_train(x = train_x, y = train_y)
