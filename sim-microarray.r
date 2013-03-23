@@ -89,5 +89,5 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
 }, mc.cores = num_cores)
 results <- do.call(rbind, results)
 
-save(results, file = 'results-microarray.RData')
+save(results, file = 'data/results-microarray.RData')
 
