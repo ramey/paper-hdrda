@@ -4,69 +4,70 @@ load.project()
 set.seed(42)
 num_cores <- 12
 
-# Problem Data Sets
-# burczynski
-# chiaretti
+train_pct <- 2/3
+num_iterations <- 50
 data_sets <- c("alon", "burczynski", "chiaretti", "christensen", "gordon",
                "gravier", "khan", "nakayama", "shipp", "singh", "sorlie", "yeoh")
+q <- c(100, 250, 500, 750, 1000)
 
-results <- mclapply(data_sets, function(data_set) {
+sim_config <- expand.grid(data_sets = data_sets, q = q, stringsAsFactors = FALSE)
+
+results <- mclapply(seq_len(nrow(sim_config)), function(i) {
+  data_set <- sim_config$data_set[i]
+  q <- sim_config$q[i]
+  
   data <- load_microarray(data_set)
   data$x <- as.matrix(data$x)
 
-  set.seed(42)
+  rand_splits <- rand_partition(y = data$y, num_partitions = num_iterations,
+                                train_pct = train_pct)
 
-  cv_folds <- cv_partition(y = data$y, num_folds = 10)
+  split_results <- lapply(seq_along(rand_splits), function(split) {
+    message("Dataset: ", data_set, " -- Split ", split)
+    rand_split <- rand_splits[[split]]
+    train_x <- as.matrix(data$x[rand_split$training, ])
+    train_y <- data$y[rand_split$training]
+    test_x <- as.matrix(data$x[rand_split$test, ])
+    test_y <- data$y[rand_split$test]
 
-  cv_results <- lapply(seq_along(cv_folds), function(i) {
-    message("Dataset: ", data_set, " -- Fold ", i)
-    cv_fold <- cv_folds[[i]]
-    train_x <- as.matrix(data$x[cv_fold$training, ])
-    train_y <- data$y[cv_fold$training]
-    test_x <- as.matrix(data$x[cv_fold$test, ])
-    test_y <- data$y[cv_fold$test]
+    # Apply Dudoit variable selection
+    dudoit_out <- dudoit(train_x, train_y, test_x, q = q)
+    train_x <- dudoit_out$train_x
+    test_x <- dudoit_out$test_x
 
     # Sets the prior probabilities equal
     num_classes <- nlevels(train_y)
     prior_probs <- rep(1, num_classes) / num_classes
 
-    # For now, I've commented out the Technometrics method because it's too slow.
-    # As in, it took about 12 hours for a single fold in my 10-fold CV simulations
-    # of several data sets.
-    # Clemmensen, Hastie, Witten and Ersbøll (2012) - Technometrics
-    # Clemmensen_out <- Clemmensen(train_x, train_y, test_x, cv_variables = TRUE,
-    #                             normalize_data = TRUE)
-    # Clemmensen_errors <- sum(Clemmensen_out != test_y)
-
     # Witten and Tibshirani (2011) - JRSS B
     Witten_out <- try_default(Witten_Tibshirani(train_x, train_y, test_x), NA)
-    Witten_errors <- sum(Witten_out$predictions != test_y)
+    Witten_errors <- mean(Witten_out$predictions != test_y)
 
     # Guo, Hastie, and Tibshirani (2007) - Biostatistics
     Guo_out <- try_default(scrda_train(x = train_x, y = train_y), NA)
     Guo_pred <- try_default(with(Guo_out, scrda_predict(rda_out, train_x, train_y, test_x,
                                             alpha, delta)), NA)
-    Guo_errors <- sum(Guo_pred != test_y)
+    Guo_errors <- mean(Guo_pred != test_y)
 
     # GRDA
     cv_out <- try_default(grda_cv(x = train_x, y = train_y, prior = prior_probs), NA)
     grda_out <- try_default(with(cv_out, grda(x = train_x, y = train_y, lambda = lambda, gamma = gamma, prior = prior_probs)), NA)
-    grda_errors <- try_default(sum(predict(grda_out, test_x)$class != test_y), NA)
+    grda_errors <- try_default(mean(predict(grda_out, test_x)$class != test_y), NA)
 
     # DLDA and DQDA
-    dlda_errors <- try_default(sum(predict(dlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
-    dqda_errors <- try_default(sum(predict(dqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
+    dlda_errors <- try_default(mean(predict(dlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
+    dqda_errors <- try_default(mean(predict(dqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
 
     # Pang, Tong, and Zhao (2009) - Biometrics
-    sdlda_errors <- try_default(sum(predict(sdlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
-    sdqda_errors <- try_default(sum(predict(sdqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
+    sdlda_errors <- try_default(mean(predict(sdlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
+    sdqda_errors <- try_default(mean(predict(sdqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
 
     # Tong, Chen, and Zhao (2012) - Bioinformatics
     Tong_out <- try_default(dlda(x = train_x, y = train_y, est_mean = "tong", prior = prior_probs), NA)
-    Tong_errors <- try_default(sum(predict(Tong_out, test_x)$class != test_y), NA)
+    Tong_errors <- try_default(mean(predict(Tong_out, test_x)$class != test_y), NA)
 
     # Cao, Boitard, and Besse (2011) - BMC Bioinformatics
-    Cao_errors <- try_default(sum(Cao(train_x, train_y, test_x) != test_y), NA)
+    Cao_errors <- try_default(mean(Cao(train_x, train_y, test_x) != test_y), NA)
 
     list(
       Cao = Cao_errors,
@@ -80,13 +81,13 @@ results <- mclapply(data_sets, function(data_set) {
       Witten = Witten_errors
       )
   })
-  melt_results <- melt(cv_results)
-  results_errors <- ddply(melt_results, .(L2), summarize, errors = sum(value))
-  colnames(results_errors) <- c("Classifier", "errors")
-  results_errors$error_rate <- results_errors$errors / length(data$y)
-  cbind(data = data_set, results_errors)
+
+  melt_results <- melt(split_results)
+  melt_results <- subset(melt_results, select = -L1)
+  colnames(melt_results) <- c("Error", "Classifier")
+  cbind(data_set, q, melt_results)
 }, mc.cores = num_cores)
 results <- do.call(rbind, results)
 
-save(results, file = 'results-microarray.RData')
+save(results, file = 'data/results-microarray.RData')
 

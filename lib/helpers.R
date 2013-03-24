@@ -21,17 +21,42 @@ sim_factors <- function(..., num_reps = 1, stringsAsFactors = FALSE) {
   do.call(rbind, replicate(num_reps, grid, simplify = FALSE))
 }
 
-#' Helper function to return predictions from the list element 'class'
+#' Random partition of classification data.
 #'
-#' A common convention for classifiers in R is to return a list from the
-#' 'predict' with the classifications (class labels) of each test observation
-#' along with a variety of information about each specific test
-#' classification, such as discriminant scores and posterior probabilities.
-#' For our 'classify' function, we need only the class labels. This helper
-#' function is a wrapper function that returns only the class labels when
-#' the aforementioned convention is followed.
-predict_helper <- function(obj, newdata) {
-  predict(obj, newdata)$class
+#' For a vector of training labels, we return a list of random partitions,
+#' where each partition has the indices of both the training and test
+#' observations.
+#'
+#' We partition the vector \code{y} based on its length, which we treat as the
+#' sample size, \code{n}. If an object other than a vector is used in \code{y},
+#' its length can yield unexpected results. For example, the output of
+#' \code{length(diag(3))} is 9.
+#'
+#' @export
+#' @param y a vector of the labels of the training data
+#' @return list the indices of the training and test observations for each fold.
+#' @examples
+#' library(MASS)
+#' # The following three calls to \code{rand_partition} yield the same partitions.
+#' set.seed(42)
+#' rand_partition(iris$Species)
+#' rand_partition(iris$Species, num_partitions = 5)
+#' rand_partitions(iris$Species, train_pct = 2/3)
+rand_partition <- function(y, num_partitions = 10, train_pct = 1/2) {
+  n <- length(y)
+  seq_n <- seq_len(n)
+
+  splits <- replicate(num_partitions, expr = {
+    training <- sample(seq_n, train_pct * n)
+    test <- which(!seq_n %in% training)
+    list(
+      training = training,
+      test = test
+    )
+  }, simplify = FALSE)
+
+  names(splits) <- paste0("Split", seq_len(num_partitions))
+  splits
 }
 
 # This function rounds to the nearest digits and does not truncated leading
@@ -39,7 +64,6 @@ predict_helper <- function(obj, newdata) {
 round_digits <- function(x, num_digits = 3) {
   sprintf(paste("%.", num_digits, "f", sep = ""), round(x, num_digits))
 }
-
 
 # Classifier from Witten and Tibshirani (2011) - JRSS B
 Witten_Tibshirani <- function(train_x, train_y, test_x) {
