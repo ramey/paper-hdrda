@@ -28,6 +28,8 @@ data_summary$K[data_summary$author == "nakayama"] <- 5
 rownames(data_summary) <- NULL
 colnames(data_summary)[1:3] <- c("Author", "Year", "N")
 data_summary$Author <- Hmisc:::capitalize(as.character(data_summary$Author))
+data_summary$Author <- with(data_summary, paste0(Author, " et al. (", Year, ")"))
+data_summary <- subset(data_summary, select = -Year)
 print(xtable(data_summary, caption = "Summary of high-dimensional microarray data sets.",
              label = "tab:data-summary", digits = 0), include.rownames = FALSE)
 
@@ -46,7 +48,7 @@ results_tables <- tapply(seq_along(results_summary$q), results_summary$q, functi
 
 
 results_xtables <- lapply(names(results_tables), function(q) {
-  tab_caption <- "The average of the test error rates for the microarray data sets with q = "
-  tab_caption <- paste0(tab_caption, q, ". Standard errors are given in parentheses.")
-  xtable(results_tables[[q]], caption = tab_caption, label = paste0("tab:results-q", q))
+  tab_caption <- "The average of the test error rates for the microarray data sets with $d = "
+  tab_caption <- paste0(tab_caption, q, "$. Approximate standard errors are given in parentheses.")
+  xtable(results_tables[[q]], caption = tab_caption, label = paste0("tab:results-d", q))
 })

@@ -5,16 +5,15 @@ set.seed(42)
 num_cores <- 12
 
 train_pct <- 2/3
-num_iterations <- 50
-data_sets <- c("alon", "burczynski", "chiaretti", "christensen", "gordon",
-               "gravier", "khan", "nakayama", "shipp", "singh", "sorlie", "yeoh")
-q <- c(100, 250, 500, 750, 1000)
+num_iterations <- 500
+data_sets <- c("burczynski", "nakayama", "shipp", "singh")
+d <- c(100, 250, 500, 1000)
 
-sim_config <- expand.grid(data_sets = data_sets, q = q, stringsAsFactors = FALSE)
+sim_config <- expand.grid(data_sets = data_sets, d = d, stringsAsFactors = FALSE)
 
 results <- mclapply(seq_len(nrow(sim_config)), function(i) {
   data_set <- sim_config$data_set[i]
-  q <- sim_config$q[i]
+  d <- sim_config$d[i]
   
   data <- load_microarray(data_set)
   data$x <- as.matrix(data$x)
@@ -31,7 +30,7 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
     test_y <- data$y[rand_split$test]
 
     # Apply Dudoit variable selection
-    dudoit_out <- dudoit(train_x, train_y, test_x, q = q)
+    dudoit_out <- dudoit(train_x, train_y, test_x, q = d)
     train_x <- dudoit_out$train_x
     test_x <- dudoit_out$test_x
 
@@ -54,29 +53,21 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
     grda_out <- try_default(with(cv_out, grda(x = train_x, y = train_y, lambda = lambda, gamma = gamma, prior = prior_probs)), NA)
     grda_errors <- try_default(mean(predict(grda_out, test_x)$class != test_y), NA)
 
-    # DLDA and DQDA
+    # DLDA
     dlda_errors <- try_default(mean(predict(dlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
-    dqda_errors <- try_default(mean(predict(dqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
 
     # Pang, Tong, and Zhao (2009) - Biometrics
     sdlda_errors <- try_default(mean(predict(sdlda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
-    sdqda_errors <- try_default(mean(predict(sdqda(x = train_x, y = train_y, prior = prior_probs), test_x)$class != test_y), NA)
 
     # Tong, Chen, and Zhao (2012) - Bioinformatics
     Tong_out <- try_default(dlda(x = train_x, y = train_y, est_mean = "tong", prior = prior_probs), NA)
     Tong_errors <- try_default(mean(predict(Tong_out, test_x)$class != test_y), NA)
 
-    # Cao, Boitard, and Besse (2011) - BMC Bioinformatics
-    Cao_errors <- try_default(mean(Cao(train_x, train_y, test_x) != test_y), NA)
-
     list(
-      Cao = Cao_errors,
-      dlda = dlda_errors,
-      dqda = dqda_errors,
-      grda = grda_errors,
+      Dudoit = dlda_errors,
+      GRDA = grda_errors,
       Guo = Guo_errors,
-      sdlda = sdlda_errors,
-      sdqda = sdqda_errors,
+      Pang = sdlda_errors,
       Tong = Tong_errors,
       Witten = Witten_errors
       )
@@ -85,7 +76,7 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
   melt_results <- melt(split_results)
   melt_results <- subset(melt_results, select = -L1)
   colnames(melt_results) <- c("Error", "Classifier")
-  cbind(data_set, q, melt_results)
+  cbind(data_set, d, melt_results)
 }, mc.cores = num_cores)
 results <- do.call(rbind, results)
 
