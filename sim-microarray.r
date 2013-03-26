@@ -5,7 +5,7 @@ set.seed(42)
 num_cores <- 12
 
 train_pct <- 2/3
-num_iterations <- 500
+num_iterations <- 1000
 data_sets <- c("burczynski", "nakayama", "shipp", "singh")
 d <- c(100, 250, 500, 1000)
 
