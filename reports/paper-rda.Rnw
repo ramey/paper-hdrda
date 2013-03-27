@@ -38,6 +38,21 @@
 
 \author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
 
+<<setup, include=FALSE, cache=FALSE, echo=FALSE, warning=FALSE>>=
+opts_chunk$set(fig.align = 'default', dev = 'png', message = FALSE, warning = FALSE,
+               cache = FALSE, echo = FALSE)
+  
+setwd("..")
+library(ProjectTemplate)
+load.project()
+
+# Clean up results for display
+results <- na.omit(results)
+results$d <- as.factor(results$d)
+results$data_set <- as.character(results$data_set)
+
+@ 
+
 \begin{document}
 
 \newtheorem{cor}{Corollary}
@@ -228,7 +243,7 @@ Thus far, we have constructed each $\tilde{\bm \Sigma}_k$ in terms of the first 
 
 \section{High-Dimensional Microarray Data Sets}
 
-In this section, we describe four high-dimensional microarray data sets and compare our proposed \emph{GRDA} classifier with five recently proposed classifiers designed for small-sample, high-dimensional data: the \emph{DLDA} classifier from \cite{Dudoit:2002ev}, the shrunken centroids \emph{RDA} (\emph{SCRDA}) classifier from \cite{Guo:2007te}, the shrinkage-based \emph{DLDA} (\emph{SDLDA}) classifier from \cite{Pang:2009ik}, the shrinkage-mean-based DLDA (\emph{SmDLDA}) classifier from \cite{Tong:2012hw}, and the penalized \emph{LDA} (\emph{PLDA}) classifier from \cite{Witten:2011kc}. We did not include the \emph{RDA} classifier from \cite{Friedman:1989tm} in our studies to avoid its excessive computations.  We evaluated the classification performance of each classifier by randomly partitioning the data such that $2/3$ of the observations were allocated as training data and the remaining $1/3$ of the observations were allocated as a test data set. For each random partition, we applied the feature-selection method from \cite{Dudoit:2002ev} to choose the $d$ features having the largest ratio of their between-group to within-group sums of squares from the training data. We then filtered the test data set with the corresponding $d$ features. After training each classifier from the filtered training data, we classified the filtered test data sets and computed the proportion of mislabeled test observations to estimate the classification error rate for each classifier. Repeating this process 500 times, we computed the average of the error-rate estimates for each classifier. We remark that our simulation design avoids the selection bias discussed in \cite{Ambroise:2002fa}.  In Table \ref{tab:data-summary}, we summarize the attributes of each microarray data set.
+In this section, we describe four high-dimensional microarray data sets and compare our proposed \emph{GRDA} classifier with five recently proposed classifiers designed for small-sample, high-dimensional data: the \emph{DLDA} classifier from \cite{Dudoit:2002ev}, the shrunken centroids \emph{RDA} (\emph{SCRDA}) classifier from \cite{Guo:2007te}, the shrinkage-based \emph{DLDA} (\emph{SDLDA}) classifier from \cite{Pang:2009ik}, the shrinkage-mean-based DLDA (\emph{SmDLDA}) classifier from \cite{Tong:2012hw}, and the penalized \emph{LDA} (\emph{PLDA}) classifier from \cite{Witten:2011kc}. We did not include the \emph{RDA} classifier from \cite{Friedman:1989tm} in our studies to avoid its excessive computations.  We evaluated the classification performance of each classifier by randomly partitioning the data such that $2/3$ of the observations were allocated as training data and the remaining $1/3$ of the observations were allocated as a test data set. For each random partition, we applied the feature-selection method from \cite{Dudoit:2002ev} to choose the $d$ features having the largest ratio of their between-group to within-group sums of squares from the training data. We then filtered the test data set with the corresponding $d$ features. After training each classifier from the filtered training data, we classified the filtered test data sets and computed the proportion of mislabeled test observations to estimate the classification error rate for each classifier. Repeating this process 1000 times, we computed the average of the error-rate estimates for each classifier. We remark that our simulation design avoids the selection bias discussed in \cite{Ambroise:2002fa}.  In Table \ref{tab:data-summary}, we summarize the attributes of each microarray data set.
 
 We used version 2.15.1 of the open-source statistical software {\tt R} for the classification study. For each classifier's {\tt R} implementation, we used the default settings with the exception that we explicitly set the prior probabilities as equal. In our {\tt R} implementation of the \emph{GRDA} classifier in the {\tt regdiscrim} package, we set $\alpha_k = 1$, $k = 1, \ldots, K$ for simplicity. We estimated $\lambda$ from a grid of 21 equidistant candidate values between 0 and 1, inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using 10-fold cross-validation \citep{Hastie:2008dt}.
 
@@ -278,100 +293,48 @@ We have provided an implementation of the \emph{GRDA} classifier in the {\tt reg
 
 \clearpage
 
- % latex table generated in R 2.15.1 by xtable 1.7-0 package
- % Sun Mar 24 19:54:37 2013
- \begin{table}[ht]
- \begin{center}
- \begin{tabular}{lrrrl}
-   \hline
- Author & $N$ & $p$ & $K$ & Disease \\
-   \hline
- Burczynski et al. (2006) & 127 & 22283 & 3 & Crohn's Disease \\
-   Nakayama et al. (2001) & 105 & 22283 & 5 & Sarcoma \\
-   Shipp et al. (2002) & 58 & 6817 & 2 & Lymphoma \\
-   Singh et al. (2002) & 102 & 12600 & 2 & Prostate Cancer \\
-    \hline
- \end{tabular}
- \caption{Summary of high-dimensional microarray data sets.}
- \label{tab:data-summary}
- \end{center}
- \end{table}
+<<data_summary, results="asis">>=
+# Table containing a summary of the data sets
+data_summary <- subset(describe_data(), author %in% unique(results$data_set))
+data_summary$K[data_summary$author == "nakayama"] <- 5
+rownames(data_summary) <- NULL
+colnames(data_summary)[1:3] <- c("Author", "Year", "N")
+data_summary$Author <- Hmisc:::capitalize(as.character(data_summary$Author))
+data_summary$Author <- with(data_summary, paste0(Author, " et al. (", Year, ")"))
+data_summary <- subset(data_summary, select = -Year)
+print(xtable(data_summary, caption = "Summary of high-dimensional microarray data sets.",
+             label = "tab:data-summary", digits = 0), include.rownames = FALSE)
 
-% latex table generated in R 2.15.1 by xtable 1.7-0 package
-% Mon Mar 25 07:04:20 2013
-\begin{table}[ht]
-\begin{center}
-\begin{tabular}{lllllll}
-  \hline
-Dataset & Dudoit & GRDA & Guo & Pang & Tong & Witten \\ 
-  \hline
-Burczynski & 0.232 (0.019) & 0.179 (0.017) & 0.513 (0.022) & 0.232 (0.019) & 0.231 (0.019) & 0.232 (0.019) \\ 
-  Nakayama & 0.262 (0.020) & 0.308 (0.021) & 0.586 (0.022) & 0.262 (0.020) & 0.262 (0.020) & 0.278 (0.020) \\ 
-  Shipp & 0.136 (0.015) & 0.106 (0.014) & 0.310 (0.021) & 0.136 (0.015) & 0.136 (0.015) & 0.136 (0.015) \\ 
-  Singh & 0.111 (0.014) & 0.097 (0.013) & 0.338 (0.021) & 0.111 (0.014) & 0.111 (0.014) & 0.111 (0.014) \\ 
-   \hline
-\end{tabular}
-\caption{The average of the test error rates for the microarray data sets with $d = 100$. Approximate standard errors are given in parentheses.}
-\label{tab:results-d100}
-\end{center}
-\end{table}
+@ 
 
-% latex table generated in R 2.15.1 by xtable 1.7-0 package
-% Mon Mar 25 07:04:37 2013
-\begin{table}[ht]
-\begin{center}
-\begin{tabular}{lllllll}
-  \hline
-Dataset & Dudoit & GRDA & Guo & Pang & Tong & Witten \\ 
-  \hline
-Burczynski & 0.244 (0.019) & 0.163 (0.017) & 0.459 (0.022) & 0.244 (0.019) & 0.244 (0.019) & 0.243 (0.019) \\ 
-  Nakayama & 0.244 (0.019) & 0.267 (0.020) & 0.498 (0.022) & 0.244 (0.019) & 0.244 (0.019) & 0.259 (0.020) \\ 
-  Shipp & 0.153 (0.016) & 0.104 (0.014) & 0.188 (0.017) & 0.153 (0.016) & 0.153 (0.016) & 0.154 (0.016) \\ 
-  Singh & 0.135 (0.015) & 0.117 (0.014) & 0.188 (0.017) & 0.135 (0.015) & 0.135 (0.015) & 0.135 (0.015) \\ 
-   \hline
-\end{tabular}
-\caption{The average of the test error rates for the microarray data sets with $d = 250$. Approximate standard errors are given in parentheses.}
-\label{tab:results-d250}
-\end{center}
-\end{table}
 
-% latex table generated in R 2.15.1 by xtable 1.7-0 package
-% Mon Mar 25 07:04:48 2013
-\begin{table}[ht]
-\begin{center}
-\begin{tabular}{lllllll}
-  \hline
-Dataset & Dudoit & GRDA & Guo & Pang & Tong & Witten \\ 
-  \hline
-Burczynski & 0.243 (0.019) & 0.159 (0.016) & 0.429 (0.022) & 0.243 (0.019) & 0.243 (0.019) & 0.243 (0.019) \\ 
-  Nakayama & 0.247 (0.019) & 0.248 (0.019) & 0.465 (0.022) & 0.247 (0.019) & 0.248 (0.019) & 0.261 (0.020) \\ 
-  Shipp & 0.169 (0.017) & 0.097 (0.013) & 0.119 (0.015) & 0.169 (0.017) & 0.169 (0.017) & 0.170 (0.017) \\ 
-  Singh & 0.174 (0.017) & 0.125 (0.015) & 0.155 (0.016) & 0.174 (0.017) & 0.174 (0.017) & 0.174 (0.017) \\ 
-   \hline
-\end{tabular}
-\caption{The average of the test error rates for the microarray data sets with $d = 500$. Approximate standard errors are given in parentheses.}
-\label{tab:results-d500}
-\end{center}
-\end{table}
+<<microarray_results, results="asis">>=
+results_summary <- ddply(results, .(data_set, d, Classifier), summarize,
+                         Avg_Error = mean(Error),
+                         SE_Error = sqrt(mean(Error) * (1 - mean(Error)) / length(Error)))
 
-% latex table generated in R 2.15.1 by xtable 1.7-0 package
-% Mon Mar 25 07:05:01 2013
-\begin{table}[ht]
-\begin{center}
-\begin{tabular}{lllllll}
-  \hline
-Dataset & Dudoit & GRDA & Guo & Pang & Tong & Witten \\ 
-  \hline
-Burczynski & 0.249 (0.019) & 0.168 (0.017) & 0.381 (0.022) & 0.249 (0.019) & 0.249 (0.019) & 0.249 (0.019) \\ 
-  Nakayama & 0.237 (0.019) & 0.238 (0.019) & 0.460 (0.022) & 0.237 (0.019) & 0.237 (0.019) & 0.246 (0.019) \\ 
-  Shipp & 0.196 (0.018) & 0.106 (0.014) & 0.095 (0.013) & 0.196 (0.018) & 0.195 (0.018) & 0.198 (0.018) \\ 
-  Singh & 0.224 (0.019) & 0.140 (0.016) & 0.142 (0.016) & 0.224 (0.019) & 0.224 (0.019) & 0.224 (0.019) \\ 
-   \hline
-\end{tabular}
-\caption{The average of the test error rates for the microarray data sets with $d = 1000$. Approximate standard errors are given in parentheses.}
-\label{tab:results-d1000}
-\end{center}
-\end{table}
+# Tables containing the classification results for each value of 'q'
+results_summary$data_set <- Hmisc:::capitalize(results_summary$data_set)
+results_summary$d <- as.factor(results_summary$d)
+results_summary$Avg_Error <- round_digits(results_summary$Avg_Error, 3)
+results_summary$SE_Error <- round_digits(results_summary$SE_Error, 3)
+results_summary$Error <- with(results_summary, paste0(Avg_Error, " (", SE_Error, ")"))
+results_summary <- subset(results_summary, select = -c(Avg_Error, SE_Error))
+colnames(results_summary) <- c("Dataset", "d", "Classifier", "Error")
+
+results_tables <- tapply(seq_along(results_summary$d), results_summary$d, function(i) {
+  dcast(results_summary[i, ], Dataset ~ Classifier, value.var = "Error")
+})
+
+results_xtables <- lapply(names(results_tables), function(d) {
+  tab_caption <- "The average of the test error rates for the microarray data sets with $d = "
+  tab_caption <- paste0(tab_caption, d, "$. Approximate standard errors are given in parentheses.")
+  xtable(results_tables[[d]], caption = tab_caption, label = paste0("tab:results-d", d))
+})
+
+lapply(results_xtables, print, include.rownames = FALSE)
+
+@ 
 
 
 \end{document} 
