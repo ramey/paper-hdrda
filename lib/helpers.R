@@ -124,21 +124,18 @@ load_microarray <- function(dataset) {
   data_out
 }
 
-# Variable selection method from Dudoit et al.
-dudoit <- function(train_x, train_y, test_x = NULL, q) {
+#' Variable selection method from Dudoit et al.
+#'
+#' @param train_x data matrix of training training observations
+#' @param train_y vector of training labels for the training observations
+#' @return vector containing the Dudoit variable scores in descending order.
+#' The largest scores indicate that the variables should be kept.
+dudoit <- function(train_x, train_y) {
   library('multtest')
 
   F_stat <- mt.teststat(t(train_x), train_y, test = "f")
-  top_q_genes <- rev(order(F_stat))[seq_len(q)]
 
-  out <- list()
-  out$train_x <- train_x[, top_q_genes]
-
-  if (!is.null(test_x)) {
-    out$test_x <- test_x[, top_q_genes]
-  }
-
-  out
+  rev(order(F_stat))
 }
 
 # Classifier from Clemmensen, Hastie, Witten and Ersbøll (2012) - Technometrics
