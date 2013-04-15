@@ -65,6 +65,69 @@ round_digits <- function(x, num_digits = 3) {
   sprintf(paste("%.", num_digits, "f", sep = ""), round(x, num_digits))
 }
 
+#' Generates a 2x2 rotation matrix using the given angle
+#' #'
+#' #' @param theta numeric value giving the angle of rotation
+#' #' @return 2x2 rotation matrix
+rotation_matrix <- function(theta) {
+  matrix(c(cos(theta), -sin(theta), sin(theta), cos(theta)), nrow = 2, byrow = TRUE)
+}
+
+#' Creates a ggplot2 object containing the contours of the GRDA classifier as a
+#' function of the tuning parameter lambda
+#'
+#' @param lambda numeric value between 0 and 1, inclusively.
+#' @return a \code{ggplot2} object
+rda_contours <- function(lambda) {
+  mu1 <- c(-2, -2)
+  Sigma1 <- 3 * diag(2)
+
+  mu2 <- c(3, 3)
+  Sigma2 <- diag(2)
+  Sigma2 <- 3.5 * rotation_matrix(-pi/2) %*% (0.9^abs(row(Sigma2) - col(Sigma2))) %*% t(rotation_matrix(-pi/2))
+
+  mu3 <- c(4, -2)
+  Sigma3 <- diag(2)
+  Sigma3 <- 1 * (-0.5)^abs(row(Sigma3) - col(Sigma3))
+
+  mu4 <- c(-3, 3)
+  Sigma4 <- diag(2)
+  Sigma4 <- 0.5 * rotation_matrix(-pi/8) %*% (0.9)^abs(row(Sigma4) - col(Sigma4)) %*% t(rotation_matrix(-pi/8))
+
+  mu5 <- c(1, 1)
+  Sigma5 <- 0.1 * diag(2)
+
+  Sigma_pool <- 0.2 * (Sigma1 + Sigma2 + Sigma3 + Sigma4 + Sigma5)
+
+  Sigma1 <- (1 - lambda) * Sigma1 + lambda * Sigma_pool
+  Sigma2 <- (1 - lambda) * Sigma2 + lambda * Sigma_pool
+  Sigma3 <- (1 - lambda) * Sigma3 + lambda * Sigma_pool
+  Sigma4 <- (1 - lambda) * Sigma4 + lambda * Sigma_pool
+  Sigma5 <- (1 - lambda) * Sigma5 + lambda * Sigma_pool
+
+  contours1 <- mixtools:::ellipse(mu = mu1, sigma = Sigma1, draw = FALSE)
+  contours2 <- mixtools:::ellipse(mu = mu2, sigma = Sigma2, draw = FALSE)
+  contours3 <- mixtools:::ellipse(mu = mu3, sigma = Sigma3, draw = FALSE)
+  contours4 <- mixtools:::ellipse(mu = mu4, sigma = Sigma4, draw = FALSE)
+  contours5 <- mixtools:::ellipse(mu = mu5, sigma = Sigma5, draw = FALSE)
+
+  contours <- list(contours1, contours2, contours3, contours4, contours5)
+  contours <- lapply(seq_along(contours), function(k) {
+    cbind.data.frame(X = contours[[k]], k)
+  })
+  contours <- do.call(rbind.data.frame, contours)
+  colnames(contours) <- c("X1", "X2", "Population")
+  contours$Population <- factor(contours$Population)
+  contours$lambda <- lambda
+
+  p <- ggplot(contours, aes(x = X1, y = X2, colour = Population))
+  p <- p + geom_path(size = 1.5, linetype = 2)
+  p <- p + facet_grid(. ~ lambda, labeller = label_bquote(lambda == .(x)))
+  p <- p + theme_bw() + xlab("") + ylab("") + theme(legend.position = "none")
+  p <- p + scale_x_continuous(breaks = NULL) + scale_y_continuous(breaks = NULL)
+  p  + theme(strip.text.x = element_text(size = 18))
+}
+
 # Classifier from Witten and Tibshirani (2011) - JRSS B
 Witten_Tibshirani <- function(train_x, train_y, test_x) {
   # Uses cross-validation to select the best lambda and K

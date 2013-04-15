@@ -34,22 +34,71 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-\title{A Generalization of Regularized Discriminant Analysis for High-Dimensional Classification}
+\title{Another Look at Regularized Discriminant Analysis for High-Dimensional Classification}
 
 \author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
 
-<<setup, include=FALSE, cache=FALSE, echo=FALSE, warning=FALSE>>=
-opts_chunk$set(fig.align = 'default', dev = 'png', message = FALSE, warning = FALSE,
-               cache = FALSE, echo = FALSE)
+<<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
+# Round digits throughout document including \Sexpr statements.
+# See Yihui's response here:
+# http://stackoverflow.com/questions/11062497/how-to-avoid-using-round-in-every-sexpr
+options(digits = 3)
+
+opts_chunk$set(fig.align = 'default', dev = 'png', message = FALSE,
+               warning = FALSE, cache = TRUE, echo = FALSE, autodep = TRUE,
+               fig.width = 10, fig.height = 10, out.width = "\\linewidth")
+@ 
   
+<<setup>>=
 setwd("..")
 library(ProjectTemplate)
 load.project()
 
-# Clean up results for display
-results <- na.omit(results)
-results$d <- as.factor(results$d)
-results$data_set <- as.character(results$data_set)
+results <- lapply(results, function(res) {
+  res <- lapply(res, function(res_d) {
+    errors <- do.call(cbind, res_d$errors)
+    res_d[["errors"]] <- NULL
+    cbind(do.call(cbind, res_d), errors)
+  })
+  do.call(rbind, res)
+})
+results <- data.frame(do.call(rbind, results), stringsAsFactors = FALSE)
+
+results$lambda <- as.numeric(results$lambda)
+results$gamma <- as.numeric(results$gamma)
+results$Dudoit <- as.numeric(results$Dudoit)
+results$GRDA <- as.numeric(results$GRDA)
+results$Guo <- as.numeric(results$Guo)
+results$Pang <- as.numeric(results$Pang)
+results$Tong <- as.numeric(results$Tong)
+results$Witten <- as.numeric(results$Witten)
+
+results$d <- factor(results$d, labels = sort(unique(as.numeric(results$d))))
+
+# Summary of the classification error rates for each data set and number of
+# variables selected, d.
+error_rates <- subset(results, select = -c(lambda, gamma))
+m_error <- melt(error_rates, variable.name = "Classifier", value.name = "Error")
+error_rates <- ddply(m_error, .(data_set, d, Classifier), plyr:::summarize,
+                     Avg_Error = mean(Error), Num_Reps = length(Error))
+error_rates <- ddply(error_rates, .(data_set, d, Classifier), transform,
+                     SE_Error = sqrt(Avg_Error * (1 - Avg_Error) / Num_Reps))
+error_rates <- subset(error_rates, select = -Num_Reps)
+
+# Candidate values of tuning parameters.
+seq_lambda <- seq(0, 1, by = 0.05)
+seq_gamma <- 10^seq.int(-1, 5)
+
+# Summary of the optimal tuning-parameter estimates for each data set and number
+# of variables selected, d.
+grda_optimal <- subset(results, select = c(data_set, d, lambda, gamma))
+grda_optimal$lambda <- factor(grda_optimal$lambda, levels = seq_lambda)
+grda_optimal$gamma <- factor(grda_optimal$gamma, levels = seq_gamma)
+
+grda_optimal <- ddply(grda_optimal, .(data_set, d), function(x) {
+  x <- subset(x, select = c(lambda, gamma))
+  melt(table(x))
+})
 
 @ 
 
@@ -77,19 +126,16 @@ proposed, often with strict covariance assumptions or eigenvalue adjustments to
 ensure that the classifiers are well-posed. Here, we consider an improved
 version of the regularized discriminant analysis (\emph{RDA}) classifier
 popularized by \cite{Friedman:1989tm}, which requires computationally expensive
-matrix operations and involves a time-consuming model-selection procedure,
-making the \emph{RDA} classifier impractical for high-dimensional data. We
+matrix operations and involves a time-consuming model-selection procedure. We
 propose a novel modification of the \emph{RDA} (\emph{GRDA}) classifier that
-incorporates a more general covariance-matrix regularization approach that
-includes several proposed sparse and regularization methods as special
-cases. Furthermore, we overcome the computational shortcomings of the \emph{RDA}
-classifier by integrating a novel dimension-reduction technique that enables a
-computationally efficient model-selection procedure. Moreover, we demonstrate
-with several high-dimensional microarray data sets that our proposed classifier
-is competitive and often superior to several recently proposed sparse and
-regularized classifiers in terms of classification accuracy. Finally, we provide
-an implementation of the \emph{GRDA} classifier in the {\tt regdiscrim} R
-package, available on CRAN.
+provides a straightforward interpration and employs a novel dimension-reduction
+technique to enable a computationally efficient model-selection procedure, thus
+overcoming the computational shortcomings of the \emph{RDA}
+classifier. Moreover, we demonstrate with several high-dimensional microarray
+data sets that our proposed classifier is competitive and often superior to
+several recently proposed sparse and regularized classifiers in terms of
+classification accuracy. Finally, we provide an implementation of the
+\emph{GRDA} classifier in the {\tt sparsediscrim} R package, available on CRAN.
 
 \end{abstract}
 
@@ -137,7 +183,7 @@ estimators from the \emph{LDA} and \emph{QDA} classifiers and has additionally
 incorporated a covariance-matrix shrinkage term to ensure that the \emph{RDA}
 classifier is well-posed. \cite{Friedman:1989tm} has shown that the \emph{RDA}
 classifier can attain improved classification accuracy, compared to the
-\emph{LDA} and \emph{QDA} classifiers when $p > N$. However, in its original
+\emph{LDA} and \emph{QDA} classifiers when $p < N$. However, in its original
 form, the \emph{RDA} classifier is impractical when $p \gg N$ because the
 \emph{RDA} decision rule requires the calculation of the inverses and
 determinants of the $p \times p$ covariance-matrix estimators for each
@@ -175,10 +221,7 @@ selection. In fact, we show that the inverse and determinants can be reduced to
 calculations of $n_k \times n_k$ matrices, where $n_k$ is the sample size of the
 $k$th class, $k = 1, \ldots, K$. This reduction in calculation is clearly
 advantageous because $n_k$ is often quite small, say, 15--20, in microarray data
-sets. Thus, through a dimension-reduction technique we demonstrate that the
-calculation of the \emph{RDA} decision rule involving inverses and determinants
-of extremely large covariance matrices is equivalent to a decision rule
-involving inverses and determinants for much lower-dimensional matrices.
+sets.
 
 In addition to the improvement in computational performance, we demonstrate that
 our \emph{GRDA} classifier is competitive with and often superior to several
@@ -355,11 +398,15 @@ rank$(\widehat{\bm\Sigma}_k)$ to rank$(\widehat{\bm\Sigma})$ for $0 < \lambda
 $K - 1$ classes do not contribute to the estimation of $\bm \Sigma_k$,
 corresponding to $\widehat{\bm \Sigma}_k$. Furthermore, if $\lambda = 1$, the
 weights in \eqref{eq:sig-lambda-alternative2} reduce to $1/N$, corresponding to
-$\widehat{\bm\Sigma}$. For brevity, for $\lambda = 1$, we define $\bm X =
+$\widehat{\bm\Sigma}$. In Figure \ref{fig:grda-contours} we demonstrate the
+effect of $\lambda$ on the contours of five multivariate normal populations with
+unequal covariance matrices. For brevity, when $\lambda = 1$, we define $\bm X =
 [\sqrt{c_{1k}(1)} \bm x_1', \ldots, \sqrt{c_{Nk}(1)} \bm x_N']'$ such that
 $\widehat{\bm \Sigma} = \bm X' \bm X$. Similarly, for $\lambda = 0$, we define
 $\bm X_k = [\sqrt{c_{1k}(0)} \bm x_1', \ldots, \sqrt{c_{Nk}(0)} \bm x_N']'$ such
 that $\widehat{\bm \Sigma}_k = \bm X_k' \bm X_k$, $k = 1, \ldots, K$.
+
+\[ \left[\text{Figure \ref{fig:grda-contours} goes about here }\right]\]
 
 As we have discussed, several eigenvalue adjustment methods have been proposed
 to increase eigenvalues (approximately) equal to 0. Here, we define a more
@@ -483,16 +530,14 @@ Let $\bm U_2$ be defined as above. Then, for all $\bm x \in \mathbb{R}_{p \times
 k' \le K$.
 \end{lemma}
 \begin{proof}
-Let $\bm x \in \mathbb{R}_{p \times 1}$, and suppose that $1 \le k, k' \le
-K$. Then, $\xbar_k - \xbar_{k'} = \sum_{i=1}^N \beta_i \bm x_i$, where $\beta_i
-= (n_k n_{k'})^{-1} \{ I(y_i = k) n_{k'} - I(y_i = k') n_k \}$.  Then, $\bm U_2'
-(\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$ is equivalent to $\bm
-U_2'(\xbar_k - \xbar_{k'}) = \sum_{i=1}^N \beta_i \bm U_2' \bm x_i$. Recall that
-$\bm U_2 \in \mathcal{N}(\widehat{\bm \Sigma})$, which implies that $\bm U_2'
-\in \mathcal{C}(\widehat{\bm \Sigma})^{\perp}$ \citep[Lemma
+Let $\bm x \in \mathbb{R}_{p \times 1}$, and suppose that $1 \le k, k' \le K$.
+Recall that $\bm U_2 \in \mathcal{N}(\widehat{\bm \Sigma})$, which implies that
+$\bm U_2' \in \mathcal{C}(\widehat{\bm \Sigma})^{\perp}$ \citep[Lemma
   1.2.5]{Kollo:2005vp}. Now, because $\bm x_i \in \mathcal{C}(\widehat{\bm
-  \Sigma})$, $i = 1, \ldots, N$, $\bm U_2' \bm x_i = \bm 0_{(p-q) \times 1}$,
-which implies that $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$.
+  \Sigma})$, $i = 1, \ldots, N$, $\bm U_2' \bm x_i = \bm 0_{(p-q) \times 1}$.
+Hence, $\bm 0_{(p-q) \times 1} = \sum_{i=1}^N \beta_i \bm U_2'\bm x_i = \bm U_2'(\xbar_k -
+\xbar_{k'})$, where $\beta_i = (n_k n_{k'})^{-1} \{ I(y_i = k) n_{k'} - I(y_i =
+k') n_k \}$. Therefore, $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$.
 \end{proof}
 
 We now present our main result, where we decompose the \emph{GRDA} decision rule
@@ -608,7 +653,7 @@ We used version 3.0.0 of the open-source statistical software {\tt R} for the
 classification study. For each classifier's {\tt R} implementation, we used the
 default settings with the exception that we explicitly set the prior
 probabilities as equal. In our {\tt R} implementation of the \emph{GRDA}
-classifier in the {\tt regdiscrim} package, we set $\alpha_k = 1$, $k = 1,
+classifier in the {\tt sparsediscrim} package, we set $\alpha_k = 1$, $k = 1,
 \ldots, K$ for simplicity. We estimated $\lambda$ from a grid of 21 equidistant
 candidate values between 0 and 1, inclusively. Similarly, we estimated $\gamma$
 from a grid consisting of the values $10^{-1}, \ldots, 10^4$, and $10^5$. We
@@ -676,9 +721,9 @@ to $d = 100, \ldots, 1000$, similar to the values of $d$ considered by
 $d$, we applied each value of $d$ considered to the same random allocation of
 training and test data. Hence, for a given random partition, the set of features
 selected for a small value of $d$ is a proper subset of the features selected
-for a larger value of $d$. We report the error-rate estimates along with
-approximate standard errors in parentheses in Tables \ref{tab:results-d100} --
-\ref{tab:results-d1000} along with the reduced dimension $d$.
+for a larger value of $d$. We report the average of the error-rate estimates for
+each value of $d$ in Figure \ref{fig:error-rates}. Approximate standard errors
+were no greater than \Sexpr{max(error_rates[["SE_Error"]])}.
 
 The \emph{GRDA} classifier was superior in classification performance for the
 majority of the simulations. For the Burczysnki, Shipp, and Singh data sets, the
@@ -686,7 +731,7 @@ majority of the simulations. For the Burczysnki, Shipp, and Singh data sets, the
 examined. For the Nakayama data set, the \emph{GRDA} classifier was outperformed
 by the Dudoit, Pang, and Tong classifiers for small values of $d$ but attained
 classification rates superior to its competitors for larger values of
-$d$. Furthermore, Figure \textbf{TODO} emphasizes two strengths of the
+$d$. Furthermore, Figure \ref{fig:error-rates} emphasizes two strengths of the
 \emph{GRDA} classifier: reliability of the classifier for small $d$ and
 stability of the classifier for large $d$. In contrast to the other classifiers,
 the \emph{GRDA} classifier exhibited less variability its misclassification
@@ -716,67 +761,104 @@ advise that practioners be aware of the necessity to filter a large number of
 features before employing these methods, lest their classification performance
 can degrade.
 
-The popular classifier from Guo is most competitive over large values of $d$ for
-the Shipp and Singh data sets. However, for the Burczynski and Nakayama data
-sets, the implementation of Guo's method in the {\tt rda} package often
-classified every test observation into a single class, thus yielding larger
-error rates than its competitors. Furthermore, the Guo classifier exhibited
-unreliable classification performance for smaller values of $d$. The Guo
-classifier required a larger subset of the features to perform competitively in
-our study.
+The popular Guo classifier is most competitive over large values of $d$ for the
+Shipp and Singh data sets. However, for the Burczynski and Nakayama data sets,
+the implementation of the Guo method in the {\tt rda} package often classified
+every test observation into a single class, thus yielding larger error rates
+than its competitors. Furthermore, the Guo classifier exhibited unreliable
+classification performance for smaller values of $d$. The Guo classifier
+required a larger subset of the features to perform competitively in our study.
 
-As seen in Figure ?, the \emph{GRDA} classifier exhibits an interesting bathtub
-shape in selection of the lambda tuning parameter through cross-validation. (Not
-sure what else to write here.)   
+\[ \left[\text{Figure \ref{fig:error-rates} goes about here }\right]\]
 
+Next, we examine the optimal estimates of the tuning parameters for the
+\emph{GRDA} classifier. For brevity, we include only a graphical summary of the
+optimal estimates of $\lambda$ for the Shipp data set in Figure
+\ref{fig:optimal-shipp}. Similar figures for the other three data sets can be
+found in the Supplementary Information. In Figure \ref{fig:optimal-shipp}, the
+distribution of the optimal values of $\lambda$ selected through
+cross-validation has a notable interesting bathtub shape, resembling a Beta
+distribution with shape parameters $1/2$ and $1/2$. Specifically, the optimal
+values of $\lambda$ are typically near 0 or near 1, corresponding to the
+\emph{QDA} and \emph{LDA} classifiers, respectively. We noticed a similar
+distribution of optimal values of $\lambda$ for the other three data sets.
 
-\[ \left[\text{Table 2 goes about here }\right]\]
+For the Shipp data set with smaller values of $d$, the range of optimal values
+of $\lambda$ was typically no larger than 0.05, indicating there were a large
+number of training data sets for which we can safely assume the covariance
+matrices are unequal or nearly unequal. As $d$ increased, the majority of the
+optimal values of $\lambda$ were selected as unity, thereby an increased number
+of variables resulted in the \emph{GRDA} classifier preferring the more
+parsimonious assumption of equal covariance matrices. In this instance we can
+see the flexibility of the \emph{GRDA} classifier to employ the more realistic
+assumption that the class covariance matrices are unequal, but if optimal, we
+can employ the more parsimonious \emph{LDA} classifier as a special case.
 
-\[ \left[\text{Table 3 goes about here }\right]\]
+\[ \left[\text{Figure \ref{fig:optimal-shipp} goes about here }\right]\]
 
-\[ \left[\text{Table 4 goes about here }\right]\]
-
-\[ \left[\text{Table 5 goes about here }\right]\]
 
 \section{Discussion}
 
 The analysis of high-dimensional microarray data sets is important to modern
 biomedical studies and presents challenges with supervised classification
 because the number of gene expressions greatly outnumbers the number of
-collected responses. Consequently, regularization techniques are often employed
-to stabilize popular classifiers for improved classification performance. We
-have provided a generalization of the well-known \emph{RDA} classifier from
-\cite{Friedman:1989tm}, aimed for small-sample, high-dimensional
-classification. The covariance-matrix regularization employed in the \emph{GRDA}
-classifier includes a large family of shrinkage methods. Our formulation of the
-\emph{GRDA} classifier in terms of the nonzero eigenvalues of the pooled sample
-covariance matrix indicates that eigenvalue-adjustment methods applied to the
-\emph{LDA} classifier explains the similiarities in classification accuracy of
-several regularization methods applied to the \emph{LDA} classifier reported by
-\cite{Ramey:2013ji} in a high-dimensional classification study. We have provided
-an invariance property that extends results of \cite{Ji:2008wp} and
-\cite{Ye:2006jm}, who have provided a similar invariance property for the
-\emph{LDA} decision rule.
+collected responses. Consequently, several variants of the well-known \emph{LDA}
+classifier have been proposed by employing for improved classification
+performance. However, the \emph{LDA} classifier includes the strong assumption
+that the covariance matrices of each class are equal. Ideally, we could model
+the class covariance matrices as unrestricted and unequal in the \emph{QDA}
+classifier, but it is well known to have a large number of parameters that must
+be estimated and require a large number of samples, which are often unavailable
+in the high-dimensional setting. With this mind, \cite{Friedman:1989tm} proposed
+the \emph{RDA} classifier as a compromise between the \emph{LDA} and \emph{QDA}
+classifiers, controlling the amount of pooling of the individual class
+covariance-matrix estimators using the tuning parameter $\lambda$. However,
+despite its success for data sets where $p > N$, the \emph{RDA} classifier
+requires excessive calculations and a time-consuming model selection.
 
-We have provided an implementation of the \emph{GRDA} classifier in the {\tt
-  regdiscrim} R package, available on CRAN. Our implementation facilitates a
-rapid classification of high-dimensional data by employing the novel results
-provided in this paper. Moreover, our 10-fold cross-validation procedure
-typically requires a couple of seconds for data sets having large $p$. When
+With this in mind, we have adapted the \emph{RDA} classifier for usage with
+modern small-sample, high-dimensional data sets. Our model formulation
+facilitates a rapid classification of high-dimensional data by employing a novel
+dimension reduction technique. Moreover, our 10-fold cross-validation procedure
+typically requires a small runtime for data sets having large $p$. When
 preliminary variable selection is applied to the data as we performed in our
 classification study, the time to perform model selection is nearly
 instantaneous, confirming the computational complexity reported regarding the
-operations employed in the \emph{GRDA} classifier.
+operations employed in the \emph{GRDA} classifier. Additionally, we have
+provided an implementation of the \emph{GRDA} classifier in the {\tt
+  sparsediscrim} R package that is easy to use and available on CRAN.
 
-Although several variants of the \emph{LDA} classifier have been proposed for
-high-dimensional, classification, the \emph{QDA} classifier has largely been
-ignored, in part due to the large number of parameters that must be
-estimated. Our proposed classifier ...
+We have parameterized the covariance-matrix regularization employed in the
+\emph{GRDA} classifier to include a large family of shrinkage methods, such as
+the methods from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and a wide variety
+of other shrinkage methods studied by \cite{Ramey:2013ji} and
+\cite{Xu:2009fl}. Our formulation of the \emph{GRDA} classifier in terms of the
+nonzero eigenvalues of the pooled sample covariance matrix indicates that
+eigenvalue-adjustment methods applied to the \emph{LDA} classifier explains the
+similiarities in classification accuracy of several regularization methods
+applied to the \emph{LDA} classifier reported by \cite{Ramey:2013ji} in a
+high-dimensional classification study. We have provided an invariance property
+that extends results of \cite{Ji:2008wp} and \cite{Ye:2006jm}, who have provided
+a similar invariance property for the \emph{LDA} decision rule. Additionally,
+our model formulation improves the interpretation of the \emph{RDA} classifier
+by explicitly defining the covariance-matrix estimator so that each of the $N$
+observations contributes to the estimation of the individual class covariance
+matrices.
 
-Our formulation of covariance-matrix regularization employed in the \emph{GRDA}
-classifier includes a large family of shrinkage methods, such as the methods
-from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and a wide variety of other
-shrinkage methods studied by \cite{Ramey:2013ji} and \cite*{Xu:2009fl}.
+In our simulation study, we compared the \emph{GRDA} classifier to several
+recently proposed classifiers, including the Dudoit, Pang, Tong, and Guo
+classifiers, each of which assumes independence of the features conditional on
+class membership. Despite the rapid computational performance of diagonal
+classifiers and the reduction in the number of parameters to estimate,
+\cite{Mai:2012bf} have noted that diagonal classifiers can often yield inferior
+classification performance to other classification methods. We have shown that
+our proposed \emph{GRDA} classifier often yields superior classification
+accuracy to the diagonal classifiers considered, confirming the assertion of
+\cite{Mai:2012bf}. Furthermore, the \emph{GRDA} classifier is able to compete
+with the diagonal classifiers in terms of speed by incorporating a novel
+dimension-reduction technique. Although the diagonal classifiers are clearly
+faster to compute, the differences in runtime for small-sample, high-dimensional
+data sets is hardly noticeable.
 
 
 \bibliographystyle{plainnat}
@@ -798,34 +880,46 @@ print(xtable(data_summary, caption = "Summary of high-dimensional microarray dat
 
 @ 
 
-
-<<microarray_results, results="asis">>=
-results_summary <- ddply(results, .(data_set, d, Classifier), summarize,
-                         Avg_Error = mean(Error),
-                         SE_Error = sqrt(mean(Error) * (1 - mean(Error)) / length(Error)))
-
-# Tables containing the classification results for each value of 'q'
-results_summary$data_set <- Hmisc:::capitalize(results_summary$data_set)
-results_summary$d <- as.factor(results_summary$d)
-results_summary$Avg_Error <- round_digits(results_summary$Avg_Error, 3)
-results_summary$SE_Error <- round_digits(results_summary$SE_Error, 3)
-results_summary$Error <- with(results_summary, paste0(Avg_Error, " (", SE_Error, ")"))
-results_summary <- subset(results_summary, select = -c(Avg_Error, SE_Error))
-colnames(results_summary) <- c("Dataset", "d", "Classifier", "Error")
-
-results_tables <- tapply(seq_along(results_summary$d), results_summary$d, function(i) {
-  dcast(results_summary[i, ], Dataset ~ Classifier, value.var = "Error")
-})
-
-results_xtables <- lapply(names(results_tables), function(d) {
-  tab_caption <- "The average of the test error rates for the microarray data sets with $d = "
-  tab_caption <- paste0(tab_caption, d, "$. Approximate standard errors are given in parentheses.")
-  xtable(results_tables[[d]], caption = tab_caption, label = paste0("tab:results-d", d))
-})
-
-lapply(results_xtables, print, include.rownames = FALSE)
-
+\begin{figure}
+<<grda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
+rda_contours(lambda = 0)
+rda_contours(lambda = 1/4)
+rda_contours(lambda = 3/4)
+rda_contours(lambda = 1)
 @ 
+\caption{Contours of five multivariate normal populations as a function of the
+  pooling parameter $\lambda$.}
+\label{fig:grda-contours}
+\end{figure}
+
+\begin{figure}
+<<error_rates>>=
+error_rates$data_set <- Hmisc:::capitalize(error_rates$data_set)
+p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
+p <- p + geom_line(aes(color = Classifier, linetype = Classifier), size = 1.5)
+p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
+p <- p + xlab("Number of Variables Selected") + ylab("Average Error Rate")
+p
+@ 
+\caption{Average error-rate estimates of the competing classifiers as a function
+  of $d$. Approximate standard errors are no greater than \Sexpr{max(error_rates[["SE_Error"]])}.}
+\label{fig:error-rates}
+\end{figure}
+
+\begin{figure}
+<<optimal_estimates>>=
+grda_optimal$lambda <- factor(grda_optimal$lambda)
+grda_optimal$gamma <- factor(grda_optimal$gamma)
+p <- ggplot(subset(grda_optimal, data_set == "shipp" & d %in% c(100, 500, 1000)), aes(lambda))
+p <- p + geom_bar(aes(fill = gamma, weight = value))
+p <- p + facet_grid(d ~ .) + theme_bw()
+p
+@ 
+\caption{Counts of the optimal tuning-parameter estimates for the \emph{GRDA}
+  classifier for the Shipp data set for $d = 100$, $500$, and $1000$.}
+\label{fig:optimal-shipp}
+\end{figure}
+
 
 
 \end{document} 
