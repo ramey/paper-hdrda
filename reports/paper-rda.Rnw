@@ -67,7 +67,7 @@ results <- data.frame(do.call(rbind, results), stringsAsFactors = FALSE)
 results$lambda <- as.numeric(results$lambda)
 results$gamma <- as.numeric(results$gamma)
 results$Dudoit <- as.numeric(results$Dudoit)
-results$GRDA <- as.numeric(results$GRDA)
+results$HDRDA <- as.numeric(results$HDRDA)
 results$Guo <- as.numeric(results$Guo)
 results$Pang <- as.numeric(results$Pang)
 results$Tong <- as.numeric(results$Tong)
@@ -91,11 +91,11 @@ seq_gamma <- 10^seq.int(-1, 5)
 
 # Summary of the optimal tuning-parameter estimates for each data set and number
 # of variables selected, d.
-grda_optimal <- subset(results, select = c(data_set, d, lambda, gamma))
-grda_optimal$lambda <- factor(grda_optimal$lambda, levels = seq_lambda)
-grda_optimal$gamma <- factor(grda_optimal$gamma, levels = seq_gamma)
+hdrda_optimal <- subset(results, select = c(data_set, d, lambda, gamma))
+hdrda_optimal$lambda <- factor(hdrda_optimal$lambda, levels = seq_lambda)
+hdrda_optimal$gamma <- factor(hdrda_optimal$gamma, levels = seq_gamma)
 
-grda_optimal <- ddply(grda_optimal, .(data_set, d), function(x) {
+hdrda_optimal <- ddply(hdrda_optimal, .(data_set, d), function(x) {
   x <- subset(x, select = c(lambda, gamma))
   melt(table(x))
 })
@@ -119,23 +119,23 @@ grda_optimal <- ddply(grda_optimal, .(data_set, d), function(x) {
  
 A reliable supervised classification of tumors from gene expression microarray
 data is essential for successful diagnosis and treatment of diseases such as
-cancer, but the analysis of microarray data often presents difficult challenges
-because the number of gene expression levels is typically much greater than the
-sample size. Consequently, several sparse and regularized classifiers have been
-proposed, often with strict covariance assumptions or eigenvalue adjustments to
-ensure that the classifiers are well-posed. Here, we consider an improved
-version of the regularized discriminant analysis (\emph{RDA}) classifier
-popularized by \cite{Friedman:1989tm}, which requires computationally expensive
-matrix operations and involves a time-consuming model-selection procedure. We
-propose a novel modification of the \emph{RDA} (\emph{GRDA}) classifier that
-provides a straightforward interpration and employs a novel dimension-reduction
-technique to enable a computationally efficient model-selection procedure, thus
-overcoming the computational shortcomings of the \emph{RDA}
-classifier. Moreover, we demonstrate with several high-dimensional microarray
-data sets that our proposed classifier is competitive and often superior to
-several recently proposed sparse and regularized classifiers in terms of
-classification accuracy. Finally, we provide an implementation of the
-\emph{GRDA} classifier in the {\tt sparsediscrim} R package, available on CRAN.
+cancer; however, the analysis of microarray data often presents difficult
+challenges because the number of gene expression levels is typically much
+greater than the sample size. Consequently, several sparse and regularized
+classifiers have been proposed, often with strict covariance assumptions or
+eigenvalue adjustments to ensure that the classifiers are well-posed. Here, we
+consider an improved version of the regularized discriminant analysis
+(\emph{RDA}) classifier popularized by \cite{Friedman:1989tm}. That is, we
+propose the high-dimensional \emph{RDA} (\emph{HDRDA}) classifier, a novel
+modification of the \emph{RDA} classifier, that provides a straightforward
+interpretation and employs a new dimension-reduction technique to enable a
+computationally efficient model-selection procedure, thus overcoming the
+computational shortcomings of the \emph{RDA} classifier for high-dimensional
+data. Moreover, we demonstrate with several high-dimensional microarray data
+sets that our proposed classifier is competitive and often superior to several
+recently proposed sparse and regularized classifiers in terms of classification
+accuracy. Finally, we provide an implementation of the \emph{HDRDA} classifier in
+the {\tt sparsediscrim} R package, available on CRAN.
 
 \end{abstract}
 
@@ -200,15 +200,15 @@ combination of the covariance-matrix estimators employed in the \emph{LDA} and
 interpretation of the pooling operation of the \emph{RDA} classifier. The
 \emph{LDA} classifier involves the assumption that the population covariance
 matrices are equal, which is often too stringent in practice
-\citep{Clemmensen:2011kr}. The \emph{GRDA} classifier allows us to relax the
+\citep{Clemmensen:2011kr}. The \emph{HDRDA} classifier allows us to relax the
 linearity assumption by including unequal covariance matrices in the model. The
-\emph{GRDA} classifier is then a compromise between the \emph{LDA} and
-\emph{QDA} classifiers, so that the \emph{GRDA} classifier includes both the
+\emph{HDRDA} classifier is then a compromise between the \emph{LDA} and
+\emph{QDA} classifiers, so that the \emph{HDRDA} classifier includes both the
 \emph{LDA} and \emph{QDA} classifiers as special cases. We then introduce a more
-general shrinkage term to the \emph{RDA} classifier to establish our \emph{GRDA}
+general shrinkage term to the \emph{RDA} classifier to establish our \emph{HDRDA}
 classifier.
 
-We show that the \emph{GRDA} classifier is invariant to any adjustments of the
+We show that the \emph{HDRDA} classifier is invariant to any adjustments of the
 eigenvalues corresponding to the null space of the pooled sample covariance
 matrix. Applying a reasoning similar to \cite{Ye:2006tq}, we decompose the
 \emph{RDA} classifier and show that the sum related to the null space of the
@@ -224,9 +224,9 @@ advantageous because $n_k$ is often quite small, say, 15--20, in microarray data
 sets.
 
 In addition to the improvement in computational performance, we demonstrate that
-our \emph{GRDA} classifier is competitive with and often superior to several
+our \emph{HDRDA} classifier is competitive with and often superior to several
 recent classifiers designed for small-sample, high-dimensional data. In
-particular, we compare our \emph{GRDA} classifier with the \emph{DLDA}
+particular, we compare our \emph{HDRDA} classifier with the \emph{DLDA}
 classifier from \cite{Dudoit:2002ev} and the recently proposed classifiers from
 \cite{Guo:2007te}, \cite{Pang:2009ik}, \cite{Tong:2012hw}, and
 \cite{Witten:2011kc}. We conduct our comparison of the classification accuracy
@@ -237,7 +237,7 @@ We have organized the remainder of the paper as follows. In Section 2 we review
 the \emph{RDA} classifier from \cite{Friedman:1989tm} and discuss our
 generalization in Section 3. In Section 4 we describe four small-sample,
 high-dimensional microarray data sets and then demonstrate that our proposed
-\emph{GRDA} classifier is often superior to the competing classifiers in terms
+\emph{HDRDA} classifier is often superior to the competing classifiers in terms
 of classification accuracy. We then conclude with a brief discussion in Section
 5.
 
@@ -364,7 +364,7 @@ obtain the \emph{RDA} classifier
 	D_{RDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)'\widehat{\bm\Sigma}_k(\lambda, \gamma)^{-1}(\bm x - \xbar_k)  + \ln |\widehat{\bm\Sigma}_k(\lambda, \gamma)|. \label{eq:rda}
 \end{align}
 
-\section{The GRDA Classifier}
+\section{The HDRDA Classifier}
 
 Here, we define our generalization of the \emph{RDA} classifier by first
 simplifying the formulation of $\widehat{\bm \Sigma}_k(\lambda)$ in
@@ -398,35 +398,40 @@ rank$(\widehat{\bm\Sigma}_k)$ to rank$(\widehat{\bm\Sigma})$ for $0 < \lambda
 $K - 1$ classes do not contribute to the estimation of $\bm \Sigma_k$,
 corresponding to $\widehat{\bm \Sigma}_k$. Furthermore, if $\lambda = 1$, the
 weights in \eqref{eq:sig-lambda-alternative2} reduce to $1/N$, corresponding to
-$\widehat{\bm\Sigma}$. In Figure \ref{fig:grda-contours} we demonstrate the
-effect of $\lambda$ on the contours of five multivariate normal populations with
-unequal covariance matrices. For brevity, when $\lambda = 1$, we define $\bm X =
+$\widehat{\bm\Sigma}$. For brevity, when $\lambda = 1$, we define $\bm X =
 [\sqrt{c_{1k}(1)} \bm x_1', \ldots, \sqrt{c_{Nk}(1)} \bm x_N']'$ such that
 $\widehat{\bm \Sigma} = \bm X' \bm X$. Similarly, for $\lambda = 0$, we define
 $\bm X_k = [\sqrt{c_{1k}(0)} \bm x_1', \ldots, \sqrt{c_{Nk}(0)} \bm x_N']'$ such
-that $\widehat{\bm \Sigma}_k = \bm X_k' \bm X_k$, $k = 1, \ldots, K$.
+that $\widehat{\bm \Sigma}_k = \bm X_k' \bm X_k$, $k = 1, \ldots, K$. In Figure
+\ref{fig:hdrda-contours} we demonstrate the effect of $\lambda$ on the contours
+of five multivariate normal populations with unequal covariance matrices.
 
-\[ \left[\text{Figure \ref{fig:grda-contours} goes about here }\right]\]
+\[ \left[\text{Figure \ref{fig:hdrda-contours} goes about here }\right]\]
 
 As we have discussed, several eigenvalue adjustment methods have been proposed
-to increase eigenvalues (approximately) equal to 0. Here, we define a more
-general eigenvalue adjustment of \eqref{eq:sig-lambda-alternative} as
+to increase eigenvalues (approximately) equal to 0. Here, we define the
+eigenvalue adjustment of \eqref{eq:sig-lambda-alternative} as
 \begin{align}
-	\tilde{\bm \Sigma}_k = \alpha_k \widehat{\bm \Sigma}_k(\lambda) + \gamma \bm I_p,\label{eq:grda-cov}
+	\tilde{\bm \Sigma}_k = \alpha_k \widehat{\bm \Sigma}_k(\lambda) + \gamma \bm I_p,\label{eq:hdrda-cov}
 \end{align}
 where $\alpha_k \ge 0$ and $\gamma \ge 0$ is an eigenvalue-shrinkage
-constant. Thus, the \emph{GRDA} classifier is
+constant. The choice of $\alpha_k$ allows for a flexible formulation of
+covariance-matrix estimators. For instance, if $\alpha_k = 1$, $k = 1, \ldots,
+K$, then \eqref{eq:hdrda-cov} resembles \eqref{eq:ridge-estimator}. Similarly,
+if $\alpha_k = 1 - \gamma$, then \eqref{eq:hdrda-cov} has a form similar to
+\eqref{eq:sig-rda}. Now, substituting \eqref{eq:hdrda-cov} into \eqref{eq:qda},
+we define the \emph{HDRDA} classifier as
 \begin{align}
-	D_{GRDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)'\tilde{\bm\Sigma}_k^{+}(\bm x - \xbar_k)  + \ln |\tilde{\bm\Sigma}_k|. \label{eq:grda}
+	D_{HDRDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)'\tilde{\bm\Sigma}_k^{+}(\bm x - \xbar_k)  + \ln |\tilde{\bm\Sigma}_k|. \label{eq:hdrda}
 \end{align}
 For $\gamma > 0$, $\tilde{\bm\Sigma}_k$ is nonsingular such that
 $\tilde{\bm\Sigma}_k^{-1}$ can be substituted for $\tilde{\bm\Sigma}_k^{+}$ in
-\eqref{eq:grda}. If $\gamma = 0$, we explicitly set $|\tilde{\bm\Sigma}_k|$
+\eqref{eq:hdrda}. If $\gamma = 0$, we explicitly set $|\tilde{\bm\Sigma}_k|$
 equal to the product of the positive eigenvalues of $\tilde{\bm\Sigma}_k$.
 
-Next, we demonstrate that the \emph{GRDA} classifier lends itself to an
-efficient calculation of \eqref{eq:grda} and a rapid model selection of the
-pooling parameter $\lambda$. We decompose \eqref{eq:grda} into a sum of two
+Next, we demonstrate that the \emph{HDRDA} classifier lends itself to an
+efficient calculation of \eqref{eq:hdrda} and a rapid model selection of the
+pooling parameter $\lambda$. We decompose \eqref{eq:hdrda} into a sum of two
 components, where the first summand consists of matrix operations applied to
 low-dimensional matrices and the second summand corresponds to the null space of
 $\widehat{\bm \Sigma}$ in \eqref{eq:pooled-cov}. We show that the matrix
@@ -437,7 +442,7 @@ inverses of high-dimensional matrices, and by ignoring these calculations, a
 substantial reduction in computational costs is achieved relative to Friedman's
 \emph{RDA} classifier in \eqref{eq:rda}. Furthermore, a byproduct is that
 adjustments to the associated eigenvalues have no effect on
-\eqref{eq:grda}. Lastly, we exploit the so-called fast singular value
+\eqref{eq:hdrda}. Lastly, we exploit the so-called fast singular value
 decomposition (SVD) to construct the eigenvalue decomposition of $\widehat{\bm
   \Sigma}$, further reducing the computational costs of our proposed \emph{RDA}
 classifier.
@@ -517,12 +522,12 @@ The proof follows by setting $\gamma = 0$ in Lemma \ref{lemma:rda-tilde-Sigma_k}
 \end{proof}
 
 Thus, by incorporating each $\bm x_i$ into the estimation of $\bm \Sigma_k$, we
-increase the rank of $\widehat{\bm \Sigma}_k(\lambda)$ to $q$, $k = 1, \ldots,
-K$ if the pooling parameter $\lambda \ne 0$. Next, we provide an essential
-result that enables us to prove that, under mild regularity conditions,
-\eqref{eq:grda} is invariant to adjustments to the eigenvalues of $\tilde{\bm
-  \Sigma}_k$ corresponding to the null space of $\widehat{\bm \Sigma}$ for any
-unlabeled observation $\bm x \in \mathbb{R}_{p \times 1}$.
+increase the rank of $\widehat{\bm \Sigma}_k(\lambda)$ to $q$ if $\lambda \ne
+0$. Next, we provide an essential result that enables us to prove that, under
+mild regularity conditions, \eqref{eq:hdrda} is invariant to adjustments to the
+eigenvalues of $\tilde{\bm \Sigma}_k$ corresponding to the null space of
+$\widehat{\bm \Sigma}$ for any unlabeled observation $\bm x \in \mathbb{R}_{p
+  \times 1}$.
 
 \begin{lemma}\label{lemma:RDA-constant-term}
 Let $\bm U_2$ be defined as above. Then, for all $\bm x \in \mathbb{R}_{p \times
@@ -540,18 +545,18 @@ Hence, $\bm 0_{(p-q) \times 1} = \sum_{i=1}^N \beta_i \bm U_2'\bm x_i = \bm U_2'
 k') n_k \}$. Therefore, $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$.
 \end{proof}
 
-We now present our main result, where we decompose the \emph{GRDA} decision rule
+We now present our main result, where we decompose the \emph{HDRDA} decision rule
 and show that the component requiring the largest computational costs does not
 contribute to the classification of an unlabeled observation performed using
-Lemma \ref{lemma:RDA-constant-term}. Our main result reduces \eqref{eq:grda} to
-an equivalent, more computationally efficient decision rule.
+Lemma \ref{lemma:RDA-constant-term}. Our main result reduces \eqref{eq:hdrda} to
+an equivalent, more computationally efficient and more stable decision rule.
 
 \begin{thm}
 Let $\tilde{\bm \Sigma}_k$ and $\bm W_k$ be defined as in \eqref{eq:rda-matrix}
 and \eqref{eq:Wk}, respectively, and let $\bm U_1$ be defined as above. Then,
-the \emph{GRDA} decision rule in \eqref{eq:grda} is equivalent to
+the \emph{HDRDA} decision rule in \eqref{eq:hdrda} is equivalent to
 	\begin{align}
-		D_{GRDA}(\bm x) &= \argmin_k  (\bm x - \xbar_k)' \bm U_1 \bm W_k^{-1} \bm U_1' (\bm x - \xbar_k) + \ln | \bm W_k |. \label{eq:rda-decomposed}
+		D_{HDRDA}(\bm x) &= \argmin_k  (\bm x - \xbar_k)' \bm U_1 \bm W_k^{-1} \bm U_1' (\bm x - \xbar_k) + \ln | \bm W_k |. \label{eq:rda-decomposed}
 	\end{align}
 	
 \end{thm}
@@ -570,16 +575,16 @@ The proof follows from Lemma \ref{lemma:RDA-constant-term} because $\bm U_2'
 
 \subsection{Model Selection}
 
-Thus far we have shown that the \emph{GRDA} classifier in
+Thus far we have shown that the \emph{HDRDA} classifier in
 \eqref{eq:rda-decomposed} is invariant to the term $\bm U_2$, thus yielding a
 substantial reduction in the computational costs. While the classifier is much
 improved in terms of computational performance compared to the \emph{RDA}
 classifier originally proposed by \cite{Friedman:1989tm}, we provide two
 additional results that further improve the computational performance of our
-\emph{GRDA} classifier. First, we demonstrate that the inverse and determinants
+\emph{HDRDA} classifier. First, we demonstrate that the inverse and determinants
 of $\bm W_k$ can be written so that they are performed on $n_k \times n_k$
 matrices rather than the larger $q \times q$ matrices, resulting in further
-improvements to the computational efficiency of the \emph{GRDA} classifier.
+improvements to the computational efficiency of the \emph{HDRDA} classifier.
 
 \begin{proposition}\label{proposition:rda-W_k}
 Let $\bm W_k$ be defined as above. Then, $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$ and
@@ -624,7 +629,7 @@ $\bm U_1$ by retaining only the first $q$ columns of $\bm U$.
 \section{High-Dimensional Microarray Data Sets}
 
 In this section, we describe four high-dimensional microarray data sets and
-compare our proposed \emph{GRDA} classifier with five recently proposed
+compare our proposed \emph{HDRDA} classifier with five recently proposed
 classifiers designed for small-sample, high-dimensional data: the \emph{DLDA}
 classifier from \cite{Dudoit:2002ev}, the shrunken centroids \emph{RDA}
 classifier from \cite{Guo:2007te}, the shrinkage-based \emph{DLDA} classifier
@@ -652,9 +657,11 @@ data set.
 We used version 3.0.0 of the open-source statistical software {\tt R} for the
 classification study. For each classifier's {\tt R} implementation, we used the
 default settings with the exception that we explicitly set the prior
-probabilities as equal. In our {\tt R} implementation of the \emph{GRDA}
+probabilities as equal. In our {\tt R} implementation of the \emph{HDRDA}
 classifier in the {\tt sparsediscrim} package, we set $\alpha_k = 1$, $k = 1,
-\ldots, K$ for simplicity. We estimated $\lambda$ from a grid of 21 equidistant
+\ldots, K$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov}
+employed in the \emph{HDRDA} classifier has a form resembling
+\eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21 equidistant
 candidate values between 0 and 1, inclusively. Similarly, we estimated $\gamma$
 from a grid consisting of the values $10^{-1}, \ldots, 10^4$, and $10^5$. We
 selected optimal estimates of $\lambda$ and $\gamma$ using 10-fold
@@ -725,20 +732,20 @@ for a larger value of $d$. We report the average of the error-rate estimates for
 each value of $d$ in Figure \ref{fig:error-rates}. Approximate standard errors
 were no greater than \Sexpr{max(error_rates[["SE_Error"]])}.
 
-The \emph{GRDA} classifier was superior in classification performance for the
+The \emph{HDRDA} classifier was superior in classification performance for the
 majority of the simulations. For the Burczysnki, Shipp, and Singh data sets, the
-\emph{GRDA} classifier outperformed its competitors for all values of $d$
-examined. For the Nakayama data set, the \emph{GRDA} classifier was outperformed
-by the Dudoit, Pang, and Tong classifiers for small values of $d$ but attained
-classification rates superior to its competitors for larger values of
-$d$. Furthermore, Figure \ref{fig:error-rates} emphasizes two strengths of the
-\emph{GRDA} classifier: reliability of the classifier for small $d$ and
+\emph{HDRDA} classifier outperformed its competitors for all values of $d$
+examined. For the Nakayama data set, the \emph{HDRDA} classifier was
+outperformed by the Dudoit, Pang, and Tong classifiers for small values of $d$
+but attained classification rates superior to its competitors for larger values
+of $d$. Furthermore, Figure \ref{fig:error-rates} emphasizes two strengths of
+the \emph{HDRDA} classifier: reliability of the classifier for small $d$ and
 stability of the classifier for large $d$. In contrast to the other classifiers,
-the \emph{GRDA} classifier exhibited less variability its misclassification
-estimates for small values of $d$. Also, the \emph{GRDA} classifier yielded
+the \emph{HDRDA} classifier exhibited less variability in its misclassification
+estimates for small values of $d$. Also, the \emph{HDRDA} classifier yielded
 superior classification accuracy as $d$ increased and was hardly effected by the
 inclusion of more variables in the data sets. We attribute the apparent
-stability of the error-rate estimates of the \emph{GRDA} classifier for large
+stability of the error-rate estimates of the \emph{HDRDA} classifier for large
 values of $d$ to its novel dimension-reduction technique.
 
 The error-rate estimates for the Dudoit, Pang, Tong, and Witten classifiers were
@@ -772,25 +779,25 @@ required a larger subset of the features to perform competitively in our study.
 \[ \left[\text{Figure \ref{fig:error-rates} goes about here }\right]\]
 
 Next, we examine the optimal estimates of the tuning parameters for the
-\emph{GRDA} classifier. For brevity, we include only a graphical summary of the
+\emph{HDRDA} classifier. For brevity, we include only a graphical summary of the
 optimal estimates of $\lambda$ for the Shipp data set in Figure
 \ref{fig:optimal-shipp}. Similar figures for the other three data sets can be
 found in the Supplementary Information. In Figure \ref{fig:optimal-shipp}, the
 distribution of the optimal values of $\lambda$ selected through
-cross-validation has a notable interesting bathtub shape, resembling a Beta
-distribution with shape parameters $1/2$ and $1/2$. Specifically, the optimal
-values of $\lambda$ are typically near 0 or near 1, corresponding to the
-\emph{QDA} and \emph{LDA} classifiers, respectively. We noticed a similar
-distribution of optimal values of $\lambda$ for the other three data sets.
+cross-validation has a notable bathtub shape, resembling a Beta distribution
+with both shape parameters less than unity. Specifically, the optimal values of
+$\lambda$ are typically near 0 or near 1, corresponding to the \emph{QDA} and
+\emph{LDA} classifiers, respectively. We noticed a similar distribution of
+optimal values of $\lambda$ for the other three data sets.
 
 For the Shipp data set with smaller values of $d$, the range of optimal values
 of $\lambda$ was typically no larger than 0.05, indicating there were a large
 number of training data sets for which we can safely assume the covariance
 matrices are unequal or nearly unequal. As $d$ increased, the majority of the
 optimal values of $\lambda$ were selected as unity, thereby an increased number
-of variables resulted in the \emph{GRDA} classifier preferring the more
+of variables resulted in the \emph{HDRDA} classifier preferring the more
 parsimonious assumption of equal covariance matrices. In this instance we can
-see the flexibility of the \emph{GRDA} classifier to employ the more realistic
+see the flexibility of the \emph{HDRDA} classifier to employ the more realistic
 assumption that the class covariance matrices are unequal, but if optimal, we
 can employ the more parsimonious \emph{LDA} classifier as a special case.
 
@@ -803,36 +810,34 @@ The analysis of high-dimensional microarray data sets is important to modern
 biomedical studies and presents challenges with supervised classification
 because the number of gene expressions greatly outnumbers the number of
 collected responses. Consequently, several variants of the well-known \emph{LDA}
-classifier have been proposed by employing for improved classification
-performance. However, the \emph{LDA} classifier includes the strong assumption
-that the covariance matrices of each class are equal. Ideally, we could model
-the class covariance matrices as unrestricted and unequal in the \emph{QDA}
-classifier, but it is well known to have a large number of parameters that must
-be estimated and require a large number of samples, which are often unavailable
-in the high-dimensional setting. With this mind, \cite{Friedman:1989tm} proposed
-the \emph{RDA} classifier as a compromise between the \emph{LDA} and \emph{QDA}
+classifier have been proposed for improved classification performance. However,
+the \emph{LDA} classifier includes the strong assumption that the covariance
+matrices of each class are equal. Ideally, we could model the class covariance
+matrices as unrestricted and unequal in the \emph{QDA} classifier, but it is
+well known to have a large number of parameters that must be estimated and
+require a large number of samples, which are often unavailable in the
+high-dimensional setting. With this mind, \cite{Friedman:1989tm} proposed the
+\emph{RDA} classifier as a compromise between the \emph{LDA} and \emph{QDA}
 classifiers, controlling the amount of pooling of the individual class
 covariance-matrix estimators using the tuning parameter $\lambda$. However,
 despite its success for data sets where $p > N$, the \emph{RDA} classifier
 requires excessive calculations and a time-consuming model selection.
 
-With this in mind, we have adapted the \emph{RDA} classifier for usage with
-modern small-sample, high-dimensional data sets. Our model formulation
-facilitates a rapid classification of high-dimensional data by employing a novel
-dimension reduction technique. Moreover, our 10-fold cross-validation procedure
-typically requires a small runtime for data sets having large $p$. When
-preliminary variable selection is applied to the data as we performed in our
-classification study, the time to perform model selection is nearly
-instantaneous, confirming the computational complexity reported regarding the
-operations employed in the \emph{GRDA} classifier. Additionally, we have
-provided an implementation of the \emph{GRDA} classifier in the {\tt
+We have adapted the \emph{RDA} classifier for usage with modern small-sample,
+high-dimensional data sets. Our model formulation facilitates a rapid
+classification of high-dimensional data by employing a novel dimension reduction
+technique. Moreover, our 10-fold cross-validation procedure typically requires a
+small runtime for data sets having large $p$. When preliminary variable
+selection is applied to the data as we performed in our classification study,
+the time to perform model selection is nearly instantaneous. Additionally, we
+have provided an implementation of the \emph{HDRDA} classifier in the {\tt
   sparsediscrim} R package that is easy to use and available on CRAN.
 
 We have parameterized the covariance-matrix regularization employed in the
-\emph{GRDA} classifier to include a large family of shrinkage methods, such as
+\emph{HDRDA} classifier to include a large family of shrinkage methods, such as
 the methods from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and a wide variety
 of other shrinkage methods studied by \cite{Ramey:2013ji} and
-\cite{Xu:2009fl}. Our formulation of the \emph{GRDA} classifier in terms of the
+\cite{Xu:2009fl}. Our formulation of the \emph{HDRDA} classifier in terms of the
 nonzero eigenvalues of the pooled sample covariance matrix indicates that
 eigenvalue-adjustment methods applied to the \emph{LDA} classifier explains the
 similiarities in classification accuracy of several regularization methods
@@ -845,20 +850,18 @@ by explicitly defining the covariance-matrix estimator so that each of the $N$
 observations contributes to the estimation of the individual class covariance
 matrices.
 
-In our simulation study, we compared the \emph{GRDA} classifier to several
+In our simulation study, we compared the \emph{HDRDA} classifier to several
 recently proposed classifiers, including the Dudoit, Pang, Tong, and Guo
 classifiers, each of which assumes independence of the features conditional on
 class membership. Despite the rapid computational performance of diagonal
 classifiers and the reduction in the number of parameters to estimate,
 \cite{Mai:2012bf} have noted that diagonal classifiers can often yield inferior
 classification performance to other classification methods. We have shown that
-our proposed \emph{GRDA} classifier often yields superior classification
+our proposed \emph{HDRDA} classifier often yields superior classification
 accuracy to the diagonal classifiers considered, confirming the assertion of
-\cite{Mai:2012bf}. Furthermore, the \emph{GRDA} classifier is able to compete
-with the diagonal classifiers in terms of speed by incorporating a novel
-dimension-reduction technique. Although the diagonal classifiers are clearly
-faster to compute, the differences in runtime for small-sample, high-dimensional
-data sets is hardly noticeable.
+\cite{Mai:2012bf}. Furthermore, the \emph{HDRDA} classifier is able to compete
+with the diagonal classifiers in terms of speed by incorporating a new
+dimension-reduction technique.
 
 
 \bibliographystyle{plainnat}
@@ -881,7 +884,7 @@ print(xtable(data_summary, caption = "Summary of high-dimensional microarray dat
 @ 
 
 \begin{figure}
-<<grda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
+<<hdrda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
 rda_contours(lambda = 0)
 rda_contours(lambda = 1/4)
 rda_contours(lambda = 3/4)
@@ -889,7 +892,7 @@ rda_contours(lambda = 1)
 @ 
 \caption{Contours of five multivariate normal populations as a function of the
   pooling parameter $\lambda$.}
-\label{fig:grda-contours}
+\label{fig:hdrda-contours}
 \end{figure}
 
 \begin{figure}
@@ -899,7 +902,7 @@ p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
 p <- p + geom_line(aes(color = Classifier, linetype = Classifier), size = 1.5)
 p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
 p <- p + xlab("Number of Variables Selected") + ylab("Average Error Rate")
-p
+p  + theme(strip.text.x = element_text(size = 12))
 @ 
 \caption{Average error-rate estimates of the competing classifiers as a function
   of $d$. Approximate standard errors are no greater than \Sexpr{max(error_rates[["SE_Error"]])}.}
@@ -908,14 +911,14 @@ p
 
 \begin{figure}
 <<optimal_estimates>>=
-grda_optimal$lambda <- factor(grda_optimal$lambda)
-grda_optimal$gamma <- factor(grda_optimal$gamma)
-p <- ggplot(subset(grda_optimal, data_set == "shipp" & d %in% c(100, 500, 1000)), aes(lambda))
+hdrda_optimal$lambda <- factor(hdrda_optimal$lambda)
+hdrda_optimal$gamma <- factor(hdrda_optimal$gamma)
+p <- ggplot(subset(hdrda_optimal, data_set == "shipp" & d %in% c(100, 500, 1000)), aes(lambda))
 p <- p + geom_bar(aes(fill = gamma, weight = value))
-p <- p + facet_grid(d ~ .) + theme_bw()
-p
+p <- p + facet_grid(d ~ ., labeller = label_bquote(d == .(x))) + theme_bw()
+p + theme(strip.text.y = element_text(size = 16))
 @ 
-\caption{Counts of the optimal tuning-parameter estimates for the \emph{GRDA}
+\caption{Counts of the optimal tuning-parameter estimates for the \emph{HDRDA}
   classifier for the Shipp data set for $d = 100$, $500$, and $1000$.}
 \label{fig:optimal-shipp}
 \end{figure}

@@ -52,12 +52,12 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
                                              alpha, delta)), NA)
     Guo_errors <- mean(Guo_pred != test_y)
 
-    # GRDA
-    cv_out <- try_default(grda_cv(x = trn_x, y = train_y, prior = prior_probs), NA)
-    grda_lambda <- cv_out$lambda
-    grda_gamma <- cv_out$gamma
-    grda_out <- try_default(with(cv_out, grda(x = trn_x, y = train_y, lambda = lambda, gamma = gamma, prior = prior_probs)), NA)
-    grda_errors <- try_default(mean(predict(grda_out, tst_x)$class != test_y), NA)
+    # HDRDA
+    cv_out <- try_default(hdrda_cv(x = trn_x, y = train_y, prior = prior_probs), NA)
+    hdrda_lambda <- cv_out$lambda
+    hdrda_gamma <- cv_out$gamma
+    hdrda_out <- try_default(with(cv_out, hdrda(x = trn_x, y = train_y, lambda = lambda, gamma = gamma, prior = prior_probs)), NA)
+    hdrda_errors <- try_default(mean(predict(hdrda_out, tst_x)$class != test_y), NA)
 
     # DLDA
     dlda_errors <- try_default(mean(predict(dlda(x = trn_x, y = train_y, prior = prior_probs), tst_x)$class != test_y), NA)
@@ -71,12 +71,12 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
 
     list(errors = list(
            Dudoit = dlda_errors,
-           GRDA = grda_errors,
+           HDRDA = hdrda_errors,
            Guo = Guo_errors,
            Pang = sdlda_errors,
            Tong = Tong_errors,
            Witten = Witten_errors
-      ), data_set = data_set, d = d, lambda = grda_lambda, gamma = grda_gamma)
+      ), data_set = data_set, d = d, lambda = hdrda_lambda, gamma = hdrda_gamma)
   })
 }, mc.cores = num_cores)
 

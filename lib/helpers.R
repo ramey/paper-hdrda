@@ -125,7 +125,7 @@ rda_contours <- function(lambda) {
   p <- p + facet_grid(. ~ lambda, labeller = label_bquote(lambda == .(x)))
   p <- p + theme_bw() + xlab("") + ylab("") + theme(legend.position = "none")
   p <- p + scale_x_continuous(breaks = NULL) + scale_y_continuous(breaks = NULL)
-  p  + theme(strip.text.x = element_text(size = 18))
+  p + theme(strip.text.x = element_text(size = 18))
 }
 
 # Classifier from Witten and Tibshirani (2011) - JRSS B
