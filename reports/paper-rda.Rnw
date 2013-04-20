@@ -157,11 +157,11 @@ exhibit poor classification performance because of the \emph{curse of
 including linear discriminant analysis \emph{(LDA)} and quadratic discriminant
 analysis \emph{(QDA)}, are incalculable when $p > N$ because the sample
 covariance matrices employed in both classifiers are singular. As a result, many
-researchers, including \cite*{Mai:2012bf}, \cite*{Merchante:2012vk},
-\cite*{Clemmensen:2011kr}, and \cite*{Huang:2010ju}, have introduced
-restrictions on the population covariance matrices in the \emph{LDA} and
-\emph{QDA} models to reduce number of covariance parameters that must be
-estimated to ensure that the resulting classifiers are calculable.  For
+researchers, including \cite*{Mai:2012bf}, \cite*{Fan:2012iq},
+\cite*{Merchante:2012vk}, \cite*{Clemmensen:2011kr}, and \cite*{Huang:2010ju},
+have introduced restrictions on the population covariance matrices in the
+\emph{LDA} and \emph{QDA} models to reduce number of covariance parameters that
+must be estimated to ensure that the resulting classifiers are calculable.  For
 instance, \cite{Dudoit:2002ev} have proposed the diagonal \emph{LDA}
 (\emph{DLDA}) classifier, a modification of the \emph{LDA} classifier where the
 class covariance matrices are assumed to be diagonal.
@@ -197,16 +197,18 @@ In this paper we modify the \emph{RDA} classifier by first simplifying the
 pooling matrix employed in the \emph{RDA} classifier. We construct a convex
 combination of the covariance-matrix estimators employed in the \emph{LDA} and
 \emph{QDA} classifiers and demonstrate that this simplification improves the
-interpretation of the pooling operation of the \emph{RDA} classifier. The
-\emph{LDA} classifier involves the assumption that the population covariance
-matrices are equal, which is often too stringent in practice
-\citep{Clemmensen:2011kr}. The \emph{HDRDA} classifier allows us to relax the
-linearity assumption by including unequal covariance matrices in the model. The
+interpretation of the pooling operation of the \emph{RDA} classifier.
+\cite{Clemmensen:2011kr} have argued that the assumption of equal population
+covariance matrices within the \emph{LDA} classifier is often too stringent in
+practice. The \emph{HDRDA} classifier allows us to relax the linearity
+assumption by including unequal covariance matrices in the model. The
 \emph{HDRDA} classifier is then a compromise between the \emph{LDA} and
 \emph{QDA} classifiers, so that the \emph{HDRDA} classifier includes both the
-\emph{LDA} and \emph{QDA} classifiers as special cases. We then introduce a more
-general shrinkage term to the \emph{RDA} classifier to establish our \emph{HDRDA}
-classifier.
+\emph{LDA} and \emph{QDA} classifiers as special cases. We then establish the
+\emph{HDRDA} classifier by applying covariance-matrix regularization with a
+parameterization that includes a large family of shrinkage methods, such as the
+methods from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and a wide variety of
+other shrinkage methods studied by \cite{Ramey:2013ji} and \cite{Xu:2009fl}.
 
 We show that the \emph{HDRDA} classifier is invariant to any adjustments of the
 eigenvalues corresponding to the null space of the pooled sample covariance
@@ -215,23 +217,21 @@ matrix. Applying a reasoning similar to \cite{Ye:2006tq}, we decompose the
 pooled sample covariance matrix can be discarded. Hence, no gain in
 classification performance can be obtained by adjusting these zero
 eigenvalues. This invariance property addresses the computational shortcomings
-of the \emph{RDA} classifier and provides a substantial increase in the
-computational efficiency of the \emph{RDA} classifier and its model
-selection. In fact, we show that the inverse and determinants can be reduced to
-calculations of $n_k \times n_k$ matrices, where $n_k$ is the sample size of the
-$k$th class, $k = 1, \ldots, K$. This reduction in calculation is clearly
-advantageous because $n_k$ is often quite small, say, 15--20, in microarray data
-sets.
+of the \emph{RDA} classifier and provides a substantial increase in
+computational efficiency and model selection. In fact, we show that the inverse
+and determinants can be reduced to calculations of $n_k \times n_k$ matrices,
+where $n_k$ is the sample size of the $k$th class, $k = 1, \ldots, K$. This
+reduction in calculation is clearly advantageous because $n_k$ is often quite
+small, say, 15--20, in microarray data sets.
 
-In addition to the improvement in computational performance, we demonstrate that
-our \emph{HDRDA} classifier is competitive with and often superior to several
-recent classifiers designed for small-sample, high-dimensional data. In
-particular, we compare our \emph{HDRDA} classifier with the \emph{DLDA}
-classifier from \cite{Dudoit:2002ev} and the recently proposed classifiers from
-\cite{Guo:2007te}, \cite{Pang:2009ik}, \cite{Tong:2012hw}, and
-\cite{Witten:2011kc}. We conduct our comparison of the classification accuracy
-of the competing classifiers using four small-sample, high-dimensional
-microarray data sets.
+We also demonstrate that our \emph{HDRDA} classifier is competitive with and
+often superior to several recent classifiers designed for small-sample,
+high-dimensional data. In particular, we compare our \emph{HDRDA} classifier
+with the \emph{DLDA} classifier from \cite{Dudoit:2002ev} and the recently
+proposed classifiers from \cite{Guo:2007te}, \cite{Pang:2009ik},
+\cite{Tong:2012hw}, and \cite{Witten:2011kc}. We conduct our comparison of the
+classification accuracy of the competing classifiers using four small-sample,
+high-dimensional microarray data sets.
 
 We have organized the remainder of the paper as follows. In Section 2 we review
 the \emph{RDA} classifier from \cite{Friedman:1989tm} and discuss our
@@ -366,11 +366,11 @@ obtain the \emph{RDA} classifier
 
 \section{The HDRDA Classifier}
 
-Here, we define our generalization of the \emph{RDA} classifier by first
-simplifying the formulation of $\widehat{\bm \Sigma}_k(\lambda)$ in
-\eqref{eq:sig-lambda} and demonstrating its clear interpretation as a linear
-combination of the crossproducts of the training observations centered by their
-respective class sample means. We define
+Here, we define our adaptation of the \emph{RDA} classifier by first simplifying
+the formulation of $\widehat{\bm \Sigma}_k(\lambda)$ in \eqref{eq:sig-lambda}
+and demonstrating its clear interpretation as a linear combination of the
+crossproducts of the training observations centered by their respective class
+sample means. We define
 \begin{align}
   \widehat{\bm\Sigma}_k(\lambda) = (1 - \lambda) \widehat{\bm\Sigma}_k + \lambda \widehat{\bm\Sigma}.\label{eq:sig-lambda-alternative}
 \end{align}
@@ -389,7 +389,7 @@ interpretation of $\widehat{\bm\Sigma}_k(\lambda)$. We have that
 \end{align}
 where $c_{ik}(\lambda) = \lambda N^{-1} + (1 - \lambda)n_k^{-1}I(y_i = k)$.
 From \eqref{eq:sig-lambda-alternative2}, $\lambda$ weights the contribution of
-each of the $N$ observations to estimating $\bm \Sigma_k$. That is, for $0 <
+each of the $N$ observations to estimate $\bm \Sigma_k$. That is, for $0 <
 \lambda \le 1$, we estimate $\bm \Sigma_k$ with $N$ rather than $n_k$
 observations. Below, we will show that the pooling operation is advantageous in
 increasing the rank of each $\widehat{\bm\Sigma}_k(\lambda)$ from
@@ -403,8 +403,11 @@ $\widehat{\bm\Sigma}$. For brevity, when $\lambda = 1$, we define $\bm X =
 $\widehat{\bm \Sigma} = \bm X' \bm X$. Similarly, for $\lambda = 0$, we define
 $\bm X_k = [\sqrt{c_{1k}(0)} \bm x_1', \ldots, \sqrt{c_{Nk}(0)} \bm x_N']'$ such
 that $\widehat{\bm \Sigma}_k = \bm X_k' \bm X_k$, $k = 1, \ldots, K$. In Figure
-\ref{fig:hdrda-contours} we demonstrate the effect of $\lambda$ on the contours
-of five multivariate normal populations with unequal covariance matrices.
+\ref{fig:hdrda-contours} we plot the contours of five multivariate normal
+populations with unequal covariance matrices and $\lambda = 0$. As $\lambda$ is
+increased towards 1, the contours become more similar, ultimately resulting in
+equal covariance matrices and contours for the parsimonious case of $\lambda =
+1$.
 
 \[ \left[\text{Figure \ref{fig:hdrda-contours} goes about here }\right]\]
 
@@ -442,10 +445,9 @@ inverses of high-dimensional matrices, and by ignoring these calculations, a
 substantial reduction in computational costs is achieved relative to Friedman's
 \emph{RDA} classifier in \eqref{eq:rda}. Furthermore, a byproduct is that
 adjustments to the associated eigenvalues have no effect on
-\eqref{eq:hdrda}. Lastly, we exploit the so-called fast singular value
-decomposition (SVD) to construct the eigenvalue decomposition of $\widehat{\bm
-  \Sigma}$, further reducing the computational costs of our proposed \emph{RDA}
-classifier.
+\eqref{eq:hdrda}. Lastly, we utilize the singular value decomposition (SVD) to
+calculate efficiently the eigenvalue decomposition of $\widehat{\bm \Sigma}$,
+further reducing the computational costs of our proposed \emph{RDA} classifier.
 
 First, we require the following relationship regarding the null spaces of
 $\widehat{\bm \Sigma}_k(\lambda)$, $\widehat{\bm \Sigma}$, and $\widehat{\bm
@@ -545,18 +547,18 @@ Hence, $\bm 0_{(p-q) \times 1} = \sum_{i=1}^N \beta_i \bm U_2'\bm x_i = \bm U_2'
 k') n_k \}$. Therefore, $\bm U_2' (\bm x - \xbar_k) = \bm U_2' (\bm x - \xbar_{k'})$.
 \end{proof}
 
-We now present our main result, where we decompose the \emph{HDRDA} decision rule
-and show that the component requiring the largest computational costs does not
-contribute to the classification of an unlabeled observation performed using
-Lemma \ref{lemma:RDA-constant-term}. Our main result reduces \eqref{eq:hdrda} to
-an equivalent, more computationally efficient and more stable decision rule.
+We now present our main result, where we decompose the \emph{HDRDA} decision
+rule and show that the component requiring the largest computational costs does
+not contribute to the classification of an unlabeled observation performed using
+Lemma \ref{lemma:RDA-constant-term}. Hence, we reduce \eqref{eq:hdrda} to an
+equivalent, more computationally efficient decision rule.
 
 \begin{thm}
 Let $\tilde{\bm \Sigma}_k$ and $\bm W_k$ be defined as in \eqref{eq:rda-matrix}
 and \eqref{eq:Wk}, respectively, and let $\bm U_1$ be defined as above. Then,
 the \emph{HDRDA} decision rule in \eqref{eq:hdrda} is equivalent to
 	\begin{align}
-		D_{HDRDA}(\bm x) &= \argmin_k  (\bm x - \xbar_k)' \bm U_1 \bm W_k^{-1} \bm U_1' (\bm x - \xbar_k) + \ln | \bm W_k |. \label{eq:rda-decomposed}
+		D_{HDRDA}(\bm x) &= \argmin_k  (\bm x - \xbar_k)' \bm U_1 \bm W_k^{-1} \bm U_1' (\bm x - \xbar_k) + \ln | \bm W_k |. \label{eq:hdrda-decomposed}
 	\end{align}
 	
 \end{thm}
@@ -575,16 +577,17 @@ The proof follows from Lemma \ref{lemma:RDA-constant-term} because $\bm U_2'
 
 \subsection{Model Selection}
 
-Thus far we have shown that the \emph{HDRDA} classifier in
-\eqref{eq:rda-decomposed} is invariant to the term $\bm U_2$, thus yielding a
-substantial reduction in the computational costs. While the classifier is much
-improved in terms of computational performance compared to the \emph{RDA}
-classifier originally proposed by \cite{Friedman:1989tm}, we provide two
-additional results that further improve the computational performance of our
-\emph{HDRDA} classifier. First, we demonstrate that the inverse and determinants
-of $\bm W_k$ can be written so that they are performed on $n_k \times n_k$
-matrices rather than the larger $q \times q$ matrices, resulting in further
-improvements to the computational efficiency of the \emph{HDRDA} classifier.
+Thus far, we have shown that the \emph{HDRDA} classifier in \eqref{eq:hdrda} is
+invariant to the term $\bm U_2$, thus yielding an equivalent classifier in
+\eqref{eq:hdrda-decomposed} with a substantial reduction in the computational
+complexity. While the classifier is much improved in terms of computational
+performance compared to the \emph{RDA} classifier originally proposed by
+\cite{Friedman:1989tm}, we provide two additional results that further improve
+the computational performance of our \emph{HDRDA} classifier. First, we
+demonstrate that the inverse and determinants of $\bm W_k$ can be written so
+that they are performed on $n_k \times n_k$ matrices rather than the larger $q
+\times q$ matrices, resulting in further improvements to the computational
+efficiency.
 
 \begin{proposition}\label{proposition:rda-W_k}
 Let $\bm W_k$ be defined as above. Then, $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$ and
@@ -635,24 +638,28 @@ classifier from \cite{Dudoit:2002ev}, the shrunken centroids \emph{RDA}
 classifier from \cite{Guo:2007te}, the shrinkage-based \emph{DLDA} classifier
 from \cite{Pang:2009ik}, the shrinkage-mean-based DLDA classifier from
 \cite{Tong:2012hw}, and the penalized \emph{LDA} classifier from
-\cite{Witten:2011kc}. Below, we refer to each classifier by the first author's
-surname. We evaluated the classification performance of each classifier by
-randomly partitioning the data such that $2/3$ of the observations were
-allocated as training data and the remaining $1/3$ of the observations were
-allocated as a test data set. For each random partition, we applied the
-feature-selection method from \cite{Dudoit:2002ev} to choose the $d$ features
-having the largest ratio of their between-group to within-group sums of squares
-from the training data. We then filtered the test data set with the
-corresponding $d$ features. After training each classifier from the filtered
-training data, we classified the filtered test data sets and computed the
-proportion of mislabeled test observations to estimate the classification error
-rate for each classifier. Repeating this process 1000 times, we computed the
-average of the error-rate estimates for each classifier. We remark that our
-simulation design avoids the selection bias discussed in
-\cite{Ambroise:2002fa}. We did not include the \emph{RDA} classifier from
-\cite{Friedman:1989tm} in our studies to avoid its excessive computations. In
-Table \ref{tab:data-summary}, we summarize the attributes of each microarray
-data set.
+\cite{Witten:2011kc}. The classifiers from \cite{Tong:2012hw} and
+\cite{Pang:2009ik} are both modifications of the \emph{DLDA} classifier from
+\cite{Dudoit:2002ev}, where the former employs an improved mean estimator and
+the latter utilizes an improved variance estimator. Below, we refer to each
+classifier by the first author's surname.
+
+We evaluated the classification performance of each classifier by randomly
+partitioning the data such that $2/3$ of the observations were allocated as
+training data and the remaining $1/3$ of the observations were allocated as a
+test data set. For each random partition, we applied the feature-selection
+method from \cite{Dudoit:2002ev} to the training data to choose the $d$ features
+having the largest ratio of their between-group to within-group sums of squares.
+We then filtered the test data set with the corresponding $d$ features. After
+training each classifier from the filtered training data, we classified the
+filtered test data sets and computed the proportion of mislabeled test
+observations to estimate the classification error rate for each
+classifier. Repeating this process 1000 times, we computed the average of the
+error-rate estimates for each classifier. We remark that our simulation design
+avoids the selection bias discussed in \cite{Ambroise:2002fa}. We did not
+include the \emph{RDA} classifier from \cite{Friedman:1989tm} in our studies to
+avoid its excessive computations. In Table \ref{tab:data-summary}, we summarize
+the attributes of each microarray data set.
 
 We used version 3.0.0 of the open-source statistical software {\tt R} for the
 classification study. For each classifier's {\tt R} implementation, we used the
@@ -782,7 +789,7 @@ Next, we examine the optimal estimates of the tuning parameters for the
 \emph{HDRDA} classifier. For brevity, we include only a graphical summary of the
 optimal estimates of $\lambda$ for the Shipp data set in Figure
 \ref{fig:optimal-shipp}. Similar figures for the other three data sets can be
-found in the Supplementary Information. In Figure \ref{fig:optimal-shipp}, the
+found in the Supplementary Material. In Figure \ref{fig:optimal-shipp}, the
 distribution of the optimal values of $\lambda$ selected through
 cross-validation has a notable bathtub shape, resembling a Beta distribution
 with both shape parameters less than unity. Specifically, the optimal values of
@@ -855,11 +862,12 @@ recently proposed classifiers, including the Dudoit, Pang, Tong, and Guo
 classifiers, each of which assumes independence of the features conditional on
 class membership. Despite the rapid computational performance of diagonal
 classifiers and the reduction in the number of parameters to estimate,
-\cite{Mai:2012bf} have noted that diagonal classifiers can often yield inferior
-classification performance to other classification methods. We have shown that
-our proposed \emph{HDRDA} classifier often yields superior classification
-accuracy to the diagonal classifiers considered, confirming the assertion of
-\cite{Mai:2012bf}. Furthermore, the \emph{HDRDA} classifier is able to compete
+\cite{Mai:2012bf} and \cite{Fan:2012iq} have noted that diagonal classifiers
+can often yield inferior classification performance to other classification
+methods. We have shown that our proposed \emph{HDRDA} classifier often yields
+superior classification accuracy to the diagonal classifiers considered,
+confirming the assertions of \cite{Mai:2012bf} and
+\cite{Fan:2012iq}. Furthermore, the \emph{HDRDA} classifier is able to compete
 with the diagonal classifiers in terms of speed by incorporating a new
 dimension-reduction technique.
 
