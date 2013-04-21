@@ -263,10 +263,11 @@ matrices. Because $\mu_k$ and $\Sigma_k$ are typically unknown, we assign
 an unlabeled observation $x$ to class $\omega_k$ with the sample quadratic
 discriminant analysis classifier
 \begin{align}
-	D_{QDA}(x) = \argmin_{k}  (x - \xbar_k)'\widehat{\Sigma}_k^{-1}(x - \xbar_k)  + \log |\widehat{\Sigma}_k|, \label{eq:qda}
+	D_{QDA}(x) = \argmin_{k}  (x - \xbar_k)^{T}\widehat{\Sigma}_k^{-1}(x - \xbar_k)  + \log |\widehat{\Sigma}_k|, \label{eq:qda}
 \end{align}
 where $\xbar_k$ and $\widehat{\Sigma}_k$ are the maximum likelihood
-estimators for $\mu_k$ and $\Sigma_k$, respectively. If we assume
+estimators for $\mu_k$ and $\Sigma_k$, respectively, and $A^{T}$ denotes the
+matrix transpose of $A \in \mathbb{R}_{m \times p}$. If we assume
 further that $\Sigma_k = \Sigma$ $(k = 1, \ldots, K)$, then the pooled
 sample covariance matrix $\widehat{\Sigma}$ is substituted for $\widehat{
   \Sigma}_k$ in \eqref{eq:qda}, where
@@ -286,7 +287,7 @@ $0_{m \times m}$. Lastly, for $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne
   1]{Lutkepohl:1996uz}. Let $A^+$ and $\mathcal{N}(A) = \{z \in \mathbb{R}_{p
   \times 1} : A z = 0_{m \times 1}\}$ denote the Moore-Penrose pseudoinverse and null space
 of $A \in \mathbb{R}_{m \times p}$, respectively. Let $V^{\perp} = \{y
-\in \mathbb{R}_{p \times 1} : y'v = 0\ \forall v \in V \}$ denote
+\in \mathbb{R}_{p \times 1} : y^{T}v = 0\ \forall v \in V \}$ denote
 the orthogonal complement of a vector space $V \subset \mathbb{R}_{p \times 1}$.
 
 \subsection{Covariance Matrix Regularization}
@@ -352,7 +353,7 @@ amount of eigenvalue shrinkage applied. Finally, by substituting
 \eqref{eq:sig-rda} into \eqref{eq:qda}, we have the regularized discriminant
 analysis classifier
 \begin{align}
-	D_{RDA}(x) = \argmin_{k}  (x - \xbar_k)'\widehat{\Sigma}_k(\lambda, \gamma)^{-1}(x - \xbar_k)  + \log |\widehat{\Sigma}_k(\lambda, \gamma)|. \label{eq:rda}
+	D_{RDA}(x) = \argmin_{k}  (x - \xbar_k)^{T}\widehat{\Sigma}_k(\lambda, \gamma)^{-1}(x - \xbar_k)  + \log |\widehat{\Sigma}_k(\lambda, \gamma)|. \label{eq:rda}
 \end{align}
 If $\gamma$ is sufficiently small, \eqref{eq:sig-rda} can be singular or
 near-singular. For this case \cite{Friedman:1989tm} has suggested replacing the
@@ -381,8 +382,8 @@ clear interpretation of $\widehat{\Sigma}_k(\lambda)$. That is,
 	\widehat{\Sigma}_k(\lambda) &= \widehat{\Sigma}_k + \lambda (\widehat{\Sigma} - \widehat{\Sigma}_k) \nonumber\\
 %	&= \widehat{\Sigma}_k + \lambda \left(\sum_{k' = 1}^K \frac{n_k}{N} \widehat{\Sigma}_{k'}  - \widehat{\Sigma}_k \right) \nonumber\\
 	&= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right) \widehat{\Sigma}_k +  \frac{\lambda}{N} \sum_{\substack{k' = 1\\k' \ne k}} n_{k'} \widehat{\Sigma}_{k'} \nonumber \\
-%	&= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right)\sum_{i=1}^N I(y_i = k) x_i x_i' +  \frac{\lambda}{N} \sum_{i=1}^N I(y_i \ne k) x_i x_i' \nonumber \\
-	&= \sum_{i=1}^N c_{ik}(\lambda) x_i x_i',\label{eq:sig-lambda-alternative2}
+%	&= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right)\sum_{i=1}^N I(y_i = k) x_i x_i^{T} +  \frac{\lambda}{N} \sum_{i=1}^N I(y_i \ne k) x_i x_i^{T} \nonumber \\
+	&= \sum_{i=1}^N c_{ik}(\lambda) x_i x_i^{T},\label{eq:sig-lambda-alternative2}
 \end{align}
 where $c_{ik}(\lambda) = \lambda N^{-1} + (1 - \lambda)n_k^{-1}I(y_i = k)$.
 From \eqref{eq:sig-lambda-alternative2}, $\lambda$ weights the contribution of
@@ -396,10 +397,10 @@ $K - 1$ classes do not contribute to the estimation of $\Sigma_k$,
 corresponding to $\widehat{\Sigma}_k$. Furthermore, if $\lambda = 1$, the
 weights in \eqref{eq:sig-lambda-alternative2} reduce to $1/N$, corresponding to
 $\widehat{\Sigma}$. For brevity, when $\lambda = 1$, we define $X =
-[\sqrt{c_{1k}(1)} x_1', \ldots, \sqrt{c_{Nk}(1)} x_N']'$ such that
-$\widehat{\Sigma} = X' X$. Similarly, for $\lambda = 0$, we define
-$X_k = [\sqrt{c_{1k}(0)} x_1', \ldots, \sqrt{c_{Nk}(0)} x_N']'$ such
-that $\widehat{\Sigma}_k = X_k' X_k$. In Figure
+[\sqrt{c_{1k}(1)} x_1^{T}, \ldots, \sqrt{c_{Nk}(1)} x_N^{T}]^{T}$ such that
+$\widehat{\Sigma} = X^{T} X$. Similarly, for $\lambda = 0$, we define
+$X_k = [\sqrt{c_{1k}(0)} x_1^{T}, \ldots, \sqrt{c_{Nk}(0)} x_N^{T}]^{T}$ such
+that $\widehat{\Sigma}_k = X_k^{T} X_k$. In Figure
 \ref{fig:hdrda-contours} we plot the contours of five multivariate normal
 populations for $\lambda = 0$ with unequal covariance matrices. As $\lambda$
 approaches 1, the contours become more similar, resulting in identical contours
@@ -421,7 +422,7 @@ if $\alpha_k = 1 - \gamma$, then \eqref{eq:hdrda-cov} has a form similar to
 \eqref{eq:sig-rda}. Now, substituting \eqref{eq:hdrda-cov} into \eqref{eq:qda},
 we define the high-dimensional regularized discriminant analysis classifier
 \begin{align}
-	D_{HDRDA}(x) = \argmin_{k}  (x - \xbar_k)'\tilde{\Sigma}_k^{+}(x - \xbar_k)  + \log |\tilde{\Sigma}_k|. \label{eq:hdrda}
+	D_{HDRDA}(x) = \argmin_{k}  (x - \xbar_k)^{T}\tilde{\Sigma}_k^{+}(x - \xbar_k)  + \log |\tilde{\Sigma}_k|. \label{eq:hdrda}
 \end{align}
 For $\gamma > 0$, $\tilde{\Sigma}_k$ is nonsingular such that
 $\tilde{\Sigma}_k^{-1}$ can be substituted for $\tilde{\Sigma}_k^{+}$ in
@@ -462,15 +463,15 @@ $\widehat{\Sigma}_k(\lambda)$ be defined as in
 \end{lemma}
 \begin{proof}
 Let $z \in \mathcal{N}\{\widehat{\Sigma}_k(\lambda)\}$ for some $k = 1,
-\ldots, K$. Hence, $0 = z' \widehat{\Sigma}_k(\lambda) z = (1 -
-\lambda) z' \widehat{\Sigma}_k z + \lambda z' \widehat{
+\ldots, K$. Hence, $0 = z^{T} \widehat{\Sigma}_k(\lambda) z = (1 -
+\lambda) z^{T} \widehat{\Sigma}_k z + \lambda z^{T} \widehat{
   \Sigma} z$. Because $\widehat{\Sigma}_k, \widehat{\Sigma}\in
 \mathbb{R}_{p \times p}^{\ge}$, we have $z \in \mathcal{N}(\widehat{
   \Sigma})$ and $z \in \mathcal{N}(\widehat{\Sigma}_k)$. In particular,
 we have that $\mathcal{N}\{\widehat{\Sigma}_k(\lambda)\} \subset
 \mathcal{N}(\widehat{\Sigma})$. Now, suppose $z \in
-\mathcal{N}(\widehat{\Sigma})$. Similarly, we have that $0 = z'
-\widehat{\Sigma} z = N^{-1} \sum_{k = 1}^K n_k z' \widehat{
+\mathcal{N}(\widehat{\Sigma})$. Similarly, we have that $0 = z^{T}
+\widehat{\Sigma} z = N^{-1} \sum_{k = 1}^K n_k z^{T} \widehat{
   \Sigma}_k z$, which implies that $z \in \mathcal{N}(\widehat{
   \Sigma}_k)$ because $\widehat{\Sigma}_k \in \mathbb{R}_{p \times
   p}^{\ge}$. Therefore, $\mathcal{N}(\widehat{\Sigma}) \subset
@@ -479,7 +480,7 @@ we have that $\mathcal{N}\{\widehat{\Sigma}_k(\lambda)\} \subset
 
 In Lemma \ref{lemma:rda-tilde-Sigma_k} below, we derive an alternative
 expression for $\tilde{\Sigma}_k$ in terms of the matrix of eigenvectors of
-$\widehat{\Sigma}$. Let $\widehat{\Sigma} = U D U'$ be the
+$\widehat{\Sigma}$. Let $\widehat{\Sigma} = U D U^{T}$ be the
 eigendecomposition of $\widehat{\Sigma}$ such that $D \in \mathbb{R}_{p
   \times p}^{\ge}$ is the diagonal matrix of eigenvalues of $\widehat{\Sigma}$
 with $D = D_q \oplus 0_{p-q}$, $D_q \in \mathbb{R}_{q \times
@@ -491,22 +492,22 @@ U_2)$ such that $U_1 \in \mathbb{R}_{p \times q}$ and $U_2 \in
 \mathbb{R}_{p \times (p - q)}$.
 
 \begin{lemma}\label{lemma:rda-tilde-Sigma_k}
-Let $\widehat{\Sigma} = U D U'$ be the eigendecomposition of
+Let $\widehat{\Sigma} = U D U^{T}$ be the eigendecomposition of
 $\widehat{\Sigma}$ as above, and suppose that rank$(\widehat{\Sigma}) =
 q \le p$. Then, we have
 \begin{align}
-	\tilde{\Sigma}_k &= U(W_k \oplus \gamma I_{p-q})U' \quad
+	\tilde{\Sigma}_k &= U(W_k \oplus \gamma I_{p-q})U^{T} \quad
   (k = 1, \ldots, K),\label{eq:rda-matrix}
 \intertext{where}
-W_k &= \alpha_k \{(1 - \lambda) U_1' \widehat{\Sigma}_k U_1 + \lambda D_q\} + \gamma I_{q}.\label{eq:Wk}
+W_k &= \alpha_k \{(1 - \lambda) U_1^{T} \widehat{\Sigma}_k U_1 + \lambda D_q\} + \gamma I_{q}.\label{eq:Wk}
 \end{align}
 \end{lemma}
 \begin{proof}
 From Lemma \ref{lemma:null-spaces}, the columns of $U_2$ span the null space
 of $\widehat{\Sigma}$, which implies that $\widehat{\Sigma}_k U_2 =
-0_{p \times (p - q)}$. Hence, $U' \widehat{\Sigma}_k U = 
-U_1' \widehat{\Sigma}_k U_1 \oplus 0_{p-q}$ $(k = 1, \ldots,
-K)$. Thus, $U' \tilde{\Sigma}_k U = \alpha_k \{(1 - \lambda) U'
+0_{p \times (p - q)}$. Hence, $U^{T} \widehat{\Sigma}_k U = 
+U_1^{T} \widehat{\Sigma}_k U_1 \oplus 0_{p-q}$ $(k = 1, \ldots,
+K)$. Thus, $U^{T} \tilde{\Sigma}_k U = \alpha_k \{(1 - \lambda) U^{T}
 \widehat{\Sigma}_k U + \lambda D\} + \gamma I_p$, and
 \eqref{eq:rda-matrix} follows because $U$ is orthogonal.
 \end{proof}
@@ -532,18 +533,18 @@ unlabeled observation $x \in \mathbb{R}_{p \times 1}$.
 
 \begin{lemma}\label{lemma:RDA-constant-term}
 Let $U_2$ be defined as above. Then, for all $x \in \mathbb{R}_{p \times
-  1}$, $U_2' (x - \xbar_k) = U_2' (x - \xbar_{k'})$ $(1 \le k,
+  1}$, $U_2^{T} (x - \xbar_k) = U_2^{T} (x - \xbar_{k'})$ $(1 \le k,
 k' \le K)$.
 \end{lemma}
 \begin{proof}
 Let $x \in \mathbb{R}_{p \times 1}$, and suppose that $1 \le k, k' \le K$.
 Recall that $U_2 \in \mathcal{N}(\widehat{\Sigma})$, which implies that
-$U_2' \in \mathcal{C}(\widehat{\Sigma})^{\perp}$ \citep[Lemma
+$U_2^{T} \in \mathcal{C}(\widehat{\Sigma})^{\perp}$ \citep[Lemma
   1.2.5]{Kollo:2005vp}. Now, because $x_i \in \mathcal{C}(\widehat{
-  \Sigma})$ $(i = 1, \ldots, N)$, $U_2' x_i = 0_{(p-q) \times 1}$.
-Hence, $0_{(p-q) \times 1} = \sum_{i=1}^N \beta_i U_2'x_i = U_2'(\xbar_k -
+  \Sigma})$ $(i = 1, \ldots, N)$, $U_2^{T} x_i = 0_{(p-q) \times 1}$.
+Hence, $0_{(p-q) \times 1} = \sum_{i=1}^N \beta_i U_2^{T}x_i = U_2^{T}(\xbar_k -
 \xbar_{k'})$, where $\beta_i = (n_k n_{k'})^{-1} \{ I(y_i = k) n_{k'} - I(y_i =
-k') n_k \}$. Therefore, $U_2' (x - \xbar_k) = U_2' (x - \xbar_{k'})$.
+k') n_k \}$. Therefore, $U_2^{T} (x - \xbar_k) = U_2^{T} (x - \xbar_{k'})$.
 \end{proof}
 
 We now present our main result, where we decompose the decision rule of our
@@ -557,22 +558,22 @@ Let $\tilde{\Sigma}_k$ and $W_k$ be defined as in \eqref{eq:rda-matrix}
 and \eqref{eq:Wk}, respectively, and let $U_1$ be defined as above. Then,
 the decision rule in \eqref{eq:hdrda} is equivalent to
 	\begin{align}
-		D_{HDRDA}(x) &= \argmin_k  (x - \xbar_k)' U_1 W_k^{-1} U_1' (x - \xbar_k) + \log | W_k |. \label{eq:hdrda-decomposed}
+		D_{HDRDA}(x) &= \argmin_k  (x - \xbar_k)^{T} U_1 W_k^{-1} U_1^{T} (x - \xbar_k) + \log | W_k |. \label{eq:hdrda-decomposed}
 	\end{align}
 \end{thm}
 \begin{proof}
 From \eqref{eq:rda-matrix}, we have that $\tilde{\Sigma}_k^{+} = U(
-W_k^{-1} \oplus \gamma^{+} I_{p-q} )U'$ and $|\tilde{\Sigma}_k| =
+W_k^{-1} \oplus \gamma^{+} I_{p-q} )U^{T}$ and $|\tilde{\Sigma}_k| =
 \gamma^{p-q}| W_k |$ $(k = 1, \ldots, K)$. Therefore, for all $x \in
 \mathbb{R}_{p \times 1}$, we have that
 	\begin{align*}
-	(x - \xbar_k)' \tilde{\Sigma}_k^{+}(x - \xbar_k)  + \log |\tilde{\Sigma}_k| &= (x - \xbar_k)' U_1 W_k^{-1} U_1' (x - \xbar_k)\\
-	&+ \gamma^{+} (x - \xbar_k)' U_2 U_2' (x - \xbar_k) + \log | W_k | + (p - q) \log \gamma.
+	(x - \xbar_k)^{T} \tilde{\Sigma}_k^{+}(x - \xbar_k)  + \log |\tilde{\Sigma}_k| &= (x - \xbar_k)^{T} U_1 W_k^{-1} U_1^{T} (x - \xbar_k)\\
+	&+ \gamma^{+} (x - \xbar_k)^{T} U_2 U_2^{T} (x - \xbar_k) + \log | W_k | + (p - q) \log \gamma.
 	\end{align*}
 Because $\gamma$ is constant for $k = 1, \ldots, K$, we can omit the $(p - q)
 \log \gamma$ term and particularly avoid the calculation of $\log 0$ for $\gamma
 = 0$. Then, the proof follows from Lemma \ref{lemma:RDA-constant-term} because
-$U_2' (x - \xbar_k)$ is constant for $k = 1, \ldots, K$.
+$U_2^{T} (x - \xbar_k)$ is constant for $k = 1, \ldots, K$.
 \end{proof}
 
 \subsection{Model Selection}
@@ -591,17 +592,17 @@ matrices, resulting in further improvements to the computational efficiency.
 Let $W_k$ be defined as above $(k = 1, \ldots, K)$. Then, $|W_k| = |
 \Gamma_k| |Q_k|$ and
 	\begin{align}
-		W_k^{-1} &= \Gamma_k^{-1} - \alpha_k(1 - \lambda) \Gamma_k^{-1} U_1' X_k' Q_k^{-1} X_k U_1 \Gamma_k^{-1},\label{eq:W_k_inv}
+		W_k^{-1} &= \Gamma_k^{-1} - \alpha_k(1 - \lambda) \Gamma_k^{-1} U_1^{T} X_k^{T} Q_k^{-1} X_k U_1 \Gamma_k^{-1},\label{eq:W_k_inv}
 	\end{align}
 where $Q_k = I_{n_k} + \alpha_k(1- \lambda) X_k U_1 
-\Gamma_k^{-1} U_1' X_k'$ and $\Gamma_k = \alpha_k \lambda D_q +
+\Gamma_k^{-1} U_1^{T} X_k^{T}$ and $\Gamma_k = \alpha_k \lambda D_q +
 \gamma I_q$.
 \end{proposition}
 \begin{proof}
 To calculate $|W_k|$, we apply Theorem 18.1.1 from \cite{Harville:2008wja},
 which states that $|A + B T C| = |A| |T| |T^{-1} +
 C A^{-1} B|$. Thus, setting $A = \Gamma_k$, $B =
-\alpha_k (1 - \lambda) U_1' X_k'$, $T = I_{n_k}$, and $C =
+\alpha_k (1 - \lambda) U_1^{T} X_k^{T}$, $T = I_{n_k}$, and $C =
 X_k U_1$, we have $|W_k| = |\Gamma_k| |Q_k|$. Also,
 \eqref{eq:W_k_inv} follows from the well-known Sherman-Woodbury formula
 \citep[Theorem 18.2.8]{Harville:2008wja}.
@@ -612,17 +613,17 @@ $q$ eigenvectors of $\widehat{\Sigma}$. By utilizing a technique similar to
 the so-called kernel trick, we can obtain $U_1$ by computing the
 eigendecomposition of a much smaller $N \times N$ matrix when $p \gg N$
 \citep{Hastie:2008dt}. Recall that the pooled sample covariance matrix
-$\widehat{\Sigma} = X' X$. Then, because $X = M D^{1/2}
-U'$ by the singular value decomposition, we have the eigendecomposition
-$\widehat{\Sigma} = U D U'$, where $M \in \mathbb{R}_{N
+$\widehat{\Sigma} = X^{T} X$. Then, because $X = M D^{1/2}
+U^{T}$ by the singular value decomposition, we have the eigendecomposition
+$\widehat{\Sigma} = U D U^{T}$, where $M \in \mathbb{R}_{N
   \times N}$ is orthogonal, $D^{1/2} \in \mathbb{R}_{N \times N}^{\ge}$ is a
 diagonal matrix consisting of the singular values of $X$, and $U \in
-\mathbb{R}_{p \times N}$ is orthogonal. Now, $X X' = M D M'$
-is the eigenvalue decomposition of $X X'$, where $D$ is the matrix
-of eigenvalues of $X X'$ and the columns of $M$ are the
+\mathbb{R}_{p \times N}$ is orthogonal. Now, $X X^{T} = M D M^{T}$
+is the eigenvalue decomposition of $X X^{T}$, where $D$ is the matrix
+of eigenvalues of $X X^{T}$ and the columns of $M$ are the
 corresponding eigenvectors. Hence, we obtain $M$ and $D$ from an
-eigendecomposition of $X X' \in \mathbb{R}_{N \times N}$. Next, we
-compute $U = X' M D^{+/2}$, where $D^{+/2} = D_q^{-1/2}
+eigendecomposition of $X X^{T} \in \mathbb{R}_{N \times N}$. Next, we
+compute $U = X^{T} M D^{+/2}$, where $D^{+/2} = D_q^{-1/2}
 \oplus 0_{N-q}$. We then determine $q$ by computing the number of
 numerically nonzero eigenvalues present in $D$, where $q$ is the number of
 eigenvalues that exceeds some tolerance value, say, $\epsilon = 1 \times
