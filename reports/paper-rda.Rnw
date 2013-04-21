@@ -864,20 +864,5 @@ p  + theme(strip.text.x = element_text(size = 12))
 \label{fig:error-rates}
 \end{figure}
 
-\begin{figure}
-<<optimal_estimates>>=
-hdrda_optimal$lambda <- factor(hdrda_optimal$lambda)
-hdrda_optimal$gamma <- factor(hdrda_optimal$gamma)
-p <- ggplot(subset(hdrda_optimal, data_set == "shipp" & d %in% c(100, 500, 1000)), aes(lambda))
-p <- p + geom_bar(aes(fill = gamma, weight = value))
-p <- p + facet_grid(d ~ ., labeller = label_bquote(d == .(x))) + theme_bw()
-p + theme(strip.text.y = element_text(size = 16))
-@ 
-\caption{Counts of the optimal tuning-parameter estimates for the \emph{HDRDA}
-  classifier for the Shipp data set for $d = 100$, $500$, and $1000$.}
-\label{fig:optimal-shipp}
-\end{figure}
-
-
 
 \end{document} 

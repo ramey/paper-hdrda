@@ -8,7 +8,7 @@
 .PHONY: clean
 
 # Put all PDF targets here, separated by spaces.
-PDFS= paper-rda.pdf
+PDFS= paper-rda.pdf supplementary-material.pdf
 
 all: $(PDFS) 
 
