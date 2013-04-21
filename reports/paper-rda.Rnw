@@ -171,9 +171,7 @@ the decision rule requires the calculation of the inverses and determinants of
 large $p \times p$ covariance-matrix estimators for each class. Furthermore,
 \citeauthor{Friedman:1989tm}'s classifier has two tuning parameters that are
 selected via cross-validation, which adds a substantial computational burden to
-the model-selection process. \citeauthor{Friedman:1989tm}'s classifier is
-ill-advised on modern data sets because the model selection requires $O(Kp^3)$
-calculations for each tuning-parameter pair.
+the model-selection process.
 
 In this paper we modify \citeauthor{Friedman:1989tm}'s classifier by first
 constructing the pooling matrix as a convex combination of the covariance-matrix
@@ -340,7 +338,7 @@ permits a numerically stable matrix inversion.
 
 \section{High-Dimensional Regularized Discriminant Analysis}
 
-\subsection{Improvements to \citeauthor{Friedman:1989tm}'s Classifier}
+\subsection{Model Specification}
 
 Here, we define our adaptation of \citeauthor{Friedman:1989tm}'s classifier by
 first simplifying the formulation of $\widehat{\Sigma}_k(\lambda)$ in
@@ -404,29 +402,30 @@ we define the high-dimensional regularized discriminant analysis classifier
 \end{align}
 For $\gamma > 0$, $\tilde{\Sigma}_k$ is nonsingular such that
 $\tilde{\Sigma}_k^{-1}$ can be substituted for $\tilde{\Sigma}_k^{+}$ in
-\eqref{eq:hdrda}. If $\gamma = 0$, we explicitly set $|\tilde{\Sigma}_k|$
-equal to the product of the positive eigenvalues of $\tilde{\Sigma}_k$.
+\eqref{eq:hdrda}. If $\gamma = 0$, we explicitly set $|\tilde{\Sigma}_k|$ equal
+to the product of the positive eigenvalues of $\tilde{\Sigma}_k$. Following
+\cite{Friedman:1989tm}, we select $\lambda$ and $\gamma$ from a grid of
+candidate models via cross-validation \citep{Hastie:2008dt}. We provide an
+implementation of \eqref{eq:hdrda} in the {\tt hdrda} function in the {\tt
+  sparsediscrim} R package, available on CRAN.
 
 \subsection{Enhanced Computational Efficiency}
 
 Next, we demonstrate that our proposed classifier in \eqref{eq:hdrda} lends
-itself to a more efficient calculation and a rapid model selection of the
-parameters $\lambda$ and $\gamma$\footnote{TODO: Briefly mention the updating
-  trick employed in the R package}. We decompose \eqref{eq:hdrda} into a sum of
-two components, where the first summand consists of matrix operations applied to
-low-dimensional matrices and the second summand corresponds to the null space of
-$\widehat{\Sigma}$ in \eqref{eq:pooled-cov}. We show that the matrix
+itself to a more efficient calculation. We decompose \eqref{eq:hdrda} into a sum
+of two components, where the first summand consists of matrix operations applied
+to low-dimensional matrices and the second summand corresponds to the null space
+of $\widehat{\Sigma}$ in \eqref{eq:pooled-cov}. We show that the matrix
 operations performed on the null space of $\widehat{\Sigma}$ yield constant
 quadratic forms across all classes and can be omitted. For $p \gg N$, the
 constant component involves determinants and inverses of high-dimensional
 matrices, and by ignoring these calculations, a substantial reduction in
 computational costs is achieved relative to Friedman's classifier in
-\eqref{eq:rda}\footnote{TODO: Add a brief comparison of the computations of
-  \emph{RDA} and \emph{HDRDA} in terms of Big Oh notation}. Furthermore, a
-byproduct is that adjustments to the associated eigenvalues have no effect on
-\eqref{eq:hdrda}. Lastly, we utilize the singular value decomposition to
-calculate efficiently the eigenvalue decomposition of $\widehat{\Sigma}$,
-further reducing the computational costs of our proposed classifier.
+\eqref{eq:rda}. Furthermore, a byproduct is that adjustments to the associated
+eigenvalues have no effect on \eqref{eq:hdrda}. Lastly, we utilize the singular
+value decomposition to calculate efficiently the eigenvalue decomposition of
+$\widehat{\Sigma}$, further reducing the computational costs of our proposed
+classifier.
 
 First, we require the following relationship regarding the null spaces of
 $\widehat{\Sigma}_k(\lambda)$, $\widehat{\Sigma}$, and $\widehat{
@@ -554,25 +553,20 @@ Because $\gamma$ is constant for $k = 1, \ldots, K$, we can omit the $(p - q)
 $U_2^{T} (x - \xbar_k)$ is constant for $k = 1, \ldots, K$.
 \end{proof}
 
-\subsection{Model Selection}
-
 Thus far, we have shown that our classifier in \eqref{eq:hdrda} is invariant to
 the term $U_2$, thus yielding an equivalent classifier in
 \eqref{eq:hdrda-decomposed} with a substantial reduction in the computational
-complexity. Here, we provide two\footnote{TODO: Two? Perhaps, I mean one and
-  then the Fast SVD below. If so, clarify this.} additional results that further
-improve the computational performance of our classifier. First, we demonstrate
-that the inverse and determinants of $W_k$ can be written so that they are
-performed on $n_k \times n_k$ matrices rather than the larger $q \times q$
-matrices, resulting in further improvements to the computational efficiency.
+complexity. Here, we demonstrate that the computational efficiency in
+calculating the inverse and determinants of $W_k$ can be further improved via
+standard matrix operations.
 
-\begin{proposition}\label{proposition:rda-W_k}
+\begin{proposition}\label{proposition:hdrda-W_k}
 Let $W_k$ be defined as above $(k = 1, \ldots, K)$. Then, $|W_k| = |
 \Gamma_k| |Q_k|$ and
 	\begin{align}
 		W_k^{-1} &= \Gamma_k^{-1} - \alpha_k(1 - \lambda) \Gamma_k^{-1} U_1^{T} X_k^{T} Q_k^{-1} X_k U_1 \Gamma_k^{-1},\label{eq:W_k_inv}
 	\end{align}
-where $Q_k = I_{n_k} + \alpha_k(1- \lambda) X_k U_1 
+where $Q_k = I_{n_k} + \alpha_k(1 - \lambda) X_k U_1 
 \Gamma_k^{-1} U_1^{T} X_k^{T}$ and $\Gamma_k = \alpha_k \lambda D_q +
 \gamma I_q$.
 \end{proposition}
@@ -586,33 +580,45 @@ X_k U_1$, we have $|W_k| = |\Gamma_k| |Q_k|$. Also,
 \citep[Theorem 18.2.8]{Harville:2008wja}.
 \end{proof}
 
-Thus far, we have constructed each $\tilde{\Sigma}_k$ in terms of the first
-$q$ eigenvectors of $\widehat{\Sigma}$. By utilizing a technique similar to
-the so-called kernel trick, we can obtain $U_1$ by computing the
-eigendecomposition of a much smaller $N \times N$ matrix when $p \gg N$
+Conveniently, we see that the inverse and determinant of $W_k$ are each in terms
+of the inverse and determinant of $Q_k \in \mathbb{R}_{n_k \times n_k}$,
+respectively, as well as the diagonal matrix $\Gamma_k \in \mathbb{R}_{q \times
+  q}$. This formulation is especially advantageous when the number of classes
+$K$ is large because $n_k$ is then potentially much smaller than $q$. The
+expressions given in Proposition \ref{proposition:hdrda-W_k} also expedite the
+selection of $\lambda$ and $\gamma$ via cross-validation. The most
+time-consuming matrix operations involved in computing $W_k^{-1}$ and $|W_k|$ is
+$X_k U_1 \in \mathbb{R}_{n_k \times q}$, which is independent of $\lambda$ and
+$\gamma$. Hence, we need calculate $X_k U_1$ only once for each cross-validation
+fold. The subsequent operations in calculating $W_k^{-1}$ and $|W_K|$ can be
+simply updated for different pairs of $\lambda$ and $\gamma$.
+
+Thus far, we have constructed each $\tilde{\Sigma}_k$ in terms of the first $q$
+eigenvectors of $\widehat{\Sigma}$. By utilizing a technique similar to the
+so-called kernel trick, we can obtain $U_1$ by computing the eigendecomposition
+of a much smaller $N \times N$ matrix when $p \gg N$
 \citep{Hastie:2008dt}. Recall that the pooled sample covariance matrix
-$\widehat{\Sigma} = X^{T} X$. Then, because $X = M D^{1/2}
-U^{T}$ by the singular value decomposition, we have the eigendecomposition
-$\widehat{\Sigma} = U D U^{T}$, where $M \in \mathbb{R}_{N
-  \times N}$ is orthogonal, $D^{1/2} \in \mathbb{R}_{N \times N}^{\ge}$ is a
-diagonal matrix consisting of the singular values of $X$, and $U \in
-\mathbb{R}_{p \times N}$ is orthogonal. Now, $X X^{T} = M D M^{T}$
-is the eigenvalue decomposition of $X X^{T}$, where $D$ is the matrix
-of eigenvalues of $X X^{T}$ and the columns of $M$ are the
-corresponding eigenvectors. Hence, we obtain $M$ and $D$ from an
-eigendecomposition of $X X^{T} \in \mathbb{R}_{N \times N}$. Next, we
-compute $U = X^{T} M D^{+/2}$, where $D^{+/2} = D_q^{-1/2}
-\oplus 0_{N-q}$. We then determine $q$ by computing the number of
-numerically nonzero eigenvalues present in $D$, where $q$ is the number of
-eigenvalues that exceeds some tolerance value, say, $\epsilon = 1 \times
-10^{-6}$. After calculating $q$, we extract $U_1$ by retaining only the
+$\widehat{\Sigma} = X^{T} X$. Then, because $X = M D^{1/2} U^{T}$ by the
+singular value decomposition, we have the eigendecomposition $\widehat{\Sigma} =
+U D U^{T}$, where $M \in \mathbb{R}_{N \times N}$ is orthogonal, $D^{1/2} \in
+\mathbb{R}_{N \times N}^{\ge}$ is a diagonal matrix consisting of the singular
+values of $X$, and $U \in \mathbb{R}_{p \times N}$ is orthogonal. Now, $X X^{T}
+= M D M^{T}$ is the eigenvalue decomposition of $X X^{T}$, where $D$ is the
+matrix of eigenvalues of $X X^{T}$ and the columns of $M$ are the corresponding
+eigenvectors. Hence, we obtain $M$ and $D$ from an eigendecomposition of $X
+X^{T} \in \mathbb{R}_{N \times N}$. Next, we compute $U = X^{T} M D^{+/2}$,
+where $D^{+/2} = D_q^{-1/2} \oplus 0_{N-q}$. We then determine $q$ by computing
+the number of numerically nonzero eigenvalues present in $D$, where $q$ is the
+number of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1
+\times 10^{-6}$. After calculating $q$, we extract $U_1$ by retaining only the
 first $q$ columns of $U$.
 
 \section{High-Dimensional Microarray Data Sets}
 
 In this section, we describe four high-dimensional microarray data sets and
 compare our proposed classifier with five classifiers recently proposed for
-small-sample, high-dimensional data. Our competitors include diagonal linear
+small-sample, high-dimensional data. In Table \ref{tab:data-summary}, we
+summarize the four microarray data sets. Our competitors include diagonal linear
 discriminant analysis from \cite{Dudoit:2002ev}, shrunken centroids regularized
 discriminant analysis from \cite{Guo:2007te}, and penalized linear discriminant
 analysis from \cite{Witten:2011kc}. We also consider two modifications of
@@ -635,16 +641,20 @@ classifier. Repeating this process 1000 times, we computed the average of the
 error-rate estimates for each classifier. We remark that our simulation design
 avoids the selection bias discussed in \cite{Ambroise:2002fa}. We did not
 include \citeauthor{Friedman:1989tm}'s classifier in our studies to avoid its
-excessive computations. In Table \ref{tab:data-summary}, we summarize the
-attributes of each microarray data set.
+excessive computations.
 
 We used version 3.0.0 of the open-source statistical software {\tt R} for the
-classification study. For each classifier's {\tt R} implementation, we used the
-default settings with the exception that we explicitly set prior probabilities
-as equal. For our classifier, we set $\alpha_k = 1$ $(k = 1, \ldots, K)$, so
-that the covariance-matrix estimator \eqref{eq:hdrda-cov} employed had a form
-resembling \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21
-equidistant candidate values between 0 and 1, inclusively. Similarly, we
+classification study. We used the implementations of the Witten and Guo
+classifiers from the {\tt penalizedLDA} and {\tt rda} packages, respectively, on
+CRAN. Because the {\tt rda} package does not perform the authors' ``Min-Min''
+rule automatically, we applied this rule in our {\tt R} code. We also utilized
+our implementations of the Dudoit, Pang, and Tong classifiers available in the
+{\tt sparsediscrim} package. We used the default settings for each classifier
+with the exception that we explicitly set prior probabilities as equal, if the
+option was available. For our classifier, we set $\alpha_k = 1$ $(k = 1, \ldots,
+K)$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov} employed had a
+form resembling \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid
+of 21 equidistant candidate values between 0 and 1, inclusively. Similarly, we
 estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots, 10^4$,
 and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
 10-fold cross-validation \citep{Hastie:2008dt}.
@@ -790,11 +800,10 @@ classification performance to other classification methods. We have shown that
 our proposed classifier often yields superior classification accuracy to the
 diagonal classifiers considered, confirming the assertions of \cite{Mai:2012bf}
 and \cite{Fan:2012iq}. Furthermore, the implementation of our classifier in the
-{\tt sparsediscrim} R package available on CRAN was comparable to that of the
-diagonal classifiers in terms of computational runtime. Moreover, when
-preliminary variable selection was applied to the data in our classification
-study, the time to perform model selection with our proposed classifier was
-nearly instantaneous.
+{\tt sparsediscrim} R package was comparable to that of the diagonal classifiers
+in terms of computational runtime. Moreover, when preliminary variable selection
+was applied to the data in our classification study, the time to perform model
+selection with our proposed classifier was nearly instantaneous.
 
 
 \bibliographystyle{plainnat}
