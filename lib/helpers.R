@@ -120,12 +120,12 @@ rda_contours <- function(lambda) {
   contours$Population <- factor(contours$Population)
   contours$lambda <- lambda
 
-  p <- ggplot(contours, aes(x = X1, y = X2, colour = Population))
-  p <- p + geom_path(size = 1.5, linetype = 2)
+  p <- ggplot(contours, aes(x = X1, y = X2, colour = Population, linetype = Population))
+  p <- p + geom_path(size = 1.5)
   p <- p + facet_grid(. ~ lambda, labeller = label_bquote(lambda == .(x)))
   p <- p + theme_bw() + xlab("") + ylab("") + theme(legend.position = "none")
   p <- p + scale_x_continuous(breaks = NULL) + scale_y_continuous(breaks = NULL)
-  p + theme(strip.text.x = element_text(size = 18))
+  p + theme(strip.text.x = element_text(size = 28))
 }
 
 # Classifier from Witten and Tibshirani (2011) - JRSS B

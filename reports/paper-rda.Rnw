@@ -46,7 +46,7 @@ options(digits = 3)
 
 opts_chunk$set(fig.align = 'default', dev = 'png', message = FALSE,
                warning = FALSE, cache = TRUE, echo = FALSE, autodep = TRUE,
-               fig.width = 10, fig.height = 10, out.width = "\\linewidth")
+               fig.width = 12, fig.height = 12, out.width = "\\linewidth")
 @ 
   
 <<setup>>=
@@ -73,39 +73,17 @@ results$Pang <- as.numeric(results$Pang)
 results$Tong <- as.numeric(results$Tong)
 results$Witten <- as.numeric(results$Witten)
 
-# To abide by Biometrika's requirements of no abbreviations, we rename the
-# results of our HDRDA classifier as simply "Ours."
-results$Ours <- results$HDRDA
-results <- subset(results, select = -HDRDA)
-
 results$d <- factor(results$d, labels = sort(unique(as.numeric(results$d))))
 
 # Summary of the classification error rates for each data set and number of
 # variables selected, d.
 error_rates <- subset(results, select = -c(lambda, gamma))
 m_error <- melt(error_rates, variable.name = "Classifier", value.name = "Error")
-m_error$Classifier <- factor(m_error$Classifier)
 error_rates <- ddply(m_error, .(data_set, d, Classifier), plyr:::summarize,
                      Avg_Error = mean(Error), Num_Reps = length(Error))
 error_rates <- ddply(error_rates, .(data_set, d, Classifier), transform,
                      SE_Error = sqrt(Avg_Error * (1 - Avg_Error) / Num_Reps))
 error_rates <- subset(error_rates, select = -Num_Reps)
-
-# Candidate values of tuning parameters.
-seq_lambda <- seq(0, 1, by = 0.05)
-seq_gamma <- 10^seq.int(-1, 5)
-
-# Summary of the optimal tuning-parameter estimates for each data set and number
-# of variables selected, d.
-hdrda_optimal <- subset(results, select = c(data_set, d, lambda, gamma))
-hdrda_optimal$lambda <- factor(hdrda_optimal$lambda, levels = seq_lambda)
-hdrda_optimal$gamma <- factor(hdrda_optimal$gamma, levels = seq_gamma)
-
-hdrda_optimal <- ddply(hdrda_optimal, .(data_set, d), function(x) {
-  x <- subset(x, select = c(lambda, gamma))
-  melt(table(x))
-})
-
 @ 
 
 \begin{document}
@@ -854,13 +832,21 @@ rda_contours(lambda = 1)
 <<error_rates>>=
 error_rates$data_set <- Hmisc:::capitalize(error_rates$data_set)
 p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
-p <- p + geom_line(aes(color = Classifier, linetype = Classifier), size = 1.5)
+p <- p + geom_line(aes(color = Classifier), size = 1.5, linetype = 2)
+p <- p + geom_point(aes(color = Classifier, shape = Classifier), size = 4)
 p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
-p <- p + xlab("Number of Variables Selected") + ylab("Average Error Rate")
-p  + theme(strip.text.x = element_text(size = 12))
+p <- p + xlab("Number of Variables Selected, d") + ylab("Average Error Rate")
+p <- p + theme(axis.text = element_text(size = 16))
+p <- p + theme(axis.title.x = element_text(size = 20))
+p <- p + theme(axis.title.y = element_text(size = 20))
+p <- p + theme(strip.text.x = element_text(size = 18))
+p + theme(legend.position = "none")
 @ 
-\caption{Average error-rate estimates of the competing classifiers as a function
-  of $d$. Approximate standard errors are no greater than \Sexpr{max(error_rates[["SE_Error"]])}.}
+\caption{Averages of the 1000 error-rate estimates of the competing classifiers
+  for each data set as a function of $d$. The classifiers are marked as follows:
+  Dudoit (red circle), Guo (gold triangle), Pang (green square), Tong = (cyan
+  cross), Witten (blue square with X), and ours (pink asterisk). Approximate
+  standard errors are no greater than \Sexpr{max(error_rates[["SE_Error"]])}.}
 \label{fig:error-rates}
 \end{figure}
 
