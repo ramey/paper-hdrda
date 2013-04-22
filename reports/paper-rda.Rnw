@@ -1,42 +1,78 @@
-\documentclass[11pt]{article}
-\usepackage{graphicx, amsmath, amssymb, bm, url, mathtools, natbib, amsthm, setspace}
+\documentclass[lineno]{biometrika}
 
-\pagestyle{plain}
-%----------------Page dimensions ----------------
-\oddsidemargin 0.0in
-\evensidemargin 0.0in
-\topmargin -0.75in
-\leftmargin 0in
-\headheight 0.0in
-\headsep 0.5in
-%\footheight 0.0in
-\footskip 0.5in
-\footnotesep 0.0in
-\textwidth 6.7in
-\textheight 9.5in
-%-----------Define Pictures---------------------
-\def\picture #1 by #2 (#3){
- \vbox to #2{
-   \hrule width #1 height 0pt depth 0pt
-   \vfill
-   \special{picture #3} % this is the low-level interface
-   }
- }
-\def\scaledpicture #1 by #2 (#3 scaled #4){{
- \dimen0=#1 \dimen1=#2
- \divide\dimen0 by 1000 \multiply\dimen0 by #4
- \divide\dimen1 by 1000 \multiply\dimen1 by #4
- \picture \dimen0 by \dimen1 (#3 scaled #4)}
- }
-
+\usepackage{graphicx, amsmath, amssymb, bm, natbib}
 \newcommand{\xbar}{\bar{x}}
 \newcommand{\tr}{\text{tr}}
 \DeclareMathOperator*{\argmin}{arg\,min}
-\DeclareMathOperator*{\argmax}{arg\,max}
 
+\newtheorem{cor}{Corollary}
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{proposition}{Proposition}
+\newtheorem{thm}{Theorem}
+
+\bibpunct{(}{)}{;}{a}{,}{,}
+
+%% Please use the following statements for
+%% managing the text and math fonts for your papers:
+\usepackage{times}
+%\usepackage[cmbold]{mathtime}
+
+\usepackage[plain,noend]{algorithm2e}
+
+\makeatletter
+\renewcommand{\algocf@captiontext}[2]{#1\algocf@typo. \AlCapFnt{}#2} % text of caption
+\renewcommand{\AlTitleFnt}[1]{#1\unskip}% default definition
+\def\@algocf@capt@plain{top}
+\renewcommand{\algocf@makecaption}[2]{%
+  \addtolength{\hsize}{\algomargin}%
+  \sbox\@tempboxa{\algocf@captiontext{#1}{#2}}%
+  \ifdim\wd\@tempboxa >\hsize%     % if caption is longer than a line
+    \hskip .5\algomargin%
+    \parbox[t]{\hsize}{\algocf@captiontext{#1}{#2}}% then caption is not centered
+  \else%
+    \global\@minipagefalse%
+    \hbox to\hsize{\box\@tempboxa}% else caption is centered
+  \fi%
+  \addtolength{\hsize}{-\algomargin}%
+}
+\makeatother
+
+%%% User-defined macros should be placed here, but keep them to a minimum.
+\def\Bka{{\it Biometrika}}
+\def\AIC{\textsc{aic}}
+\def\T{{ \mathrm{\scriptscriptstyle T} }}
+\def\v{{\varepsilon}}
+
+\begin{document}
+
+\jname{Biometrika}
+%% The year, volume, and number are determined on publication
+\jyear{2013}
+\jvol{99}
+\jnum{1}
+%% The \doi{...} and \accessdate commands are used by the production team
+%\doi{10.1093/biomet/asm023}
+\accessdate{Advance Access publication on 31 July 2012}
+\copyrightinfo{\Copyright\ 2013 Biometrika Trust\goodbreak {\em Printed in Great Britain}}
+
+%% These dates are usually set by the production team
+\received{April 2013}
+\revised{April 2013}
+
+%% The left and right page headers are defined here:
+\markboth{J. A. Ramey, C. K. Stein \and D. M. Young}{High-Dimensional
+  Regularized Discriminant Analysis}
+
+%% Here are the title, author names and addresses
 \title{Another Look at Regularized Discriminant Analysis for High-Dimensional Classification}
 
-\author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
+% \author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
+\author{J. A. RAMEY}
+\affil{Vaccine and Infectious Disease Division, Fred Hutchinson Cancer Research
+  Center,\\ Seattle, Washington 98115, U.S.A. \email{johnramey@gmail.com}}
+
+\author{C. K. STEIN \and D. M. YOUNG}
+\affil{Department of Statistical Science, Baylor University, Waco, Texas 76706, U.S.A. \email{Caleb\_Stein@baylor.edu} \email{Dean\_Young@baylor.edu}}
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
 # Round digits throughout document including \Sexpr statements.
@@ -84,18 +120,9 @@ error_rates <- ddply(m_error, .(data_set, d, Classifier), plyr:::summarize,
 error_rates <- ddply(error_rates, .(data_set, d, Classifier), transform,
                      SE_Error = sqrt(Avg_Error * (1 - Avg_Error) / Num_Reps))
 error_rates <- subset(error_rates, select = -Num_Reps)
+
+max_se <- max(error_rates[["SE_Error"]])
 @ 
-
-\begin{document}
-
-\newtheorem{cor}{Corollary}
-\newtheorem{lemma}{Lemma}
-\newtheorem{proposition}{Proposition}
-\newtheorem{thm}{Theorem}
-
-\bibpunct{(}{)}{;}{a}{,}{,}
-
-\doublespacing
 
 \maketitle
 
@@ -381,9 +408,7 @@ that $\widehat{\Sigma}_k = X_k^{T} X_k$. In Figure
 populations for $\lambda = 0$ with unequal covariance matrices. As $\lambda$
 approaches 1, the contours become more similar, resulting in identical contours
 for $\lambda = 1$.
-
 \[ \left[\text{Figure \ref{fig:hdrda-contours} goes about here }\right]\]
-
 As we have discussed above, several eigenvalue adjustment methods have been
 proposed to increase eigenvalues (approximately) equal to 0. Here, we define the
 eigenvalue adjustment of \eqref{eq:sig-lambda-alternative} as
@@ -617,8 +642,7 @@ first $q$ columns of $U$.
 
 In this section, we describe four high-dimensional microarray data sets and
 compare our proposed classifier with five classifiers recently proposed for
-small-sample, high-dimensional data. In Table \ref{tab:data-summary}, we
-summarize the four microarray data sets. Our competitors include diagonal linear
+small-sample, high-dimensional data. Our competitors include diagonal linear
 discriminant analysis from \cite{Dudoit:2002ev}, shrunken centroids regularized
 discriminant analysis from \cite{Guo:2007te}, and penalized linear discriminant
 analysis from \cite{Witten:2011kc}. We also consider two modifications of
@@ -658,8 +682,6 @@ of 21 equidistant candidate values between 0 and 1, inclusively. Similarly, we
 estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots, 10^4$,
 and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
 10-fold cross-validation \citep{Hastie:2008dt}.
-
-\[ \left[\text{Table 1 goes about here }\right]\]
 
 \subsection{\cite{Burczynski:2006ik} Data Set}
 
@@ -722,7 +744,7 @@ training and test data. Hence, for a given random partition, the set of features
 selected for a small value of $d$ is a proper subset of the features selected
 for a larger value of $d$. We report the average of the error-rate estimates for
 each value of $d$ in Figure \ref{fig:error-rates}. Approximate standard errors
-were no greater than \Sexpr{max(error_rates[["SE_Error"]])}.
+were no greater than $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.
 
 Our classifier was superior in classification performance for the majority of
 the simulations. For the Burczysnki, Shipp, and Singh data sets, our classifier
@@ -766,9 +788,7 @@ every test observation into a single class, thus yielding larger error rates
 than its competitors. Furthermore, the Guo classifier exhibited unreliable
 classification performance for smaller values of $d$. The Guo classifier
 required a larger subset of the features to perform competitively in our study.
-
 \[ \left[\text{Figure \ref{fig:error-rates} goes about here }\right]\]
-
 Next, we examine the optimal estimates of the tuning parameters for our
 classifier. For brevity, we provide graphical summaries of the optimal estimates
 of $\lambda$ and $\gamma$ in the Supplementary Material. For each of the four
@@ -806,24 +826,11 @@ was applied to the data in our classification study, the time to perform model
 selection with our proposed classifier was nearly instantaneous.
 
 
-\bibliographystyle{plainnat}
+%\bibliographystyle{plainnat}
+\bibliographystyle{biometrika}
 \bibliography{rda}
 
 \clearpage
-
-<<data_summary, results="asis">>=
-# Table containing a summary of the data sets
-data_summary <- subset(describe_data(), author %in% unique(results$data_set))
-data_summary$K[data_summary$author == "nakayama"] <- 5
-rownames(data_summary) <- NULL
-colnames(data_summary)[1:3] <- c("Author", "Year", "N")
-data_summary$Author <- Hmisc:::capitalize(as.character(data_summary$Author))
-data_summary$Author <- with(data_summary, paste0(Author, " et al. (", Year, ")"))
-data_summary <- subset(data_summary, select = -Year)
-print(xtable(data_summary, caption = "Summary of high-dimensional microarray data sets.",
-             label = "tab:data-summary", digits = 0), include.rownames = FALSE)
-
-@ 
 
 \begin{figure}
 <<hdrda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
@@ -855,9 +862,9 @@ p + theme(legend.position = "none")
   for each data set as a function of $d$. The classifiers are marked as follows:
   Dudoit (red circle), Guo (gold triangle), Pang (green square), Tong = (cyan
   cross), Witten (blue square with X), and ours (pink asterisk). Approximate
-  standard errors are no greater than \Sexpr{max(error_rates[["SE_Error"]])}.}
+  standard errors are no greater than $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.}
 \label{fig:error-rates}
 \end{figure}
 
-
 \end{document} 
+
