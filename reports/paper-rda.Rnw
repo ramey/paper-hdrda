@@ -825,6 +825,11 @@ in terms of computational runtime. Moreover, when preliminary variable selection
 was applied to the data in our classification study, the time to perform model
 selection with our proposed classifier was nearly instantaneous.
 
+\section*{Supplementary material}
+\label{SM}
+Supplementary material available at \Bka\ online includes the graphical summary
+of the optimal estimates of our classifier from the classification study.
+
 
 %\bibliographystyle{plainnat}
 \bibliographystyle{biometrika}
