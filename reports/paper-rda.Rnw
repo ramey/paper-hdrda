@@ -64,7 +64,7 @@
   Regularized Discriminant Analysis}
 
 %% Here are the title, author names and addresses
-\title{Another Look at Regularized Discriminant Analysis for High-Dimensional Classification}
+\title{High-Dimensional Regularized Discriminant Analysis}
 
 % \author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
 \author{J. A. RAMEY}
@@ -390,7 +390,7 @@ clear interpretation of $\widehat{\Sigma}_k(\lambda)$. That is,
 \end{align}
 where $c_{ik}(\lambda) = \lambda N^{-1} + (1 - \lambda)n_k^{-1}I(y_i = k)$.
 From \eqref{eq:sig-lambda-alternative2}, $\lambda$ weights the contribution of
-each of the $N$ observations to estimate $\Sigma_k$. Hence, for $0 < \lambda
+each of the $N$ observations in estimating $\Sigma_k$. Hence, for $0 < \lambda
 \le 1$, we estimate $\Sigma_k$ with $N$ rather than $n_k$
 observations. Below, we will show that the pooling operation is advantageous in
 increasing the rank of each $\widehat{\Sigma}_k(\lambda)$ from
@@ -831,7 +831,6 @@ Supplementary material available at \Bka\ online includes the graphical summary
 of the optimal estimates of our classifier from the classification study.
 
 
-%\bibliographystyle{plainnat}
 \bibliographystyle{biometrika}
 \bibliography{rda}
 
