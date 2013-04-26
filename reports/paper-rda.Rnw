@@ -814,9 +814,9 @@ p + theme(legend.position = "none")
 @ 
 \caption{Averages of the 1000 error-rate estimates of the competing classifiers
   for each data set as a function of $d$. The classifiers are marked as follows:
-  Dudoit (circle), Guo (triangle), Pang (square), Tong = (cross), Witten (
-  square with X), and ours (asterisk). Approximate standard errors are no
-  greater than $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.}
+  Dudoit (circle), Guo (triangle), Pang (square), Tong = (cross), Witten (square
+  with X), and ours (asterisk). Approximate standard errors are no greater than
+  $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.}
 \label{fig:error-rates}
 \end{figure}
 Next, we examine the optimal estimates of the tuning parameters for our

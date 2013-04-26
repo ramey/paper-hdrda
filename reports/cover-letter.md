@@ -6,12 +6,13 @@ Fred Hutchinson Cancer Research Center
 Seattle, WA 98109 \
 Thursday, 25 April 2013 \
 \
-Professor A. C. Davison, Editor
-_Biometrika_  
-Institute of Mathematics  
-Ecole Poytechnique Federale de Lausanne  
-IMA-FSB-EPFL, Station 8  
-CH-1015 Lausanne, Switzerland\
+Professor A. C. Davison  
+Editor, _Biometrika_  
+Ecole Polytechnique Federale de Lausanne  
+IMA-FSB-EPFL  
+Station 8  
+CH-1015 Lausanne  
+Switzerland\
 \
 Dear Professor Davison:\
 \
