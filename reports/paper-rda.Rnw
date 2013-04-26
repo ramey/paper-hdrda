@@ -1,13 +1,8 @@
 \documentclass[lineno]{biometrika}
 
 \usepackage{graphicx, amsmath, amssymb, bm, natbib}
-\newcommand{\xbar}{\bar{x}}
-\newcommand{\tr}{\text{tr}}
-\DeclareMathOperator*{\argmin}{arg\,min}
 
 \newtheorem{cor}{Corollary}
-%\newtheorem{lemma}{Lemma}
-%\newtheorem{proposition}{Proposition}
 \newtheorem{thm}{Theorem}
 
 \bibpunct{(}{)}{;}{a}{,}{,}
@@ -42,6 +37,11 @@
 \def\AIC{\textsc{aic}}
 \def\T{{ \mathrm{\scriptscriptstyle T} }}
 \def\v{{\varepsilon}}
+
+\newcommand{\xbar}{\bar{x}}
+\newcommand{\tr}{\text{tr}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
 
 \begin{document}
 
@@ -140,8 +140,8 @@ popularized by \cite{Friedman:1989tm}. Our proposed classifier provides a
 straightforward interpretation and employs a new dimension-reduction technique
 to enable a computationally efficient model-selection procedure, thus overcoming
 the computational shortcomings of \citeauthor{Friedman:1989tm}'s classifier for
-high-dimensional data. Moreover, we demonstrate with several high-dimensional
-microarray data sets that our proposed classifier is competitive and often
+high-dimensional data. Moreover, we demonstrate with four high-dimensional
+microarray data sets that our proposed classifier is competitive with and often
 superior to several recently proposed sparse and regularized classifiers in
 terms of classification accuracy. Finally, we provide an implementation of our
 proposed classifier in the {\tt sparsediscrim} R package, available on CRAN.
@@ -205,7 +205,7 @@ constructing the pooling matrix as a convex combination of the covariance-matrix
 estimators employed in linear and quadratic discriminant analysis and
 demonstrate that this simplification improves the interpretation of the pooling
 operation of \citeauthor{Friedman:1989tm}'s classifier. Given that the
-assumption of equal population covariance matrices within linear discriminant
+assumption of equal population covariance matrices for linear discriminant
 analysis is often too stringent in practice \citep{Clemmensen:2011kr}, our
 proposed classifier can relax the linearity assumption by instead incorporating
 unequal covariance matrices while retaining linear and quadratic discriminant
@@ -232,11 +232,11 @@ often quite small in microarray data sets (e.g., 15--20 observations).
 We also demonstrate that our proposed classifier is competitive with and often
 superior to several recent classifiers designed for small-sample,
 high-dimensional data. In particular, we compare our classifier with diagonal
-linear discriminant analysis from \cite{Dudoit:2002ev} and the recently proposed
-classifiers from \cite{Guo:2007te}, \cite{Pang:2009ik}, \cite{Tong:2012hw}, and
-\cite{Witten:2011kc}. We conduct our comparison of the classification accuracy
-of the competing classifiers using four small-sample, high-dimensional
-benchmark microarray data sets.
+linear discriminant analysis proposed by \cite{Dudoit:2002ev} and the recently
+proposed classifiers from \cite{Guo:2007te}, \cite{Pang:2009ik},
+\cite{Tong:2012hw}, and \cite{Witten:2011kc}. We conduct our comparison of the
+classification accuracy of the competing classifiers using four small-sample,
+high-dimensional benchmark microarray data sets.
 
 \section{Regularized Discriminant Analysis}
 \label{sec:rda}
@@ -282,16 +282,16 @@ reduces to the sample linear discriminant analysis classifier, and the
 log-determinant is omitted because it is constant across all classes.
 
 Throughout the document we also require the following additional notation. Let
-$I_m$ be the $m \times m$ identity matrix, and let $0_{m \times p}$ be
-the $m \times p$ matrix of zeros, such that $0_m$ is understood to denote
-$0_{m \times m}$. Lastly, for $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne
-0$ and $0$ otherwise. Let $A \oplus B$ denote the direct sum of $A \in
-\mathbb{R}_{r \times r}$ and $B \in \mathbb{R}_{s \times s}$ \citep[Chapter
+$I_m$ be the $m \times m$ identity matrix, and let $0_{m \times p}$ be the $m
+\times p$ matrix of zeros, such that $0_m$ is understood to denote $0_{m \times
+  m}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$ and $0$
+otherwise. Let $A \oplus B$ denote the direct sum of $A \in \mathbb{R}_{r \times
+  r}$ and $B \in \mathbb{R}_{s \times s}$ \citep[Chapter
   1]{Lutkepohl:1996uz}. Let $A^+$ and $\mathcal{N}(A) = \{z \in \mathbb{R}_{p
-  \times 1} : A z = 0_{m \times 1}\}$ denote the Moore-Penrose pseudoinverse and null space
-of $A \in \mathbb{R}_{m \times p}$, respectively. Let $V^{\perp} = \{y
-\in \mathbb{R}_{p \times 1} : y^{T}v = 0\ \forall v \in V \}$ denote
-the orthogonal complement of a vector space $V \subset \mathbb{R}_{p \times 1}$.
+  \times 1} : A z = 0_{m \times 1}\}$ denote the Moore-Penrose pseudoinverse and
+null space of $A \in \mathbb{R}_{m \times p}$, respectively. Let $V^{\perp} =
+\{y \in \mathbb{R}_{p \times 1} : y^{T}v = 0\ \forall v \in V \}$ denote the
+orthogonal complement of a vector space $V \subset \mathbb{R}_{p \times 1}$.
 
 \subsection{Covariance Matrix Regularization}
 
@@ -408,7 +408,17 @@ that $\widehat{\Sigma}_k = X_k^{T} X_k$. In Figure
 populations for $\lambda = 0$ with unequal covariance matrices. As $\lambda$
 approaches 1, the contours become more similar, resulting in identical contours
 for $\lambda = 1$.
-\[ \left[\text{Figure \ref{fig:hdrda-contours} goes about here }\right]\]
+\begin{figure}
+<<hdrda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
+rda_contours(lambda = 0)
+rda_contours(lambda = 1/4)
+rda_contours(lambda = 3/4)
+rda_contours(lambda = 1)
+@ 
+\caption{Contours of five multivariate normal populations as a function of the
+  pooling parameter $\lambda$.}
+\label{fig:hdrda-contours}
+\end{figure}
 As we have discussed above, several eigenvalue adjustment methods have been
 proposed to increase eigenvalues (approximately) equal to 0. Here, we define the
 eigenvalue adjustment of \eqref{eq:sig-lambda-alternative} as
@@ -511,7 +521,7 @@ of $\widehat{\Sigma}$, which implies that $\widehat{\Sigma}_k U_2 =
 U_1^{T} \widehat{\Sigma}_k U_1 \oplus 0_{p-q}$ $(k = 1, \ldots,
 K)$. Thus, $U^{T} \tilde{\Sigma}_k U = \alpha_k \{(1 - \lambda) U^{T}
 \widehat{\Sigma}_k U + \lambda D\} + \gamma I_p$, and
-\eqref{eq:rda-matrix} follows because $U$ is orthogonal.
+\eqref{eq:rda-matrix} holds because $U$ is orthogonal.
 \end{proof}
 
 As an immediate immediate consequence of Lemma \ref{lemma:rda-tilde-Sigma_k}, we
@@ -622,7 +632,7 @@ Thus far, we have constructed each $\tilde{\Sigma}_k$ in terms of the first $q$
 eigenvectors of $\widehat{\Sigma}$. By utilizing a technique similar to the
 so-called kernel trick, we can obtain $U_1$ by computing the eigendecomposition
 of a much smaller $N \times N$ matrix when $p \gg N$
-\citep{Hastie:2008dt}. Recall that the pooled sample covariance matrix
+\citep{Hastie:2008dt}. Recall that the pooled sample covariance matrix is
 $\widehat{\Sigma} = X^{T} X$. Then, because $X = M D^{1/2} U^{T}$ by the
 singular value decomposition, we have the eigendecomposition $\widehat{\Sigma} =
 U D U^{T}$, where $M \in \mathbb{R}_{N \times N}$ is orthogonal, $D^{1/2} \in
@@ -632,13 +642,13 @@ values of $X$, and $U \in \mathbb{R}_{p \times N}$ is orthogonal. Now, $X X^{T}
 matrix of eigenvalues of $X X^{T}$ and the columns of $M$ are the corresponding
 eigenvectors. Hence, we obtain $M$ and $D$ from an eigendecomposition of $X
 X^{T} \in \mathbb{R}_{N \times N}$. Next, we compute $U = X^{T} M D^{+/2}$,
-where $D^{+/2} = D_q^{-1/2} \oplus 0_{N-q}$. We then determine $q$ by computing
-the number of numerically nonzero eigenvalues present in $D$, where $q$ is the
-number of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1
-\times 10^{-6}$. After calculating $q$, we extract $U_1$ by retaining only the
-first $q$ columns of $U$.
+where $D^{+/2} = D_q^{-1/2} \oplus 0_{N-q}$. We then determine $q$, the number
+of numerically nonzero eigenvalues present in $D$, by calculating the number of
+eigenvalues that exceeds some tolerance value, say, $\epsilon = 1 \times
+10^{-6}$. After calculating $q$, we extract $U_1$ by retaining only the first
+$q$ columns of $U$.
 
-\section{High-Dimensional Microarray Data Sets}
+\section{Classification Study}
 
 In this section, we describe four high-dimensional microarray data sets and
 compare our proposed classifier with five classifiers recently proposed for
@@ -676,9 +686,9 @@ our implementations of the Dudoit, Pang, and Tong classifiers available in the
 {\tt sparsediscrim} package. We used the default settings for each classifier
 with the exception that we explicitly set prior probabilities as equal, if the
 option was available. For our classifier, we set $\alpha_k = 1$ $(k = 1, \ldots,
-K)$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov} employed had a
-form resembling \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid
-of 21 equidistant candidate values between 0 and 1, inclusively. Similarly, we
+K)$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov} employed
+resembled \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21
+equidistant candidate values between 0 and 1, inclusively. Similarly, we
 estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots, 10^4$,
 and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
 10-fold cross-validation \citep{Hastie:2008dt}.
@@ -755,11 +765,11 @@ to its competitors for larger values of $d$. Furthermore, Figure
 \ref{fig:error-rates} emphasizes two strengths of our classifier: reliability of
 the classifier for small $d$ and stability of the classifier for large $d$. In
 contrast to the other classifiers, our classifier exhibited less variability in
-its misclassification estimates for small values of $d$. Also, our classifier
-yielded superior classification accuracy as $d$ increased and was hardly
-effected by the inclusion of more variables in the data sets. We attribute the
-apparent stability of the error-rate estimates of our classifier for large
-values of $d$ to its novel dimension-reduction technique.
+its misclassification estimates for small values of $d$ and yielded superior
+classification accuracy as $d$ increased and was hardly effected by the
+inclusion of more variables in the data sets. We attribute the apparent
+stability of the error-rate estimates of our classifier for large values of $d$
+to its novel dimension-reduction technique.
 
 The error-rate estimates for the Dudoit, Pang, Tong, and Witten classifiers were
 comparable for all values of $d$ examined. Furthermore, the error-rate estimates
@@ -779,16 +789,36 @@ that classification accuracy estimates were reported only for small values of
 $d$, thereby ignoring the inclusion of a larger number of variables. Hence, we
 advise that practioners be aware of the necessity to filter a large number of
 features before employing these methods, lest their classification performance
-can degrade.
+be degraded.
 
 The popular Guo classifier is most competitive over large values of $d$ for the
 Shipp and Singh data sets. However, for the Burczynski and Nakayama data sets,
 the implementation of the Guo method in the {\tt rda} package often classified
 every test observation into a single class, thus yielding larger error rates
 than its competitors. Furthermore, the Guo classifier exhibited unreliable
-classification performance for smaller values of $d$. The Guo classifier
-required a larger subset of the features to perform competitively in our study.
-\[ \left[\text{Figure \ref{fig:error-rates} goes about here }\right]\]
+classification performance for smaller values of $d$ and required a larger
+subset of the features to perform competitively in our study.
+\begin{figure}
+<<error_rates>>=
+error_rates$data_set <- Hmisc:::capitalize(error_rates$data_set)
+p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
+p <- p + geom_line(aes(), size = 1, linetype = 2)
+p <- p + geom_point(aes(shape = Classifier), size = 6)
+p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
+p <- p + xlab("Number of Variables Selected, d") + ylab("Average Error Rate")
+p <- p + theme(axis.text = element_text(size = 16))
+p <- p + theme(axis.title.x = element_text(size = 20))
+p <- p + theme(axis.title.y = element_text(size = 20))
+p <- p + theme(strip.text.x = element_text(size = 18))
+p + theme(legend.position = "none")
+@ 
+\caption{Averages of the 1000 error-rate estimates of the competing classifiers
+  for each data set as a function of $d$. The classifiers are marked as follows:
+  Dudoit (circle), Guo (triangle), Pang (square), Tong = (cross), Witten (
+  square with X), and ours (asterisk). Approximate standard errors are no
+  greater than $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.}
+\label{fig:error-rates}
+\end{figure}
 Next, we examine the optimal estimates of the tuning parameters for our
 classifier. For brevity, we provide graphical summaries of the optimal estimates
 of $\lambda$ and $\gamma$ in the Supplementary Material. For each of the four
@@ -833,42 +863,6 @@ of the optimal estimates of our classifier from the classification study.
 
 \bibliographystyle{biometrika}
 \bibliography{rda}
-
-\clearpage
-
-\begin{figure}
-<<hdrda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
-rda_contours(lambda = 0)
-rda_contours(lambda = 1/4)
-rda_contours(lambda = 3/4)
-rda_contours(lambda = 1)
-@ 
-\caption{Contours of five multivariate normal populations as a function of the
-  pooling parameter $\lambda$.}
-\label{fig:hdrda-contours}
-\end{figure}
-
-\begin{figure}
-<<error_rates>>=
-error_rates$data_set <- Hmisc:::capitalize(error_rates$data_set)
-p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
-p <- p + geom_line(aes(color = Classifier), size = 1.5, linetype = 2)
-p <- p + geom_point(aes(color = Classifier, shape = Classifier), size = 4)
-p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
-p <- p + xlab("Number of Variables Selected, d") + ylab("Average Error Rate")
-p <- p + theme(axis.text = element_text(size = 16))
-p <- p + theme(axis.title.x = element_text(size = 20))
-p <- p + theme(axis.title.y = element_text(size = 20))
-p <- p + theme(strip.text.x = element_text(size = 18))
-p + theme(legend.position = "none")
-@ 
-\caption{Averages of the 1000 error-rate estimates of the competing classifiers
-  for each data set as a function of $d$. The classifiers are marked as follows:
-  Dudoit (red circle), Guo (gold triangle), Pang (green square), Tong = (cyan
-  cross), Witten (blue square with X), and ours (pink asterisk). Approximate
-  standard errors are no greater than $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.}
-\label{fig:error-rates}
-\end{figure}
 
 \end{document} 
 
