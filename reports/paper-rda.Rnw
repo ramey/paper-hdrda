@@ -150,7 +150,7 @@ incalculable when $p > N$ because the sample covariance matrices employed are
 singular. As a result, many researchers, including \cite{Mai:2012bf},
 \cite{Fan:2012iq}, \cite{Merchante:2012vk}, \cite{Clemmensen:2011kr}, and
 \cite{Huang:2010ju}, have introduced restrictions on the population covariance
-matrices in linear and quadratic discriminant analysis to reduce number of
+matrices in linear and quadratic discriminant analysis to reduce the number of
 covariance parameters that must be estimated to ensure that the resulting
 classifiers are calculable. For instance, \cite{Dudoit:2002ev} have modified the
 linear and quadratic discriminant analysis classifiers by assuming that the
@@ -191,7 +191,8 @@ assumption of equal population covariance matrices for linear discriminant
 analysis is often too stringent in practice \citep{Clemmensen:2011kr}, our
 proposed classifier can relax the linearity assumption by instead incorporating
 unequal covariance matrices while retaining linear and quadratic discriminant
-analysis as special cases. We then establish our classifier by applying
+analysis as special cases. We then establish the high-dimensional regularized
+discriminant analysis (\emph{HDRDA}) classifier by applying
 covariance-matrix regularization with a parameterization that includes a large
 family of shrinkage methods, such as those from \cite{Srivastava:2007ww},
 \cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
@@ -200,9 +201,9 @@ family of shrinkage methods, such as those from \cite{Srivastava:2007ww},
 We show that our proposed classifier is invariant to any adjustments of the
 eigenvalues corresponding to the null space of the pooled sample covariance
 matrix. Applying a reasoning similar to \cite{Ye:2006tq}, we decompose the
-decision rule of our classifier and show that the sum related to the null space
-of the pooled sample covariance matrix can be discarded. Hence, no gain in
-classification performance can be obtained by adjusting these zero
+decision rule of the \emph{HDRDA} classifier and show that the sum related to
+the null space of the pooled sample covariance matrix can be discarded. Hence,
+no gain in classification performance can be obtained by adjusting these zero
 eigenvalues. This invariance property addresses the computational shortcomings
 of \citeauthor{Friedman:1989tm}'s classifier and provides a substantial increase
 in computational efficiency and model selection. In fact, we show that the
@@ -211,11 +212,11 @@ matrices, where $n_k$ is the sample size of the $k$th class $(k = 1, \ldots,
 K)$. This reduction in calculation is clearly advantageous because $n_k$ is
 often quite small in microarray data sets (e.g., 15--20 observations).
 
-We also demonstrate that our proposed classifier is competitive with and often
-superior to several recent classifiers designed for small-sample,
-high-dimensional data. In particular, we compare our classifier with diagonal
-linear discriminant analysis proposed by \cite{Dudoit:2002ev} and the recently
-proposed classifiers from \cite{Guo:2007te}, \cite{Pang:2009ik},
+We also demonstrate that the \emph{HDRDA} classifier is competitive with and
+often superior to several recent classifiers designed for small-sample,
+high-dimensional data. In particular, we compare our proposed classifier with
+diagonal linear discriminant analysis proposed by \cite{Dudoit:2002ev} and the
+recently proposed classifiers from \cite{Guo:2007te}, \cite{Pang:2009ik},
 \cite{Tong:2012hw}, and \cite{Witten:2011kc}. We conduct our comparison of the
 classification accuracy of the competing classifiers using four small-sample,
 high-dimensional benchmark microarray data sets.
@@ -443,8 +444,8 @@ computational costs is achieved relative to Friedman's classifier in
 \eqref{eq:rda}. Furthermore, a byproduct is that adjustments to the associated
 eigenvalues have no effect on \eqref{eq:hdrda}. Lastly, we utilize the singular
 value decomposition to calculate efficiently the eigenvalue decomposition of
-$\widehat{\bm \Sigma}$, further reducing the computational costs of our proposed
-classifier.
+$\widehat{\bm \Sigma}$, further reducing the computational costs of the
+\emph{HDRDA} classifier.
 
 First, we require the following relationship regarding the null spaces of
 $\widehat{\bm \Sigma}_k(\lambda)$, $\widehat{\bm \Sigma}$, and $\widehat{ \bm
@@ -544,11 +545,12 @@ I(y_i = k) n_{k'} - I(y_i = k') n_k \}$. Therefore, $\bm U_2^{T} (\bm x -
 \xbar_k) = \bm U_2^{T} (\bm x - \xbar_{k'})$.
 \end{proof}
 
-We now present our main result, where we decompose the decision rule of our
-proposed classifier and show that the term requiring the largest computational
-costs does not contribute to the classification of an unlabeled observation
-performed using Lemma \ref{lemma:RDA-constant-term}. Hence, we reduce
-\eqref{eq:hdrda} to an equivalent, more computationally efficient decision rule.
+We now present our main result, where we decompose the decision rule of the
+\emph{HDRDA} classifier and show that the term requiring the largest
+computational costs does not contribute to the classification of an unlabeled
+observation performed using Lemma \ref{lemma:RDA-constant-term}. Hence, we
+reduce \eqref{eq:hdrda} to an equivalent, more computationally efficient
+decision rule.
 
 \begin{thm}
 Let $\tilde{\bm \Sigma}_k$ and $\bm W_k$ be defined as in \eqref{eq:rda-matrix}
@@ -573,8 +575,8 @@ Because $\gamma$ is constant for $k = 1, \ldots, K$, we can omit the $(p - q)
 $\bm U_2^{T} (\bm x - \xbar_k)$ is constant for $k = 1, \ldots, K$.
 \end{proof}
 
-Thus far, we have shown that our classifier in \eqref{eq:hdrda} is invariant to
-the term $\bm U_2$, thus yielding an equivalent classifier in
+Thus far, we have shown that our proposed classifier in \eqref{eq:hdrda} is
+invariant to the term $\bm U_2$, thus yielding an equivalent classifier in
 \eqref{eq:hdrda-decomposed} with a substantial reduction in the computational
 complexity. Here, we demonstrate that the computational efficiency in
 calculating the inverse and determinants of $\bm W_k$ can be further improved
@@ -671,12 +673,12 @@ rule automatically, we applied this rule in our {\tt R} code. We also utilized
 our implementations of the Dudoit, Pang, and Tong classifiers available in the
 {\tt sparsediscrim} package. We used the default settings for each classifier
 with the exception that we explicitly set prior probabilities as equal, if the
-option was available. For our classifier, we set $\alpha_k = 1$ $(k = 1, \ldots,
-K)$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov} employed
-resembled \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21
-equidistant candidate values between 0 and 1, inclusively. Similarly, we
-estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots, 10^4$,
-and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
+option was available. For the \emph{HDRDA} classifier, we set $\alpha_k = 1$ $(k
+= 1, \ldots, K)$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov}
+employed resembled \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a
+grid of 21 equidistant candidate values between 0 and 1, inclusively. Similarly,
+we estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots,
+10^4$, and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
 10-fold cross-validation \citep{Hastie:2008dt}.
 
 \subsection{\cite{Burczynski:2006ik} Data Set}
@@ -742,20 +744,20 @@ for a larger value of $d$. We report the average of the error-rate estimates for
 each value of $d$ in Figure \ref{fig:error-rates}. Approximate standard errors
 were no greater than $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.
 
-Our classifier was superior in classification performance for the majority of
-the simulations. For the Burczysnki, Shipp, and Singh data sets, our classifier
-outperformed its competitors for all values of $d$ examined. For the Nakayama
-data set, our classifier was outperformed by the Dudoit, Pang, and Tong
-classifiers for small values of $d$ but attained classification rates superior
-to its competitors for larger values of $d$. Furthermore, Figure
+The \emph{HDRDA} classifier was superior in classification performance for the
+majority of the simulations. For the Burczysnki, Shipp, and Singh data sets, our
+classifier outperformed its competitors for all values of $d$ examined. For the
+Nakayama data set, the \emph{HDRDA} classifier was outperformed by the Dudoit,
+Pang, and Tong classifiers for small values of $d$ but attained classification
+rates superior to its competitors for larger values of $d$. Furthermore, Figure
 \ref{fig:error-rates} emphasizes two strengths of our classifier: reliability of
 the classifier for small $d$ and stability of the classifier for large $d$. In
-contrast to the other classifiers, our classifier exhibited less variability in
-its misclassification estimates for small values of $d$ and yielded superior
-classification accuracy as $d$ increased and was hardly effected by the
-inclusion of more variables in the data sets. We attribute the apparent
-stability of the error-rate estimates of our classifier for large values of $d$
-to its novel dimension-reduction technique.
+contrast to the other classifiers, the \emph{HDRDA} classifier exhibited less
+variability in its misclassification estimates for small values of $d$ and
+yielded superior classification accuracy as $d$ increased and was hardly
+effected by the inclusion of more variables in the data sets. We attribute the
+apparent stability of the error-rate estimates of our classifier for large
+values of $d$ to its novel dimension-reduction technique.
 
 The error-rate estimates for the Dudoit, Pang, Tong, and Witten classifiers were
 comparable for all values of $d$ examined. Furthermore, the error-rate estimates
@@ -805,41 +807,42 @@ p + theme(legend.position = "none")
   $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.}
 \label{fig:error-rates}
 \end{figure}
-Next, we examine the optimal estimates of the tuning parameters for our
-classifier. For brevity, we provide graphical summaries of the optimal estimates
-of $\lambda$ and $\gamma$ in the Supplementary Material. For each of the four
-data sets, the distribution of the optimal values of $\lambda$ selected through
-cross-validation often had a notable bathtub shape, resembling a Beta
-distribution with both shape parameters less than unity. Specifically, the
-optimal values of $\lambda$ were typically near 0 or near 1, corresponding to
-quadratic and linear discriminant analysis, respectively. For instance, with
+Next, we examine the optimal estimates of the tuning parameters for the
+\emph{HDRDA} classifier. For brevity, we provide graphical summaries of the
+optimal estimates of $\lambda$ and $\gamma$ in the Supplementary Material. For
+each of the four data sets, the distribution of the optimal values of $\lambda$
+selected through cross-validation often had a notable bathtub shape, resembling
+a Beta distribution with both shape parameters less than unity. Specifically,
+the optimal values of $\lambda$ were typically near 0 or near 1, corresponding
+to quadratic and linear discriminant analysis, respectively. For instance, with
 smaller values of $d$ applied to the Shipp data set, the range of optimal values
 of $\lambda$ was typically no larger than 0.05, indicating there were a large
 number of training data sets for which we can safely assume the covariance
 matrices are unequal or nearly unequal. As $d$ increased, the majority of the
 optimal values of $\lambda$ were selected as unity, thereby an increased number
-of variables resulted in our classifier preferring the more parsimonious
-assumption of equal covariance matrices. In this instance we can see the
-flexibility of our classifier to employ the more realistic assumption that the
-class covariance matrices are unequal, but if optimal, we can employ the more
-parsimonious assumption of equal covariance matrices.
+of variables resulted in the \emph{HDRDA} classifier preferring the more
+parsimonious assumption of equal covariance matrices. In this instance we can
+see the flexibility of our proposed classifier to employ the more realistic
+assumption that the class covariance matrices are unequal, but if optimal, we
+can employ the more parsimonious assumption of equal covariance matrices.
 
 \section{Discussion}
 
-In our simulation study, we compared our classifier to several recently proposed
-classifiers, including the Dudoit, Pang, Tong, and Guo classifiers, each of
-which assumes independence of the features conditional on class
-membership. Despite the rapid computational performance of diagonal classifiers
-and the reduction in the number of parameters to estimate, \cite{Mai:2012bf} and
-\cite{Fan:2012iq} have noted that diagonal classifiers can often yield inferior
-classification performance to other classification methods. We have shown that
-our proposed classifier often yields superior classification accuracy to the
-diagonal classifiers considered, confirming the assertions of \cite{Mai:2012bf}
-and \cite{Fan:2012iq}. Furthermore, the implementation of our classifier in the
-{\tt sparsediscrim} R package was comparable to that of the diagonal classifiers
-in terms of computational runtime. Moreover, when preliminary variable selection
-was applied to the data in our classification study, the time to perform model
-selection with our proposed classifier was nearly instantaneous.
+In our simulation study, we compared our proposed \emph{HDRDA} classifier to
+several recently proposed classifiers, including the Dudoit, Pang, Tong, and Guo
+classifiers, each of which assumes independence of the features conditional on
+class membership. Despite the rapid computational performance of diagonal
+classifiers and the reduction in the number of parameters to estimate,
+\cite{Mai:2012bf} and \cite{Fan:2012iq} have noted that diagonal classifiers can
+often yield inferior classification performance to other classification
+methods. We have shown that the \emph{HDRDA} classifier often yields superior
+classification accuracy to the diagonal classifiers considered, confirming the
+assertions of \cite{Mai:2012bf} and \cite{Fan:2012iq}. Furthermore, the
+implementation of our classifier in the {\tt sparsediscrim} R package was
+comparable to that of the diagonal classifiers in terms of computational
+runtime. Moreover, when preliminary variable selection was applied to the data
+in our classification study, the time to perform model selection with our
+proposed classifier was nearly instantaneous.
 
 \section*{Supplementary material}
 \label{SM}
