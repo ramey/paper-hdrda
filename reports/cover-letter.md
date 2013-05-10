@@ -22,14 +22,19 @@ research article in the _Annals of Applied Statistics_, with which we have had
 no prior interaction regarding our manuscript.
 
 In this paper we propose a regularized classifier that is intended for
-small-sample, high-dimensional data, that is computationally efficient, and that
-is often superior to several recently proposed sparse and regularized
-classifiers in terms of classification accuracy. We have provided an _R_
-implementation in the _sparsediscrim_ package, which is available on
-_CRAN_. Furthermore, the classification study for the article is reproducible
-and is available upon request. This paper should be of interest to a broad
-readership including those interested in efficient sparse and regularized
-classifiers for high-dimensional classification.
+small-sample, high-dimensional data, that is computationally
+efficient, and that is often superior to several recently proposed
+sparse and regularized classifiers in terms of classification
+accuracy. We have provided an _R_ implementation in the
+_sparsediscrim_ package, which is available on _CRAN_. Furthermore,
+the classification study for the article is reproducible and is
+available upon request. For the classification study, we used standard
+microarray benchmark data sets and have been bundled them in the
+_datamicroarray_ R package at:
+\url{https://github.com/ramey/datamicroarray}. This paper should be of
+interest to a broad readership including those interested in efficient
+sparse and regularized classifiers for high-dimensional
+classification.
 
 Due to a potential conflict of interest, we respectfully request that the
 following six individuals not be asked to review the paper:
