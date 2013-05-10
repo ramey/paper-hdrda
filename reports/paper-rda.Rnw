@@ -735,14 +735,14 @@ prostate samples.
 
 For the microarray data sets, we computed error-rate estimates for the competing
 classifiers after reducing the dimension of the data sets with feature selection
-to $d = 100, \ldots, 1000$, similar to the values of $d$ considered by
+to $d = 100, 200, \ldots, 1000$, similar to the values of $d$ considered by
 \cite{Xu:2009fl}. To compare misclassification rates between different values of
 $d$, we applied each value of $d$ considered to the same random allocation of
 training and test data. Hence, for a given random partition, the set of features
 selected for a small value of $d$ is a proper subset of the features selected
 for a larger value of $d$. We report the average of the error-rate estimates for
 each value of $d$ in Figure \ref{fig:error-rates}. Approximate standard errors
-were no greater than $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.
+were no greater than \Sexpr{max_se}.
 
 The \emph{HDRDA} classifier was superior in classification performance for the
 majority of the simulations. For the Burczysnki, Shipp, and Singh data sets, our
@@ -804,7 +804,7 @@ p + theme(legend.position = "none")
   for each data set as a function of $d$. The classifiers are marked as follows:
   Dudoit (circle), Guo (triangle), Pang (square), Tong = (cross), Witten (square
   with X), and ours (asterisk). Approximate standard errors are no greater than
-  $\Sexpr{gsub('.', '\\cdot', round(max_se, 3), fixed = TRUE)}$.}
+  \Sexpr{max_se}.}
 \label{fig:error-rates}
 \end{figure}
 Next, we examine the optimal estimates of the tuning parameters for the
