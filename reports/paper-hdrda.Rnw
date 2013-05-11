@@ -1,59 +1,95 @@
-\documentclass[11pt]{article}
-\usepackage{graphicx, amsmath, amssymb, bm, url, mathtools, natbib, amsthm, setspace}
+\documentclass[aoas,preprint]{imsart}
 
-\pagestyle{plain}
-%----------------Page dimensions ----------------
-\oddsidemargin 0.0in
-\evensidemargin 0.0in
-\topmargin -0.75in
-\leftmargin 0in
-\headheight 0.0in
-\headsep 0.5in
-%\footheight 0.0in
-\footskip 0.5in
-\footnotesep 0.0in
-\textwidth 6.7in
-\textheight 9.5in
-%-----------Define Pictures---------------------
-\def\picture #1 by #2 (#3){
-   \vbox to #2{
-        \hrule width #1 height 0pt depth 0pt
-           \vfill
-              \special{picture #3} % this is the low-level interface
-                 }
-    }
-\def\scaledpicture #1 by #2 (#3 scaled #4){{
-     \dimen0=#1 \dimen1=#2
-      \divide\dimen0 by 1000 \multiply\dimen0 by #4
-       \divide\dimen1 by 1000 \multiply\dimen1 by #4
-        \picture \dimen0 by \dimen1 (#3 scaled #4)}
-   }
+\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm}
+\RequirePackage[OT1]{fontenc}
+\RequirePackage{natbib}
+\RequirePackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
 
-\title{High-Dimensional Regularized Discriminant Analysis}
+% provide arXiv number if available:
+%\arxiv{arXiv:0000.0000}
 
-\author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
-%Vaccine and Infectious Disease Division, Fred Hutchinson Cancer Research
-%  Center,\\ Seattle, Washington 98115, U.S.A. \email{johnramey@gmail.com}}
-%\affil{Department of Statistical Science, Baylor University, Waco, Texas 76706, U.S.A. \email{Caleb\_Stein@baylor.edu} \email{Dean\_Young@baylor.edu}}
-
-
+\startlocaldefs
 \newcommand{\xbar}{\bar{\bm x}}
 \newcommand{\tr}{\text{tr}}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
-
 \newtheorem{cor}{Corollary}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
 \newtheorem{thm}{Theorem}
-
-\bibpunct{(}{)}{;}{a}{,}{,}
+\endlocaldefs
 
 \begin{document}
 
-\doublespacing
+\begin{frontmatter}
 
-\maketitle
+\title{High-Dimensional Regularized Discriminant Analysis}
+\runtitle{High-Dimensional Regularized Discriminant Analysis}
+
+\begin{aug}
+\author{\fnms{John A.} \snm{Ramey}\thanksref{m1}\ead[label=e1]{johnramey@gmail.com}}
+\author{\fnms{Caleb K.} \snm{Stein}\thanksref{m2}\ead[label=e2]{Caleb\_Stein@baylor.edu}}
+\and
+\author{\fnms{Dean M.} \snm{Young}\thanksref{m2}\ead[label=e3]{Dean\_Young@baylor.edu}}
+
+\runauthor{J. A. Ramey et al.}
+
+\affiliation{Fred Hutchinson Cancer Research Center\thanksmark{m1} and Baylor University\thanksmark{m2}}
+
+\address{Vaccine and Infectious Disease Division\\
+  Fred Hutchinson Cancer Research Center\\
+  1100 Fairview Ave. N., M2-C200\\
+  Seattle, Washington 98115, U.S.A.\\
+  \printead{e1}}
+
+\address{Department of Statistical Science\\
+  Baylor University\\
+  P.O. Box 97140\\
+  Waco, Texas 76706, U.S.A.\\
+  \printead{e2}\\
+  \phantom{E-mail:\ }\printead*{e3}}
+\end{aug}
+
+\begin{abstract}
+
+A reliable supervised classification of tumors from gene expression microarray
+data is essential for successful diagnosis and treatment of diseases such as
+cancer; however, because the number of gene expression levels measured is
+typically much greater than the sample size, the analysis of microarray data
+often presents difficult statistical and computational challenges. Here, we
+propose a new regularized discriminant analysis classifier that incorporates
+dimension reduction and covariance-matrix shrinkage to enable a computationally
+efficient classifier and model-selection procedure. We demonstrate with four
+high-dimensional microarray data sets that our proposed classifier is often
+superior to several recently proposed sparse and regularized classifiers in
+terms of classification accuracy. Finally, we provide an implementation of our
+proposed classifier in the {\tt sparsediscrim} R package, available on CRAN.
+
+
+\end{abstract}
+
+%\begin{keyword}[class=AMS]
+%\kwd[Primary ]{}
+%\kwd{}
+%\kwd[; secondary ]{}
+%\end{keyword}
+
+%\begin{keyword}
+%\kwd{}
+%\kwd{}
+%\end{keyword}
+
+\end{frontmatter}
+
+
+% AOS,AOAS: If there are supplements please fill:
+%\begin{supplement}[id=suppA]
+%  \sname{Supplement A}
+%  \stitle{Title}
+%  \slink[doi]{10.1214/00-AOASXXXXSUPP}
+%  \sdatatype{.pdf}" 
+%  \sdescription{Some text}
+%\end{supplement}
 
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
@@ -105,25 +141,6 @@ error_rates <- subset(error_rates, select = -Num_Reps)
 
 max_se <- max(error_rates[["SE_Error"]])
 @ 
-
-\maketitle
-
-\begin{abstract}
- 
-A reliable supervised classification of tumors from gene expression microarray
-data is essential for successful diagnosis and treatment of diseases such as
-cancer; however, because the number of gene expression levels measured is
-typically much greater than the sample size, the analysis of microarray data
-often presents difficult statistical and computational challenges. Here, we
-propose a new regularized discriminant analysis classifier that incorporates
-dimension reduction and covariance-matrix shrinkage to enable a computationally
-efficient classifier and model-selection procedure. We demonstrate with four
-high-dimensional microarray data sets that our proposed classifier is often
-superior to several recently proposed sparse and regularized classifiers in
-terms of classification accuracy. Finally, we provide an implementation of our
-proposed classifier in the {\tt sparsediscrim} R package, available on CRAN.
-
-\end{abstract}
 
 \section{Introduction}
 
@@ -802,7 +819,7 @@ Supplementary material available online includes the graphical summary
 of the optimal estimates of our classifier from the classification study.
 
 
-\bibliographystyle{plainnat}
+\bibliographystyle{imsart-nameyear}
 \bibliography{rda}
 
 \end{document} 
