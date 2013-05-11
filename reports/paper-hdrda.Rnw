@@ -113,15 +113,16 @@ max_se <- max(error_rates[["SE_Error"]])
 A reliable supervised classification of tumors from gene expression microarray
 data is essential for successful diagnosis and treatment of diseases such as
 cancer; however, because the number of gene expression levels measured is
-typically much greater than the sample size, the analysis of microarray data
-often presents difficult statistical and computational challenges. Here, we
-propose a new regularized discriminant analysis classifier that incorporates
-dimension reduction and covariance-matrix shrinkage to enable a computationally
-efficient classifier and model-selection procedure. We demonstrate with four
-high-dimensional microarray data sets that our proposed classifier is often
-superior to several recently proposed sparse and regularized classifiers in
-terms of classification accuracy. Finally, we provide an implementation of our
-proposed classifier in the {\tt sparsediscrim} R package, available on CRAN.
+typically much greater than the sample size, the analysis of microarray data can
+be difficult because classic classifiers are often ill-posed in this setting and
+require a large number of calculations. To address these challenges, we propose
+a new regularized discriminant analysis classifier that incorporates dimension
+reduction and covariance-matrix shrinkage to enable an efficacious,
+computationally efficient method. We demonstrate with four high-dimensional
+microarray data sets that our proposed classifier is often superior to several
+recently proposed sparse and regularized classifiers in terms of classification
+accuracy. Finally, we provide an implementation of our proposed classifier in
+the {\tt sparsediscrim} R package, available on CRAN.
 
 \end{abstract}
 
@@ -281,7 +282,7 @@ applies a shrinkage factor $\gamma > 0$, so that
 \end{align}
 similar to a method employed in ridge regression \citep{Hoerl:1970cd}. Equation
 \eqref{eq:ridge-estimator} effectively \emph{shrinks} the sample covariance
-matrix $\widehat{\bm \Sigma}_k$ towards $\bm I_p$, thereby increasing the
+matrix $\widehat{\bm \Sigma}_k$ toward $\bm I_p$, thereby increasing the
 eigenvalues of $\widehat{\bm \Sigma}_k$ by $\gamma$. Specifically, the zero
 eigenvalues are replaced with $\gamma$, so that \eqref{eq:ridge-estimator} is
 positive definite. For additional covariance-matrix regularization methods, see
