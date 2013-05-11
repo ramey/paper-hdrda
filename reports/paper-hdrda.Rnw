@@ -133,7 +133,7 @@ thousands of genes in a single experiment to identify a subset of genes and
 their expression patterns that either characterize a particular cell state or
 facilitate an accurate prediction of future cell state.  We focus on the
 classification of tissues and other biological samples into one of $K$ disjoint,
-predefined cancer types, where our goal is to ascertain the class membership of
+predefined types, where our goal is to ascertain the class membership of
 a new tissue sample based on gene-expression microarray data. However,
 microarray data typically consist of a large number of gene expressions $p$
 relative to the total sample size $N$. Moreover, standard benchmark microarray
@@ -173,7 +173,7 @@ linear discriminant analysis is often too stringent in practice
 \citep{Clemmensen:2011kr}, our proposed classifier can relax the linearity
 assumption by instead incorporating unequal covariance matrices while retaining
 linear and quadratic discriminant analysis as special cases. We then establish
-\emph{HDRDA} classifier by applying covariance-matrix regularization with a
+the \emph{HDRDA} classifier by applying covariance-matrix regularization with a
 parameterization that includes a large family of shrinkage methods, such as
 those from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods
 studied by \cite{Ramey:2013ji} and \cite{Xu:2009fl}. This regularization has the
@@ -188,10 +188,10 @@ the null space of the pooled sample covariance matrix can be discarded. Hence,
 no gain in classification performance can be obtained by adjusting these zero
 eigenvalues. This invariance property provides a substantial increase in
 computational efficiency of model training and selection. In fact, we show that
-the inverse and determinants can be reduced to calculations of $n_k \times n_k$
+the inverse and determinant can be reduced to calculations of $n_k \times n_k$
 matrices, where $n_k$ is the sample size of the $k$th class $(k = 1, \ldots,
 K)$. This reduction in calculation is clearly advantageous because $n_k$ is
-often quite small in microarray data sets (e.g., 15--20 observations).
+often quite small in microarray data sets (e.g., 10--20 observations).
 
 We also demonstrate that the \emph{HDRDA} classifier is competitive with and
 often superior to several recent classifiers designed for small-sample,
@@ -261,15 +261,15 @@ vector space $V \subset \mathbb{R}_{p \times 1}$.
 
 \subsection{Covariance Matrix Regularization}
 
-The smallest eigenvalues and the directions associated with their eigenvectors
-highly influence \eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm
-  \Sigma}_k$ are well-known to be biased if $p \ge n_k$ such that the smallest
-eigenvalues are underestimated \citep{Seber:2004uh}, Moreover, if $p > n_k$,
-then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which implies that at least $p -
-n_k$ eigenvalues of $\widehat{\bm \Sigma}_k$ are 0. Furthermore, although more
-feature information is available to discriminate among the $K$ classes, if $p >
-n_k$, \eqref{eq:qda} is incalculable because $\widehat{\bm \Sigma}_k^{-1}$ does
-not exist.
+The smallest eigenvalues of $\widehat{\bm \Sigma}_k$ and the directions
+associated with their eigenvectors highly influence \eqref{eq:qda}. In fact, the
+eigenvalues of $\widehat{ \bm \Sigma}_k$ are well-known to be biased if $p \ge
+n_k$ such that the smallest eigenvalues are underestimated \citep{Seber:2004uh},
+Moreover, if $p > n_k$, then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which
+implies that at least $p - n_k$ eigenvalues of $\widehat{\bm \Sigma}_k$ are
+0. Furthermore, although more feature information is available to discriminate
+among the $K$ classes, if $p > n_k$, \eqref{eq:qda} is incalculable because
+$\widehat{\bm \Sigma}_k^{-1}$ does not exist.
 
 Several regularization methods, such as the methods considered by
 \citet*{Guo:2007te}, \cite{Mkhadri:1995jp}, and \citet*{Xu:2009fl}, have been
@@ -362,8 +362,7 @@ covariance-matrix estimators. For instance, if $\alpha_k = 1$, $k = 1, \ldots,
 K$, then \eqref{eq:hdrda-cov} resembles \eqref{eq:ridge-estimator}. Similarly,
 if $\alpha_k = 1 - \gamma$, then \eqref{eq:hdrda-cov} has a form similar to the
 \emph{RDA} classifier from \cite{Friedman:1989tm}. Now, substituting
-\eqref{eq:hdrda-cov} into \eqref{eq:qda}, we define the high-dimensional
-regularized discriminant analysis classifier
+\eqref{eq:hdrda-cov} into \eqref{eq:qda}, we define the \emph{HDRDA} classifier
 \begin{align}
 	D_{HDRDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)^{T}\tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k|. \label{eq:hdrda}
 \end{align}
@@ -526,7 +525,7 @@ Thus far, we have shown that our proposed classifier in \eqref{eq:hdrda} is
 invariant to the term $\bm U_2$, thus yielding an equivalent classifier in
 \eqref{eq:hdrda-decomposed} with a substantial reduction in the computational
 complexity. Here, we demonstrate that the computational efficiency in
-calculating the inverse and determinants of $\bm W_k$ can be further improved
+calculating the inverse and determinant of $\bm W_k$ can be further improved
 via standard matrix operations.
 
 \begin{proposition}\label{proposition:hdrda-W_k}
@@ -601,18 +600,18 @@ latter utilizes an improved variance estimator. Below, we refer to each
 classifier by the first author's surname.
 
 We evaluated the classification performance of each classifier by randomly
-partitioning the data such that $2/3$ of the observations were allocated as
-training data and the remaining $1/3$ of the observations were allocated as a
-test data set. For each random partition, we applied the feature-selection
-method from \cite{Dudoit:2002ev} to the training data to choose the $d$ features
-having the largest ratio of their between-group to within-group sums of squares.
-We then filtered the test data set with the corresponding $d$ features. After
-training each classifier from the filtered training data, we classified the
-filtered test data sets and computed the proportion of mislabeled test
-observations to estimate the classification error rate for each
-classifier. Repeating this process 1000 times, we computed the average of the
-error-rate estimates for each classifier. We remark that our simulation design
-avoids the selection bias discussed in \cite{Ambroise:2002fa}.
+partitioning the data set under consideration such that $2/3$ of the
+observations were allocated as training data and the remaining $1/3$ of the
+observations were allocated as a test data set. For each random partition, we
+applied the feature-selection method from \cite{Dudoit:2002ev} to the training
+data to choose the $d$ features having the largest ratio of their between-group
+to within-group sums of squares.  We then filtered the test data set with the
+corresponding $d$ features. After training each classifier from the filtered
+training data, we classified the filtered test data sets and computed the
+proportion of mislabeled test observations to estimate the classification error
+rate for each classifier. Repeating this process 1000 times, we computed the
+average of the error-rate estimates for each classifier. We remark that our
+simulation design avoids the selection bias discussed in \cite{Ambroise:2002fa}.
 
 We used version 3.0.0 of the open-source statistical software {\tt R} for the
 classification study. We used the implementations of the Witten and Guo
@@ -688,7 +687,7 @@ to $d = 100, 200, \ldots, 1000$, similar to the values of $d$ considered by
 \cite{Xu:2009fl}. To compare misclassification rates between different values of
 $d$, we applied each value of $d$ considered to the same random allocation of
 training and test data. Hence, for a given random partition, the set of features
-selected for a small value of $d$ is a proper subset of the features selected
+selected for a smaller value of $d$ is a proper subset of the features selected
 for a larger value of $d$. We report the average of the error-rate estimates for
 each value of $d$ in Figure \ref{fig:error-rates}. Approximate standard errors
 were no greater than \Sexpr{max_se}.
@@ -724,9 +723,8 @@ methods to handle larger values of $d$. After closer examination of the
 classification studies performed in the authors' original papers, we noticed
 that classification accuracy estimates were reported only for small values of
 $d$, thereby ignoring the inclusion of a larger number of variables. Hence, we
-advise that practioners be aware of the necessity to filter a large number of
-features before employing these methods, lest their classification performance
-be degraded.
+advise practioners to consider filtering a large number of features before
+employing these methods.
 
 The popular Guo classifier is most competitive over large values of $d$ for the
 Shipp and Singh data sets. However, for the Burczynski and Nakayama data sets,
@@ -794,8 +792,8 @@ in our classification study, the time to perform model selection with our
 proposed classifier was nearly instantaneous. Hence, our proposed \emph{HDRDA}
 classifier is competitive in terms of classification accuracy for modern
 small-sample, high-dimensional data sets and requires substantially less
-computing time than standard regularized classifiers, such as regularized
-discriminant analysis proposed by \cite{Friedman:1989tm}.
+computing time than standard regularized classifiers, such as the \emph{RDA}
+classifier proposed by \cite{Friedman:1989tm}.
 
 \section*{Supplementary material}
 \label{SM}
