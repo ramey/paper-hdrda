@@ -352,7 +352,7 @@ $\widehat{\bm \Sigma}$. For brevity, when $\lambda = 1$, we define $\bm X =
       unequal covariance matrices. As $\lambda$ approaches 1, the contours
       become more similar, resulting in identical contours for $\lambda = 1$.
 \begin{figure}
-<<hdrda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
+<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', fig.show='hold'>>=
 rda_contours(lambda = 0)
 rda_contours(lambda = 1/4)
 rda_contours(lambda = 3/4)
@@ -752,24 +752,25 @@ than its competitors. Furthermore, the Guo classifier exhibited unreliable
 classification performance for smaller values of $d$ and required a larger
 subset of the features to perform competitively in our study.
 \begin{figure}
-<<error_rates>>=
+<<error_rates, fig.width=8, fig.height=8, out.width='.65\\linewidth'>>=
 error_rates$data_set <- Hmisc:::capitalize(error_rates$data_set)
 p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
-p <- p + geom_line(aes(), size = 1, linetype = 2)
-p <- p + geom_point(aes(shape = Classifier), size = 6)
+p <- p + geom_line(aes(color = Classifier), size = 1, linetype = 2)
+p <- p + geom_point(aes(color = Classifier, shape = Classifier), size = 4)
 p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
 p <- p + xlab("Number of Variables Selected, d") + ylab("Average Error Rate")
-p <- p + theme(axis.text = element_text(size = 16))
-p <- p + theme(axis.title.x = element_text(size = 20))
-p <- p + theme(axis.title.y = element_text(size = 20))
-p <- p + theme(strip.text.x = element_text(size = 18))
-p + theme(legend.position = "none")
+p <- p + theme(axis.text = element_text(size = 10))
+p <- p + theme(axis.title.x = element_text(size = 17))
+p <- p + theme(axis.title.y = element_text(size = 17))
+p <- p + theme(strip.text.x = element_text(size = 16))
+p <- p + theme(legend.title = element_text(size = 18, face = "bold"))
+p <- p + theme(legend.text = element_text(size = 16))
+p <- p + theme(legend.key.size = unit(1, "cm"))
+p
 @ 
 \caption{Averages of the 1000 error-rate estimates of the competing classifiers
-  for each data set as a function of $d$. The classifiers are marked as follows:
-  Dudoit (circle), Guo (triangle), Pang (square), Tong = (cross), Witten (square
-  with X), and ours (asterisk). Approximate standard errors are no greater than
-  \Sexpr{max_se}.}
+  for each data set as a function of $d$. Approximate standard errors are no
+  greater than \Sexpr{max_se}.}
 \label{fig:error-rates}
 \end{figure}
 Next, we examine the optimal estimates of the tuning parameters for the
