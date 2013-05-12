@@ -259,10 +259,10 @@ Cao <- function(train_x, train_y, test_x) {
 
 
 # Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
-scrda_train <- function(x, y) {
+scrda_train <- function(x, y, prior) {
   x <- t(x)
-  rda_out <- rda(x = x, y = y)
-  rda_cv_out <- rda.cv(rda_out, x = x, y = y)
+  rda_out <- rda(x = x, y = y, prior = prior)
+  rda_cv_out <- rda.cv(rda_out, x = x, y = y, prior = prior)
 
   # Which alpha and delta give min cv error?
   min_cv_error <- with(rda_cv_out, which(cv.err == min(cv.err), arr.ind = TRUE))
