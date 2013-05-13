@@ -522,7 +522,8 @@ From \eqref{eq:rda-matrix}, we have that $\tilde{\bm \Sigma}_k^{+} = \bm U(
 \mathbb{R}_{p \times 1}$, we have that
 	\begin{align*}
 	(\bm x - \xbar_k)^{T} \tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k| &= (\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k)\\
-	&+ \gamma^{+} (\bm x - \xbar_k)^{T} \bm U_2 \bm U_2^{T} (\bm x - \xbar_k) + \log | \bm W_k | + (p - q) \log \gamma.
+	&+ \gamma^{+} (\bm x - \xbar_k)^{T} \bm U_2 \bm U_2^{T} (\bm x - \xbar_k) + \log | \bm W_k |\\
+  &+ (p - q) \log \gamma.
 	\end{align*}
 Because $\gamma$ is constant for $k = 1, \ldots, K$, we can omit the $(p - q)
 \log \gamma$ term and particularly avoid the calculation of $\log 0$ for $\gamma
@@ -749,7 +750,7 @@ subset of the features to perform competitively in our study.
 error_rates$data_set <- Hmisc:::capitalize(error_rates$data_set)
 p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
 p <- p + geom_line(aes(color = Classifier), size = 1, linetype = 2)
-p <- p + geom_point(aes(color = Classifier, shape = Classifier), size = 4)
+p <- p + geom_point(aes(color = Classifier, shape = Classifier), size = 3)
 p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
 p <- p + xlab("Number of Variables Selected, d") + ylab("Average Error Rate")
 p <- p + theme(axis.text = element_text(size = 10))
