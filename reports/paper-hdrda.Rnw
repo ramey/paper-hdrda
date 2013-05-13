@@ -814,7 +814,7 @@ discriminant analysis proposed by \cite{Friedman:1989tm}.
 \begin{supplement}
 \sname{Supplement B}\label{suppB}
 \stitle{Optimal Estimates of the HDRDA Classifier}
-\slink[url]{https://github.com/ramey/paper-hdrda}
+\slink[url]{https://github.com/ramey/paper-hdrda/tree/annals-of-applied-statistics/reports}
 \sdescription{The graphical summary of the optimal estimates of the \emph{HDRDA} classifier from the classification study.}
 \end{supplement}
 
