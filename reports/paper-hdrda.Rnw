@@ -75,8 +75,8 @@ we provide an implementation of our proposed classifier in the {\tt
 \kwd{classification}
 \kwd{regularized discriminant analysis}
 \kwd{covariance-matrix regularization}
-\kwd{high-dimensional microarray data}
-\kwd{dimension reduction}
+\kwd{high-dimensional multivariate analysis}
+\kwd{microarray data}
 \end{keyword}
 
 \end{frontmatter}
