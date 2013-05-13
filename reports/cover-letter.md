@@ -4,7 +4,7 @@ Vaccine and Infectious Disease Division
 Fred Hutchinson Cancer Research Center  
 1100 Fairview Ave. N., M2-C200  
 Seattle, WA 98109 \
-Friday, 10 May 2013 \
+Monday, 13 May 2013 \
 \
 Professor Stephen E. Fienberg  
 Editor, _Annals of Applied Statistics_  
