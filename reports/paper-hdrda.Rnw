@@ -1,14 +1,8 @@
-\documentclass[aoas,preprint]{imsart}
+\documentclass{article}
 
 \usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm}
-\RequirePackage[OT1]{fontenc}
-\RequirePackage{natbib}
-\RequirePackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{natbib, setspace}
 
-% provide arXiv number if available:
-%\arxiv{arXiv:0000.0000}
-
-\startlocaldefs
 \newcommand{\xbar}{\bar{\bm x}}
 \newcommand{\tr}{\text{tr}}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -17,41 +11,16 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
 \newtheorem{thm}{Theorem}
-\endlocaldefs
 
 \begin{document}
 
-\begin{frontmatter}
-
 \title{High-Dimensional Regularized Discriminant Analysis}
-\runtitle{High-Dimensional Regularized Discriminant Analysis}
 
-\begin{aug}
-\author{\fnms{John A.} \snm{Ramey}\thanksref{m1}
-  \ead[label=e1]{johnramey@gmail.com}
-  \ead[label=u1,url]{http://ramhiser.com}}
-\author{\fnms{Caleb K.} \snm{Stein}\thanksref{m2}\ead[label=e2]{Caleb\_Stein@baylor.edu}}
-\and
-\author{\fnms{Dean M.} \snm{Young}\thanksref{m2}\ead[label=e3]{Dean\_Young@baylor.edu}}
+\author{John A. Ramey, Caleb K. Stein, \and Dean M. Young}
 
-\runauthor{J. A. Ramey et al.}
+\maketitle
 
-\affiliation{Fred Hutchinson Cancer Research Center\thanksmark{m1} and Baylor University\thanksmark{m2}}
-
-\address{Vaccine and Infectious Disease Division\\
-  Fred Hutchinson Cancer Research Center\\
-  1100 Fairview Ave. N., M2-C200\\
-  Seattle, Washington 98115, U.S.A.\\
-  \printead{e1}\\
-  \printead{u1}}
-
-\address{Department of Statistical Science\\
-  Baylor University\\
-  P.O. Box 97140\\
-  Waco, Texas 76706, U.S.A.\\
-  \printead{e2}\\
-  \phantom{E-mail:\ }\printead*{e3}}
-\end{aug}
+\doublespacing
 
 \begin{abstract}
 
@@ -68,18 +37,7 @@ sparse and regularized classifiers in terms of classification accuracy. Finally,
 we provide an implementation of our proposed classifier in the {\tt
   sparsediscrim} R package, available on CRAN.
 
-
 \end{abstract}
-
-\begin{keyword}
-\kwd{classification}
-\kwd{regularized discriminant analysis}
-\kwd{covariance-matrix regularization}
-\kwd{high-dimensional multivariate analysis}
-\kwd{microarray data}
-\end{keyword}
-
-\end{frontmatter}
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
 # Round digits throughout document including \Sexpr statements.
@@ -262,7 +220,7 @@ $p > n_k$, \eqref{eq:qda} is incalculable because $\widehat{\bm \Sigma}_k^{-1}$
 does not exist.
 
 Several regularization methods, such as the methods considered by
-\citet*{Guo:2007te}, \cite{Mkhadri:1995jp}, and \citet*{Xu:2009fl}, have been
+\citet*{Xu:2009fl}, \citet*{Guo:2007te}, and \cite{Mkhadri:1995jp} have been
 proposed in the literature to adjust the eigenvalues of $\widehat{\bm \Sigma}_k$
 so that \eqref{eq:qda} is calculable and has reduced variability in the standard
 bias-variance tradeoff. A common form of the covariance-matrix regularization
@@ -470,10 +428,12 @@ The proof follows by setting $\gamma = 0$ in Lemma \ref{lemma:rda-tilde-Sigma_k}
 
 Thus, by incorporating each $\bm x_i$ into the estimation of $\bm \Sigma_k$, we
 increase the rank of $\widehat{\bm \Sigma}_k(\lambda)$ to $q$ if $\lambda \ne
-0$. Next, we provide an essential result that enables us to prove that
-\eqref{eq:hdrda} is invariant to adjustments to the eigenvalues of $\tilde{ \bm
-  \Sigma}_k$ corresponding to the null space of $\widehat{\bm \Sigma}$ for any
-unlabeled observation $\bm x \in \mathbb{R}_{p \times 1}$.
+0$. The results is that the \emph{HDRDA} classifier has the advantage over
+\eqref{eq:qda} in that the rank$(\widehat{\bm \Sigma}_k) \le n_k$. Next, we
+provide an essential result that enables us to prove that \eqref{eq:hdrda} is
+invariant to adjustments to the eigenvalues of $\tilde{ \bm \Sigma}_k$
+corresponding to the null space of $\widehat{\bm \Sigma}$ for any unlabeled
+observation $\bm x \in \mathbb{R}_{p \times 1}$.
 
 \begin{lemma}\label{lemma:RDA-constant-term}
 Let $\bm U_2$ be defined as above. Then, for all $\bm x \in \mathbb{R}_{p \times
@@ -801,24 +761,7 @@ modern small-sample, high-dimensional data sets and requires substantially less
 computing time than standard regularized classifiers, such as regularized
 discriminant analysis proposed by \cite{Friedman:1989tm}.
 
-\begin{supplement}
-\sname{Supplement A}\label{suppA}
-\stitle{R Package Containing Microarray Data Sets}
-\slink[url]{https://github.com/ramey/datamicroarray}
-\sdescription{An R package containing all of the microarray data sets used in
-  the classification study.}
-\end{supplement}
-
-\begin{supplement}
-\sname{Supplement B}\label{suppB}
-\stitle{Optimal Estimates of the HDRDA Classifier}
-\slink[url]{https://github.com/ramey/paper-hdrda/tree/annals-of-applied-statistics/reports}
-\sdescription{The graphical summary of the optimal estimates of the \emph{HDRDA} classifier from the classification study.}
-\end{supplement}
-
-
-
-\bibliographystyle{imsart-nameyear}
+\bibliographystyle{plainnat}
 \bibliography{rda}
 
 \end{document} 
