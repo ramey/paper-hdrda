@@ -14,7 +14,8 @@
 
 \begin{document}
 
-\title{High-Dimensional Regularized Discriminant Analysis}
+\title{Efficient Calculation of Regularized Discriminant Analysis for
+  High-Dimensional Classification}
 
 \author{John A. Ramey, Caleb K. Stein, \and Dean M. Young}
 
@@ -212,7 +213,7 @@ log-determinant is omitted because it is constant across all classes.
 The smallest eigenvalues and the directions associated with their eigenvectors
 highly influence \eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm
   \Sigma}_k$ are well-known to be biased if $p \ge n_k$ such that the smallest
-eigenvalues are underestimated \citep{Seber:2004uh}, Moreover, if $p > n_k$,
+eigenvalues are underestimated \citep{Seber:2004uh}. Moreover, if $p > n_k$,
 then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which implies that at least $p -
 n_k$ eigenvalues of $\widehat{\bm \Sigma}_k$ are zero. Furthermore, although
 more feature information is available to discriminate among the $K$ classes, if
