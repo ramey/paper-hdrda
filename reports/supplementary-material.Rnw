@@ -34,7 +34,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-\title{Supplementary Material for ``Another Look at Regularized Discriminant Analysis for High-Dimensional Classification''}
+\title{Supplementary Material for ``High-Dimensional Regularized Discriminant Analysis''}
 
 \author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
 

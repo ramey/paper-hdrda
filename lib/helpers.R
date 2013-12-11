@@ -120,8 +120,8 @@ rda_contours <- function(lambda) {
   contours$Population <- factor(contours$Population)
   contours$lambda <- lambda
 
-  p <- ggplot(contours, aes(x = X1, y = X2, linetype = Population))
-  p <- p + geom_path(size = 1.5)
+  p <- ggplot(contours, aes(x = X1, y = X2, color = Population, linetype = Population))
+  p <- p + geom_path(size = 2)
   p <- p + facet_grid(. ~ lambda, labeller = label_bquote(lambda == .(x)))
   p <- p + theme_bw() + xlab("") + ylab("") + theme(legend.position = "none")
   p <- p + scale_x_continuous(breaks = NULL) + scale_y_continuous(breaks = NULL)
@@ -259,10 +259,10 @@ Cao <- function(train_x, train_y, test_x) {
 
 
 # Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
-scrda_train <- function(x, y) {
+scrda_train <- function(x, y, prior) {
   x <- t(x)
-  rda_out <- rda(x = x, y = y)
-  rda_cv_out <- rda.cv(rda_out, x = x, y = y)
+  rda_out <- rda(x = x, y = y, prior = prior)
+  rda_cv_out <- rda.cv(rda_out, x = x, y = y, prior = prior)
 
   # Which alpha and delta give min cv error?
   min_cv_error <- with(rda_cv_out, which(cv.err == min(cv.err), arr.ind = TRUE))

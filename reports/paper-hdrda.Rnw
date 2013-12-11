@@ -1,60 +1,85 @@
-\documentclass[11pt]{article}
-\usepackage{graphicx, amsmath, amssymb, bm, url, mathtools, natbib, amsthm, setspace}
+\documentclass[aoas,preprint]{imsart}
 
-\pagestyle{plain}
-%----------------Page dimensions ----------------
-\oddsidemargin 0.0in
-\evensidemargin 0.0in
-\topmargin -0.75in
-\leftmargin 0in
-\headheight 0.0in
-\headsep 0.5in
-%\footheight 0.0in
-\footskip 0.5in
-\footnotesep 0.0in
-\textwidth 6.7in
-\textheight 9.5in
-%-----------Define Pictures---------------------
-\def\picture #1 by #2 (#3){
-   \vbox to #2{
-        \hrule width #1 height 0pt depth 0pt
-           \vfill
-              \special{picture #3} % this is the low-level interface
-                 }
-    }
-\def\scaledpicture #1 by #2 (#3 scaled #4){{
-     \dimen0=#1 \dimen1=#2
-      \divide\dimen0 by 1000 \multiply\dimen0 by #4
-       \divide\dimen1 by 1000 \multiply\dimen1 by #4
-        \picture \dimen0 by \dimen1 (#3 scaled #4)}
-   }
+\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm}
+\RequirePackage[OT1]{fontenc}
+\RequirePackage{natbib}
+\RequirePackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
 
-\title{High-Dimensional Regularized Discriminant Analysis}
+% provide arXiv number if available:
+%\arxiv{arXiv:0000.0000}
 
-\author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
-%Vaccine and Infectious Disease Division, Fred Hutchinson Cancer Research
-%  Center,\\ Seattle, Washington 98115, U.S.A. \email{johnramey@gmail.com}}
-%\affil{Department of Statistical Science, Baylor University, Waco, Texas 76706, U.S.A. \email{Caleb\_Stein@baylor.edu} \email{Dean\_Young@baylor.edu}}
-
-
+\startlocaldefs
 \newcommand{\xbar}{\bar{\bm x}}
 \newcommand{\tr}{\text{tr}}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
-
 \newtheorem{cor}{Corollary}
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
 \newtheorem{thm}{Theorem}
-
-\bibpunct{(}{)}{;}{a}{,}{,}
+\endlocaldefs
 
 \begin{document}
 
-\doublespacing
+\begin{frontmatter}
 
-\maketitle
+\title{High-Dimensional Regularized Discriminant Analysis}
+\runtitle{High-Dimensional Regularized Discriminant Analysis}
 
+\begin{aug}
+\author{\fnms{John A.} \snm{Ramey}\thanksref{m1}
+  \ead[label=e1]{johnramey@gmail.com}
+  \ead[label=u1,url]{http://ramhiser.com}}
+\author{\fnms{Caleb K.} \snm{Stein}\thanksref{m2}\ead[label=e2]{Caleb\_Stein@baylor.edu}}
+\and
+\author{\fnms{Dean M.} \snm{Young}\thanksref{m2}\ead[label=e3]{Dean\_Young@baylor.edu}}
+
+\runauthor{J. A. Ramey et al.}
+
+\affiliation{Fred Hutchinson Cancer Research Center\thanksmark{m1} and Baylor University\thanksmark{m2}}
+
+\address{Vaccine and Infectious Disease Division\\
+  Fred Hutchinson Cancer Research Center\\
+  1100 Fairview Ave. N., M2-C200\\
+  Seattle, Washington 98115, U.S.A.\\
+  \printead{e1}\\
+  \printead{u1}}
+
+\address{Department of Statistical Science\\
+  Baylor University\\
+  P.O. Box 97140\\
+  Waco, Texas 76706, U.S.A.\\
+  \printead{e2}\\
+  \phantom{E-mail:\ }\printead*{e3}}
+\end{aug}
+
+\begin{abstract}
+
+Reliable supervised classification of tumors from gene expression microarray
+data is essential for successful diagnosis and treatment of diseases such as
+cancer; however, because the number of gene expression levels measured is
+typically much greater than the sample size, the analysis of microarray data
+often presents difficult statistical and computational challenges. Here, we
+propose a new regularized discriminant analysis classifier that incorporates
+dimension reduction and covariance-matrix shrinkage to enable a computationally
+efficient classifier. We demonstrate with four high-dimensional microarray data
+sets that our proposed classifier is often superior to several recently proposed
+sparse and regularized classifiers in terms of classification accuracy. Finally,
+we provide an implementation of our proposed classifier in the {\tt
+  sparsediscrim} R package, available on CRAN.
+
+
+\end{abstract}
+
+\begin{keyword}
+\kwd{classification}
+\kwd{regularized discriminant analysis}
+\kwd{covariance-matrix regularization}
+\kwd{high-dimensional multivariate analysis}
+\kwd{microarray data}
+\end{keyword}
+
+\end{frontmatter}
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
 # Round digits throughout document including \Sexpr statements.
@@ -102,29 +127,10 @@ error_rates <- ddply(m_error, .(data_set, d, Classifier), plyr:::summarize,
 error_rates <- ddply(error_rates, .(data_set, d, Classifier), transform,
                      SE_Error = sqrt(Avg_Error * (1 - Avg_Error) / Num_Reps))
 error_rates <- subset(error_rates, select = -Num_Reps)
+error_rates$Classifier <- factor(as.character(error_rates$Classifier))
 
 max_se <- max(error_rates[["SE_Error"]])
 @ 
-
-\maketitle
-
-\begin{abstract}
- 
-A reliable supervised classification of tumors from gene expression microarray
-data is essential for successful diagnosis and treatment of diseases such as
-cancer; however, because the number of gene expression levels measured is
-typically much greater than the sample size, the analysis of microarray data can
-be difficult because classic classifiers are often ill-posed in this setting and
-require a large number of calculations. To address these challenges, we propose
-a new regularized discriminant analysis classifier that incorporates dimension
-reduction and covariance-matrix shrinkage to enable an efficacious,
-computationally efficient method. We demonstrate with four high-dimensional
-microarray data sets that our proposed classifier is often superior to several
-recently proposed sparse and regularized classifiers in terms of classification
-accuracy. Finally, we provide an implementation of our proposed classifier in
-the {\tt sparsediscrim} R package, available on CRAN.
-
-\end{abstract}
 
 \section{Introduction}
 
@@ -166,10 +172,10 @@ discriminant analysis, see \cite{Murphy:2012uq}, \cite{Mkhadri:1997gy}, and
 \cite{Friedman:1989tm}.
 
 Here, we propose the high-dimensional regularized discriminant analysis
-(\emph{HDRDA}) by first constructing a pooling matrix as a convex combination of
-the covariance-matrix estimators employed in linear and quadratic discriminant
-analysis. Given that the assumption of equal population covariance matrices for
-linear discriminant analysis is often too stringent in practice
+(\emph{HDRDA}) classifier by first constructing a pooling matrix as a convex
+combination of the covariance-matrix estimators employed in linear and quadratic
+discriminant analysis. Given that the assumption of equal population covariance
+matrices for linear discriminant analysis is often too stringent in practice
 \citep{Clemmensen:2011kr}, our proposed classifier can relax the linearity
 assumption by instead incorporating unequal covariance matrices while retaining
 linear and quadratic discriminant analysis as special cases. We then establish
@@ -188,21 +194,21 @@ the null space of the pooled sample covariance matrix can be discarded. Hence,
 no gain in classification performance can be obtained by adjusting these zero
 eigenvalues. This invariance property provides a substantial increase in
 computational efficiency of model training and selection. In fact, we show that
-the inverse and determinant can be reduced to calculations of $n_k \times n_k$
-matrices, where $n_k$ is the sample size of the $k$th class $(k = 1, \ldots,
-K)$. This reduction in calculation is clearly advantageous because $n_k$ is
-often quite small in microarray data sets (e.g., 10--20 observations).
+the inverse and determinants can be reduced to calculations of $n_k \times n_k$
+matrices, where $n_k$ is the sample size of the $k$th class, $k = 1, \ldots, K$.
+This reduction in calculation is clearly advantageous because $n_k$ is often
+quite small in microarray data sets (e.g., 10--20 observations).
 
-We also demonstrate that the \emph{HDRDA} classifier is competitive with and
-often superior to several recent classifiers designed for small-sample,
-high-dimensional data. In particular, we compare our proposed classifier with
-diagonal linear discriminant analysis proposed by \cite{Dudoit:2002ev} and the
-recently proposed classifiers from \cite{Guo:2007te}, \cite{Pang:2009ik},
-\cite{Tong:2012hw}, and \cite{Witten:2011kc}. We conduct our comparison of the
-classification accuracy of the competing classifiers using four small-sample,
-high-dimensional benchmark microarray data sets.
+We also demonstrate that the \emph{HDRDA} classifier is often superior to
+several recent classifiers designed for small-sample, high-dimensional data. In
+particular, we compare our proposed classifier with diagonal linear discriminant
+analysis proposed by \cite{Dudoit:2002ev} and the recently proposed classifiers
+from \cite{Guo:2007te}, \cite{Pang:2009ik}, \cite{Tong:2012hw}, and
+\cite{Witten:2011kc}. We conduct our comparison of the classification accuracy
+of the competing classifiers using four small-sample, high-dimensional benchmark
+microarray data sets.
 
-\section{Regularized Discriminant Analysis}
+\section{High-Dimensional Regularized Discriminant Analysis}
 \label{sec:rda}
 
 \subsection{Preliminaries}
@@ -217,13 +223,12 @@ $\mathbb{R}$. We assume that $(\bm x_i, y_i)$ is a realization from a mixture
 distribution $p(\bm x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where
 $p(\bm x | \omega_k)$ is the probability density function of the $k$th class and
 $p(\omega_k)$ is the prior probability of class membership of the $k$th
-class. We further assume that each of $p(\omega_k)$ is equal $(k = 1, \ldots,
-K)$.
+class. We further assume that each of $p(\omega_k)$ is equal, $k = 1, \ldots, K$.
 
 Quadratic discriminant analysis is the optimal Bayesian decision rule with
 respect to a $0-1$ loss function when $p(\bm x | \omega_k)$ is the probability
-density function of the multivariate normal distribution with known mean vector
-$\bm \mu_k \in \mathbb{R}_{p \times 1}$ and known covariance matrix $\bm
+density function of the multivariate normal distribution with known mean vectors
+$\bm \mu_k \in \mathbb{R}_{p \times 1}$ and known covariance matrices $\bm
 \Sigma_k \in \mathbb{R}_{p \times p}^{>}$, $k = 1, 2, \ldots, K$, where
 $\mathbb{R}_{p \times p}^{>}$ denotes the cone of real $p \times p$
 positive-definite matrices. Because $\bm \mu_k$ and $\bm \Sigma_k$ are typically
@@ -236,7 +241,7 @@ sample quadratic discriminant analysis classifier
 where $\xbar_k$ and $\widehat{\bm \Sigma}_k$ are the maximum likelihood
 estimators of $\bm \mu_k$ and $\bm \Sigma_k$, respectively, and $\bm A^{T}$
 denotes the matrix transpose of $\bm A \in \mathbb{R}_{m \times p}$. If we
-assume further that $\bm \Sigma_k = \bm \Sigma$ $(k = 1, \ldots, K)$, then the
+assume further that $\bm \Sigma_k = \bm \Sigma$, $k = 1, \ldots, K$, then the
 pooled sample covariance matrix $\widehat{\bm \Sigma}$ is substituted for
 $\widehat{ \bm \Sigma}_k$ in \eqref{eq:qda}, where
 \begin{align}
@@ -246,30 +251,15 @@ is the maximum likelihood estimator for $\bm \Sigma$. In this case \eqref{eq:qda
 reduces to the sample linear discriminant analysis classifier, and the
 log-determinant is omitted because it is constant across all classes.
 
-Throughout the document we also require the following additional notation. Let
-$\bm I_m$ be the $m \times m$ identity matrix, and let $\bm 0_{m \times p}$ be
-the $m \times p$ matrix of zeros, such that $\bm 0_m$ is understood to denote
-$\bm 0_{m \times m}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$ and
-$0$ otherwise. Let $\bm A \oplus \bm B$ denote the direct sum of $\bm A \in
-\mathbb{R}_{r \times r}$ and $\bm B \in \mathbb{R}_{s \times s}$ \citep[Chapter
-  1]{Lutkepohl:1996uz}. Let $\bm A^+$ and $\mathcal{N}(\bm A) = \{\bm z \in
-\mathbb{R}_{p \times 1} : \bm A \bm z = \bm 0_{m \times 1}\}$ denote the
-Moore-Penrose pseudoinverse and null space of $\bm A \in \mathbb{R}_{m \times
-  p}$, respectively. Let $V^{\perp} = \{\bm y \in \mathbb{R}_{p \times 1} : \bm
-y^{T} \bm v = 0\ \forall \bm v \in V \}$ denote the orthogonal complement of a
-vector space $V \subset \mathbb{R}_{p \times 1}$.
-
-\subsection{Covariance Matrix Regularization}
-
-The smallest eigenvalues of $\widehat{\bm \Sigma}_k$ and the directions
-associated with their eigenvectors highly influence \eqref{eq:qda}. In fact, the
-eigenvalues of $\widehat{ \bm \Sigma}_k$ are well-known to be biased if $p \ge
-n_k$ such that the smallest eigenvalues are underestimated \citep{Seber:2004uh},
-Moreover, if $p > n_k$, then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which
-implies that at least $p - n_k$ eigenvalues of $\widehat{\bm \Sigma}_k$ are
-0. Furthermore, although more feature information is available to discriminate
-among the $K$ classes, if $p > n_k$, \eqref{eq:qda} is incalculable because
-$\widehat{\bm \Sigma}_k^{-1}$ does not exist.
+The smallest eigenvalues and the directions associated with their eigenvectors
+highly influence \eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm
+  \Sigma}_k$ are well-known to be biased if $p \ge n_k$ such that the smallest
+eigenvalues are underestimated \citep{Seber:2004uh}, Moreover, if $p > n_k$,
+then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which implies that at least $p -
+n_k$ eigenvalues of $\widehat{\bm \Sigma}_k$ are zero. Furthermore, although
+more feature information is available to discriminate among the $K$ classes, if
+$p > n_k$, \eqref{eq:qda} is incalculable because $\widehat{\bm \Sigma}_k^{-1}$
+does not exist.
 
 Several regularization methods, such as the methods considered by
 \citet*{Guo:2007te}, \cite{Mkhadri:1995jp}, and \citet*{Xu:2009fl}, have been
@@ -288,7 +278,18 @@ eigenvalues are replaced with $\gamma$, so that \eqref{eq:ridge-estimator} is
 positive definite. For additional covariance-matrix regularization methods, see
 \cite{Ramey:2013ji}, \cite{Xu:2009fl}, and \cite{Ye:2009gd}.
 
-\section{High-Dimensional Regularized Discriminant Analysis}
+Throughout the remainder of this document we also require the following
+additional notation. Let $\bm I_m$ be the $m \times m$ identity matrix, and let
+$\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm 0_m$ is
+understood to denote $\bm 0_{m \times m}$. For $c \in \mathbb{R}$, let $c^+ =
+1/c$ if $c \ne 0$ and $0$ otherwise. Let $\bm A \oplus \bm B$ denote the direct
+sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in \mathbb{R}_{s \times
+  s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Let $\bm A^+$ and $\mathcal{N}(\bm A)
+= \{\bm z \in \mathbb{R}_{p \times 1} : \bm A \bm z = \bm 0_{m \times 1}\}$
+denote the Moore-Penrose pseudoinverse and null space of $\bm A \in
+\mathbb{R}_{m \times p}$, respectively. Let $V^{\perp} = \{\bm y \in
+\mathbb{R}_{p \times 1} : \bm y^{T} \bm v = 0$ for all $\bm v \in V \}$ denote
+the orthogonal complement of a vector space $V \subset \mathbb{R}_{p \times 1}$.
 
 \subsection{Model Specification}
 
@@ -299,7 +300,7 @@ training observations centered by their respective class sample means. We define
 the convex combination
 \begin{align}
   \widehat{\bm \Sigma}_k(\lambda) = (1 - \lambda) \widehat{\bm \Sigma}_k + \lambda
-  \widehat{\bm \Sigma}, \quad (k = 1, \ldots, K)\label{eq:sig-lambda-alternative}
+  \widehat{\bm \Sigma}, \quad k = 1, \ldots, K,\label{eq:sig-lambda-alternative}
 \end{align}
 where $\lambda \in [0, 1]$ is the \emph{pooling} parameter. By rewriting
 \eqref{eq:sig-lambda-alternative} in terms of the observations $ \bm x_i$ $(i =
@@ -336,7 +337,7 @@ $\widehat{\bm \Sigma}$. For brevity, when $\lambda = 1$, we define $\bm X =
       unequal covariance matrices. As $\lambda$ approaches 1, the contours
       become more similar, resulting in identical contours for $\lambda = 1$.
 \begin{figure}
-<<hdrda_contours, fig.width=8, fig.height=8, out.width='.49\\linewidth', fig.show='hold'>>=
+<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', fig.show='hold'>>=
 rda_contours(lambda = 0)
 rda_contours(lambda = 1/4)
 rda_contours(lambda = 3/4)
@@ -356,8 +357,8 @@ define the eigenvalue adjustment of \eqref{eq:sig-lambda-alternative} as
 where $\alpha_k \ge 0$ and $\gamma \ge 0$ is an eigenvalue-shrinkage
 constant. Thus, the \emph{pooling} parameter $\lambda$ controls the amount
 borrowed from $\widehat{\bm \Sigma}$ to estimate $\bm \Sigma_k$, and the
-\emph{shrinkage} parameter $\gamma$ determines the amount of eigenvalue
-shrinkage applied. The choice of $\alpha_k$ allows for a flexible formulation of
+\emph{shrinkage} parameter $\gamma$ determines the degree of eigenvalue
+shrinkage. The choice of $\alpha_k$ allows for a flexible formulation of
 covariance-matrix estimators. For instance, if $\alpha_k = 1$, $k = 1, \ldots,
 K$, then \eqref{eq:hdrda-cov} resembles \eqref{eq:ridge-estimator}. Similarly,
 if $\alpha_k = 1 - \gamma$, then \eqref{eq:hdrda-cov} has a form similar to the
@@ -402,7 +403,7 @@ Let $\widehat{\bm \Sigma}_k$ and $\widehat{\bm \Sigma}$ be the maximum
 likelihood estimators of $\bm \Sigma_k$ and $\bm \Sigma$, respectively. Let
 $\widehat{\bm \Sigma}_k(\lambda)$ be defined as in
 \eqref{eq:sig-lambda-alternative}. Then, $\mathcal{N}\{\widehat{\bm \Sigma}_k(\lambda)\} \subset \mathcal{N}(\widehat{
-  \bm \Sigma}) \subset \mathcal{N}(\widehat{\bm \Sigma}_k)$ $(k = 1, \ldots, K)$.
+  \bm \Sigma}) \subset \mathcal{N}(\widehat{\bm \Sigma}_k)$, $k = 1, \ldots, K$.
 \end{lemma}
 \begin{proof}
 Let $\bm z \in \mathcal{N}\{\widehat{\bm \Sigma}_k(\lambda)\}$ for some $k = 1,
@@ -439,8 +440,8 @@ Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be the eigendecomposition of
 $\widehat{\bm \Sigma}$ as above, and suppose that rank$(\widehat{\bm \Sigma}) =
 q \le p$. Then, we have
 \begin{align}
-	\tilde{\bm \Sigma}_k &= \bm U(\bm W_k \oplus \gamma \bm I_{p-q})\bm U^{T} \quad
-  (k = 1, \ldots, K),\label{eq:rda-matrix}
+	\tilde{\bm \Sigma}_k &= \bm U(\bm W_k \oplus \gamma \bm I_{p-q})\bm U^{T}, \quad
+  k = 1, \ldots, K,\label{eq:rda-matrix}
 \intertext{where}
 \bm W_k &= \alpha_k \{(1 - \lambda) \bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 + \lambda \bm D_q\} + \gamma \bm I_{q}.\label{eq:Wk}
 \end{align}
@@ -449,8 +450,8 @@ q \le p$. Then, we have
 From Lemma \ref{lemma:null-spaces}, the columns of $\bm U_2$ span the null space
 of $\widehat{\bm \Sigma}$, which implies that $\widehat{\bm \Sigma}_k \bm U_2 =
 \bm 0_{p \times (p - q)}$. Hence, $\bm U^{T} \widehat{\bm \Sigma}_k \bm U = \bm
-U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 \oplus \bm 0_{p-q}$ $(k = 1, \ldots,
-K)$. Thus, $\bm U^{T} \tilde{\bm \Sigma}_k \bm U = \alpha_k \{(1 - \lambda) \bm
+U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 \oplus \bm 0_{p-q}$, $k = 1, \ldots,
+K$. Thus, $\bm U^{T} \tilde{\bm \Sigma}_k \bm U = \alpha_k \{(1 - \lambda) \bm
 U^{T} \widehat{\bm \Sigma}_k \bm U + \lambda \bm D\} + \gamma \bm I_p$, and
 \eqref{eq:rda-matrix} holds because $\bm U$ is orthogonal.
 \end{proof}
@@ -461,7 +462,7 @@ have the following corollary.
 \begin{cor}
 Let $\widehat{\bm \Sigma}_k(\lambda)$ be defined as in
 \eqref{eq:sig-lambda-alternative}. Then, for $\lambda \in (0, 1]$,
-  rank$\{\widehat{\bm \Sigma}_k(\lambda)\} = q$ $(k = 1, \ldots, K)$.
+  rank$\{\widehat{\bm \Sigma}_k(\lambda)\} = q$, $k = 1, \ldots, K$.
 \end{cor}
 \begin{proof}
 The proof follows by setting $\gamma = 0$ in Lemma \ref{lemma:rda-tilde-Sigma_k}.
@@ -491,12 +492,11 @@ I(y_i = k) n_{k'} - I(y_i = k') n_k \}$. Therefore, $\bm U_2^{T} (\bm x -
 \xbar_k) = \bm U_2^{T} (\bm x - \xbar_{k'})$.
 \end{proof}
 
-We now present our main result, where we decompose the decision rule of the
-\emph{HDRDA} classifier and show that the term requiring the largest
-computational costs does not contribute to the classification of an unlabeled
-observation performed using Lemma \ref{lemma:RDA-constant-term}. Hence, we
-reduce \eqref{eq:hdrda} to an equivalent, more computationally efficient
-decision rule.
+We now present our main result where we decompose \eqref{eq:hdrda} and show that
+the term requiring the largest computational costs does not contribute to the
+classification of an unlabeled observation performed using Lemma
+\ref{lemma:RDA-constant-term}. Hence, we reduce \eqref{eq:hdrda} to an
+equivalent, more computationally efficient decision rule.
 
 \begin{thm}
 Let $\tilde{\bm \Sigma}_k$ and $\bm W_k$ be defined as in \eqref{eq:rda-matrix}
@@ -509,11 +509,12 @@ the decision rule in \eqref{eq:hdrda} is equivalent to
 \begin{proof}
 From \eqref{eq:rda-matrix}, we have that $\tilde{\bm \Sigma}_k^{+} = \bm U(
 \bm W_k^{-1} \oplus \gamma^{+} \bm I_{p-q} )\bm U^{T}$ and $|\tilde{\bm \Sigma}_k| =
-\gamma^{p-q}| \bm W_k |$ $(k = 1, \ldots, K)$. Therefore, for all $\bm x \in
+\gamma^{p-q}| \bm W_k |$, $k = 1, \ldots, K$. Therefore, for all $\bm x \in
 \mathbb{R}_{p \times 1}$, we have that
 	\begin{align*}
 	(\bm x - \xbar_k)^{T} \tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k| &= (\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k)\\
-	&+ \gamma^{+} (\bm x - \xbar_k)^{T} \bm U_2 \bm U_2^{T} (\bm x - \xbar_k) + \log | \bm W_k | + (p - q) \log \gamma.
+	&+ \gamma^{+} (\bm x - \xbar_k)^{T} \bm U_2 \bm U_2^{T} (\bm x - \xbar_k) + \log | \bm W_k |\\
+  &+ (p - q) \log \gamma.
 	\end{align*}
 Because $\gamma$ is constant for $k = 1, \ldots, K$, we can omit the $(p - q)
 \log \gamma$ term and particularly avoid the calculation of $\log 0$ for $\gamma
@@ -529,7 +530,7 @@ calculating the inverse and determinant of $\bm W_k$ can be further improved
 via standard matrix operations.
 
 \begin{proposition}\label{proposition:hdrda-W_k}
-Let $\bm W_k$ be defined as above $(k = 1, \ldots, K)$. Then, $|\bm W_k| = |
+Let $\bm W_k$ be defined as above, $k = 1, \ldots, K$. Then, $|\bm W_k| = |
 \bm \Gamma_k| |\bm Q_k|$ and
 	\begin{align}
 		\bm W_k^{-1} &= \bm \Gamma_k^{-1} - \alpha_k(1 - \lambda) \bm \Gamma_k^{-1} \bm U_1^{T} \bm X_k^{T} \bm Q_k^{-1} \bm X_k \bm U_1 \bm \Gamma_k^{-1},\label{eq:W_k_inv}
@@ -621,13 +622,15 @@ rule automatically, we applied this rule in our {\tt R} code. We also utilized
 our implementations of the Dudoit, Pang, and Tong classifiers available in the
 {\tt sparsediscrim} package. We used the default settings for each classifier
 with the exception that we explicitly set prior probabilities as equal, if the
-option was available. For the \emph{HDRDA} classifier, we set $\alpha_k = 1$ $(k
-= 1, \ldots, K)$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov}
-employed resembled \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a
-grid of 21 equidistant candidate values between 0 and 1, inclusively. Similarly,
-we estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots,
-10^4$, and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
-10-fold cross-validation \citep{Hastie:2008dt}.
+option was available. For the \emph{HDRDA} classifier
+\eqref{eq:hdrda-decomposed}, we set $\alpha_k = 1$, $k = 1, \ldots, K$, so that
+the covariance-matrix estimator \eqref{eq:hdrda-cov} employed resembled
+\eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21 equidistant
+candidate values between 0 and 1, inclusively. Similarly, we estimated $\gamma$
+from a grid consisting of the values $10^{-1}, \ldots, 10^4$, and $10^5$. We
+selected optimal estimates of $\lambda$ and $\gamma$ using 10-fold
+cross-validation \citep{Hastie:2008dt}. Each of the microarray data sets listed
+below can be found in \ref{suppA}.
 
 \subsection{\cite{Burczynski:2006ik} Data Set}
 
@@ -695,27 +698,28 @@ were no greater than \Sexpr{max_se}.
 The \emph{HDRDA} classifier was superior in classification performance for the
 majority of the simulations. For the Burczysnki, Shipp, and Singh data sets, our
 classifier outperformed its competitors for all values of $d$ examined. For the
-Nakayama data set, the \emph{HDRDA} classifier was outperformed by the Dudoit,
-Pang, and Tong classifiers for small values of $d$ but attained classification
-rates superior to its competitors for larger values of $d$. Furthermore, Figure
-\ref{fig:error-rates} emphasizes two strengths of our classifier: reliability of
-the classifier for small $d$ and stability of the classifier for large $d$. In
-contrast to the other classifiers, the \emph{HDRDA} classifier exhibited less
-variability in its misclassification estimates for small values of $d$ and
-yielded superior classification accuracy as $d$ increased and was hardly
-effected by the inclusion of more variables in the data sets. We attribute the
-apparent stability of the error-rate estimates of our classifier for large
-values of $d$ to its novel dimension-reduction technique.
+Nakayama data set, the \emph{HDRDA} classifier \eqref{eq:hdrda-decomposed} was
+slightly outperformed by the Dudoit, Pang, and Tong classifiers for small values
+of $d$ but attained classification rates superior to its competitors for larger
+values of $d$. Furthermore, Figure \ref{fig:error-rates} emphasizes two
+strengths of our classifier: reliability of the classifier for relatively small
+$d$ and stability of the classifier for large $d$. In contrast to the other
+classifiers, the \emph{HDRDA} classifier exhibited less variability in its
+misclassification estimates for small values of $d$ and yielded superior
+classification accuracy as $d$ increased and was hardly effected by the
+inclusion of more variables in the data sets. We attribute the apparent
+stability of the error-rate estimates of our classifier for large values of $d$
+to its novel dimension-reduction technique.
 
-The error-rate estimates for the Dudoit, Pang, Tong, and Witten classifiers were
-comparable for all values of $d$ examined. Furthermore, the error-rate estimates
-of the Dudoit, Pang, and Tong classifiers were approximately equal throughout
-our study, and the Witten classifier yielded approximately equal error-rate
-estimates for the Burczysnki, Shipp, and Singh data sets. Furthermore, the
-error-rate estimates for the Dudoit and Tong classifiers were nearly identical,
-which suggests that the improved mean estimator employed by \cite{Tong:2012hw}
-provided little improvement to the classification performance of diagonal linear
-discriminant analysis.
+The average error-rate estimates for the Dudoit, Pang, Tong, and Witten
+classifiers were comparable for all values of $d$ examined. Furthermore, the
+error-rate estimates of the Dudoit, Pang, and Tong classifiers were
+approximately equal throughout our study, and the Witten classifier yielded
+approximately equal error-rate estimates for the Burczysnki, Shipp, and Singh
+data sets. Furthermore, the error-rate estimates for the Dudoit and Tong
+classifiers were nearly identical, which suggests that the improved mean
+estimator employed by \cite{Tong:2012hw} provided little improvement to the
+classification performance of diagonal linear discriminant analysis.
 
 The classification performance of the the Dudoit, Pang, Tong, and Witten
 classifiers for the Shipp and Singh data sets revealed the inability of these
@@ -734,74 +738,87 @@ than its competitors. Furthermore, the Guo classifier exhibited unreliable
 classification performance for smaller values of $d$ and required a larger
 subset of the features to perform competitively in our study.
 \begin{figure}
-<<error_rates>>=
+<<error_rates, fig.width=8, fig.height=8, out.width='.65\\linewidth'>>=
 error_rates$data_set <- Hmisc:::capitalize(error_rates$data_set)
 p <- ggplot(error_rates, aes(x = d, y = Avg_Error, group = Classifier))
-p <- p + geom_line(aes(), size = 1, linetype = 2)
-p <- p + geom_point(aes(shape = Classifier), size = 6)
+p <- p + geom_line(aes(color = Classifier), size = 1, linetype = 2)
+p <- p + geom_point(aes(color = Classifier, shape = Classifier), size = 3)
 p <- p + facet_wrap(~ data_set) + ylim(c(0, max(error_rates$Avg_Error))) + theme_bw()
 p <- p + xlab("Number of Variables Selected, d") + ylab("Average Error Rate")
-p <- p + theme(axis.text = element_text(size = 16))
-p <- p + theme(axis.title.x = element_text(size = 20))
-p <- p + theme(axis.title.y = element_text(size = 20))
-p <- p + theme(strip.text.x = element_text(size = 18))
-p + theme(legend.position = "none")
+p <- p + theme(axis.text = element_text(size = 10))
+p <- p + theme(axis.title.x = element_text(size = 17))
+p <- p + theme(axis.title.y = element_text(size = 17))
+p <- p + theme(strip.text.x = element_text(size = 16))
+p <- p + theme(legend.title = element_text(size = 16, face = "bold"))
+p <- p + theme(legend.text = element_text(size = 15))
+p <- p + theme(legend.key.size = unit(1, "cm"))
+p
 @ 
 \caption{Averages of the 1000 error-rate estimates of the competing classifiers
-  for each data set as a function of $d$. The classifiers are marked as follows:
-  Dudoit (circle), Guo (triangle), Pang (square), Tong = (cross), Witten (square
-  with X), and ours (asterisk). Approximate standard errors are no greater than
-  \Sexpr{max_se}.}
+  for each data set as a function of $d$. Approximate standard errors are no
+  greater than \Sexpr{max_se}.}
 \label{fig:error-rates}
 \end{figure}
 Next, we examine the optimal estimates of the tuning parameters for the
 \emph{HDRDA} classifier. For brevity, we provide graphical summaries of the
-optimal estimates of $\lambda$ and $\gamma$ in the Supplementary Material. For
-each of the four data sets, the distribution of the optimal values of $\lambda$
-selected through cross-validation often had a notable bathtub shape, resembling
-a Beta distribution with both shape parameters less than unity. Specifically,
-the optimal values of $\lambda$ were typically near 0 or near 1, corresponding
-to quadratic and linear discriminant analysis, respectively. For instance, with
+optimal estimates of $\lambda$ and $\gamma$ in \ref{suppB}. For each of the four
+data sets, the distribution of the optimal values of $\lambda$ selected through
+cross-validation often had a notable bathtub shape, resembling a Beta
+distribution with both shape parameters less than unity. Specifically, the
+optimal values of $\lambda$ were typically near 0 or near 1, corresponding to
+quadratic and linear discriminant analysis, respectively. For instance, with
 smaller values of $d$ applied to the Shipp data set, the range of optimal values
 of $\lambda$ was typically no larger than 0.05, indicating there were a large
 number of training data sets for which we can safely assume the covariance
-matrices are unequal or nearly unequal. As $d$ increased, the majority of the
-optimal values of $\lambda$ were selected as unity, thereby an increased number
-of variables resulted in the \emph{HDRDA} classifier preferring the more
-parsimonious assumption of equal covariance matrices. In this instance we can
-see the flexibility of our proposed classifier to employ the more realistic
-assumption that the class covariance matrices are unequal, but if optimal, we
-can employ the more parsimonious assumption of equal covariance matrices.
+matrices are unequal. As $d$ increased, the majority of the optimal values of
+$\lambda$ were selected as unity, thereby an increased number of variables
+resulted in the \emph{HDRDA} classifier preferring the more parsimonious
+assumption of equal covariance matrices. In this instance we can see the
+flexibility of our proposed classifier to employ the more realistic assumption
+of unequal class covariance matrices, but if optimal, the \emph{HDRDA}
+classifier \eqref{eq:hdrda-decomposed} can utilize the more parsimonious
+assumption of equal covariance matrices.
 
 \section{Discussion}
 
-In our simulation study, we compared our proposed \emph{HDRDA} classifier to
-several recently proposed classifiers, including the Dudoit, Pang, Tong, and Guo
-classifiers, each of which assumes independence of the features conditional on
-class membership. Despite the rapid computational performance of diagonal
+In our simulation study, we have compared our proposed \emph{HDRDA} classifier
+to several recently proposed classifiers, including the Dudoit, Pang, Tong, and
+Guo classifiers, each of which assumes independence of the features conditional
+on class membership. Despite the rapid computational performance of diagonal
 classifiers and the reduction in the number of parameters to estimate,
 \cite{Mai:2012bf} and \cite{Fan:2012iq} have noted that diagonal classifiers can
 often yield inferior classification performance to other classification
 methods. We have shown that the \emph{HDRDA} classifier often yields superior
 classification accuracy to the diagonal classifiers considered, confirming the
 assertions of \cite{Mai:2012bf} and \cite{Fan:2012iq}. Furthermore, the
-implementation of our classifier in the {\tt sparsediscrim} R package was
-comparable to that of the diagonal classifiers in terms of computational
-runtime. Moreover, when preliminary variable selection was applied to the data
-in our classification study, the time to perform model selection with our
-proposed classifier was nearly instantaneous. Hence, our proposed \emph{HDRDA}
-classifier is competitive in terms of classification accuracy for modern
-small-sample, high-dimensional data sets and requires substantially less
-computing time than standard regularized classifiers, such as the \emph{RDA}
-classifier proposed by \cite{Friedman:1989tm}.
+implementation of \eqref{eq:hdrda-decomposed} in the {\tt sparsediscrim} R
+package was comparable to that of the diagonal classifiers in terms of
+computational runtime. Moreover, when preliminary variable selection was applied
+to the data in our classification study, the time to perform model selection
+with our proposed classifier was nearly instantaneous. Hence, our proposed
+\emph{HDRDA} classifier is competitive in terms of classification accuracy for
+modern small-sample, high-dimensional data sets and requires substantially less
+computing time than standard regularized classifiers, such as regularized
+discriminant analysis proposed by \cite{Friedman:1989tm}.
 
-\section*{Supplementary material}
-\label{SM}
-Supplementary material available online includes the graphical summary
-of the optimal estimates of our classifier from the classification study.
+\begin{supplement}
+\sname{Supplement A}\label{suppA}
+\stitle{R Package Containing Microarray Data Sets}
+\slink[url]{https://github.com/ramey/datamicroarray}
+\sdescription{An R package containing all of the microarray data sets used in
+  the classification study.}
+\end{supplement}
+
+\begin{supplement}
+\sname{Supplement B}\label{suppB}
+\stitle{Optimal Estimates of the HDRDA Classifier}
+\slink[url]{https://github.com/ramey/paper-hdrda/tree/annals-of-applied-statistics/reports}
+\sdescription{The graphical summary of the optimal estimates of the \emph{HDRDA} classifier from the classification study.}
+\end{supplement}
 
 
-\bibliographystyle{plainnat}
+
+\bibliographystyle{imsart-nameyear}
 \bibliography{rda}
 
 \end{document} 

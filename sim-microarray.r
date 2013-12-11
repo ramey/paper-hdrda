@@ -44,10 +44,8 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
     Witten_out <- try_default(Witten_Tibshirani(trn_x, train_y, tst_x), NA)
     Witten_errors <- mean(Witten_out$predictions != test_y)
 
-    # TODO: Double-check cross-validation method to determine why method is classifying
-    # into one class and therefore having terrible classification accuracy
     # Guo, Hastie, and Tibshirani (2007) - Biostatistics
-    Guo_out <- try_default(scrda_train(x = trn_x, y = train_y), NA)
+    Guo_out <- try_default(scrda_train(x = trn_x, y = train_y, prior = prior_probs), NA)
     Guo_pred <- try_default(with(Guo_out, scrda_predict(rda_out, trn_x, train_y, tst_x,
                                              alpha, delta)), NA)
     Guo_errors <- mean(Guo_pred != test_y)
