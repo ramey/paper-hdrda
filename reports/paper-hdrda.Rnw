@@ -27,10 +27,9 @@
 
 \begin{document}
 
-\title{Efficient Calculation of Regularized Discriminant Analysis for
-  High-Dimensional Classification}
+\title{High-Dimensional Regularized Discriminant Analysis}
 
-\author{John A. Ramey, Caleb K. Stein, \and Dean M. Young}
+\author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
 
 \maketitle
 
@@ -38,18 +37,18 @@
 
 \begin{abstract}
 
-Reliable supervised classification of tumors from gene expression microarray
-data is essential for successful diagnosis and treatment of diseases such as
-cancer; however, because the number of gene expression levels measured is
-typically much greater than the sample size, the analysis of microarray data
-often presents difficult statistical and computational challenges. Here, we
-propose a new regularized discriminant analysis classifier that incorporates
-dimension reduction and covariance-matrix shrinkage to enable a computationally
-efficient classifier. We demonstrate with four high-dimensional microarray data
-sets that our proposed classifier is often superior to several recently proposed
-sparse and regularized classifiers in terms of classification accuracy. Finally,
-we provide an implementation of our proposed classifier in the {\tt
-  sparsediscrim} R package, available on CRAN.
+LDA and QDA suck. Friedman to the rescue with RDA. We reformulate the RDA
+classifier. Our parameterizaton yields 1) improved interpretation, 2) nice
+properties that facilitate dimension reduction, and 3) as a result of the
+dimension reduction, efficient calculation for high-dimensional data.
+
+Here, we propose a new regularized discriminant analysis classifier that
+incorporates dimension reduction and covariance-matrix shrinkage to enable a
+computationally efficient classifier. We demonstrate with four high-dimensional
+microarray data sets that our proposed classifier is often superior to several
+recently proposed sparse and regularized classifiers in terms of classification
+accuracy. Finally, we provide an implementation of our proposed classifier in
+the {\tt sparsediscrim} R package, available on CRAN.
 
 \end{abstract}
 
@@ -106,42 +105,52 @@ max_se <- max(error_rates[["SE_Error"]])
 
 \section{Introduction}
 
-Microarrays have enabled researchers to measure gene-expression levels of
-thousands of genes in a single experiment to identify a subset of genes and
-their expression patterns that either characterize a particular cell state or
-facilitate an accurate prediction of future cell state.  We focus on the
-classification of tissues and other biological samples into one of $K$ disjoint,
-predefined types, where our goal is to ascertain the class membership of
-a new tissue sample based on gene-expression microarray data. However,
-microarray data typically consist of a large number of gene expressions $p$
-relative to the total sample size $N$. Moreover, standard benchmark microarray
-data sets usually consist of between $p = 10,000$ and $55,000$ probes and fewer
-than $N = 100$ observations, in which case standard supervised-learning methods
-exhibit poor classification performance because of the \emph{curse of
-  dimensionality} \citep{Bellman:1961tn}. Furthermore, some well-known
-classifiers, such as linear and quadratic discriminant analysis, are
-incalculable when $p > N$ because the sample covariance matrices employed are
-singular. As a result, many researchers, including \cite{Mai:2012bf},
-\cite{Fan:2012iq}, \cite{Merchante:2012vk}, \cite{Clemmensen:2011kr}, and
-\cite{Huang:2010ju}, have introduced restrictions on the population covariance
-matrices in linear and quadratic discriminant analysis to reduce the number of
-covariance parameters that must be estimated to ensure that the resulting
-classifiers are calculable. For instance, \cite{Dudoit:2002ev} have modified the
-linear and quadratic discriminant analysis classifiers by assuming that the
-population covariance matrices are diagonal, resulting in classifiers that are
-special cases of the Naive Bayes classifier \citep[Chapter 4]{Hastie:2008dt}.
+Linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA) are
+classical approaches to supervised learning and are widely used in a variety of
+areas, such as medical research, facial recognition, and TODO
+\cite{Dudoit:2002ev,TODO1,TODO2} Both the LDA and QDA classifiers are based on
+the assumption that the underlying distribution of each of the $K$ classes are
+multivariate normally distributed. While both methods are popular in practice,
+they often cannot be applied to modern data sets because the sample covariance
+matrices employed are singular when the number of features exceeds the total
+sample size $N$. For instance, standard benchmark microarray data sets used in
+biological research often consist of between $p = 10,000$ and $55,000$ probes
+and fewer than $N = 100$ observations, in which case LDA and QDA are
+incalculable.
 
-Alternatively, several researchers, including \cite*{Zhang:2010va},
-\cite{Ye:2009gd}, \cite{Ji:2008wp}, \cite*{Guo:2007te},
-\cite*{Srivastava:2007ud}, \cite{Ye:2006vx}, and \cite{Ye:2005uu}, have proposed
-regularization methods to improve the estimation of the population covariance
-matrices before applying either linear or quadratic discriminant
-analysis. Covariance-matrix regularization methods often are based on the
-well-known ridge-regression approach of \cite{Hoerl:1970cd} and adjust the
-eigenvalues of the sample covariance matrices to ensure positive
-definiteness. For excellent overviews of the regularization problem in
-discriminant analysis, see \cite{Murphy:2012uq}, \cite{Mkhadri:1997gy}, and
-\cite{Friedman:1989tm}.
+\cite{Friedman:1989tm} proposed regularized discriminant analysis (RDA), which
+partially pools the individual sample covariance matrices used in the QDA
+classifier with the pooled sample covariance matrix from the LDA
+classifier. After pooling the covariance matrices, the RDA classifier employs a
+covariance-matrix regularization technique that shrinks the zero eigenvalues of
+the resulting covariance matrices to ensure they are nonsingular. Similarly,
+several researchers, including \cite*{Zhang:2010va}, \cite{Ye:2009gd},
+\cite{Ji:2008wp}, \cite*{Guo:2007te}, \cite*{Srivastava:2007ud},
+\cite{Ye:2006vx}, and \cite{Ye:2005uu}, have proposed regularization methods to
+improve the estimation of the population covariance matrices before applying
+either the LDA or QDA classifiers. Covariance-matrix regularization methods
+often are based on the well-known ridge-regression approach of
+\cite{Hoerl:1970cd} and adjust the eigenvalues of the sample covariance matrices
+to ensure positive definiteness. For excellent overviews of the regularization
+problem in discriminant analysis, see \cite{Murphy:2012uq},
+\cite{Mkhadri:1997gy}, and \cite{Friedman:1989tm}.
+
+% TODO: Should we remove this paragraph? Keep a couple of the recent references
+% though.
+Alternatively, many researchers, including \cite{Mai:2012bf}, \cite{Fan:2012iq},
+\cite{Merchante:2012vk}, \cite{Clemmensen:2011kr}, and \cite{Huang:2010ju}, have
+introduced restrictions on the population covariance matrices in linear and
+quadratic discriminant analysis to reduce the number of covariance parameters
+that must be estimated to ensure that the resulting classifiers are
+calculable. For instance, \cite{Dudoit:2002ev} have modified the linear and
+quadratic discriminant analysis classifiers by assuming that the population
+covariance matrices are diagonal, resulting in classifiers that are special
+cases of the Naive Bayes classifier \citep[Chapter 4]{Hastie:2008dt}.
+
+We reformulate the RDA classifier. Our parameterizaton yields 1) improved
+interpretation, 2) nice properties that facilitate dimension reduction, and 3)
+as a result of the dimension reduction, efficient calculation for
+high-dimensional data.
 
 Here, we propose the high-dimensional regularized discriminant analysis
 (\emph{HDRDA}) classifier by first constructing a pooling matrix as a convex
@@ -203,17 +212,16 @@ matrices. Let $V^{\perp} = \{\bm y \in \mathbb{R}_{p \times 1} : \bm y^{T} \bm v
 $V \subset \mathbb{R}_{p \times 1}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if
 $c \ne 0$ and $0$ otherwise.
 
-In discriminant analysis we wish to assign correctly an unlabeled
-$p$-dimensional observation vector $\bm x$ to one of $K$ unique, known classes
-(or populations) by constructing a classifier from $N$ training
-observations. Let $\bm x_i = (x_{i1}, \ldots, x_{ip}) \in \mathbb{R}_{p \times
-  1}$ be the $i$th observation $(i = 1, \ldots, N)$ with true, unique membership
-$y_i \in \{\omega_1, \ldots, \omega_K\}$. We assume that $(\bm x_i, y_i)$ is a
-realization from a mixture distribution $p(\bm x) = \sum_{k=1}^K p(\bm x |
-\omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$ is the probability density
-function of the $k$th class and $p(\omega_k)$ is the prior probability of class
-membership of the $k$th class. We further assume that each of $p(\omega_k)$ is
-equal, $k = 1, \ldots, K$.
+In discriminant analysis we wish to assign correctly an unlabeled vector $\bm x
+\in \mathbb{R}_{p \times 1}$ to one of $K$ unique, known classes by constructing
+a classifier from $N$ training observations. Let $\bm x_i = (x_{i1}, \ldots,
+x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots,
+N)$ with true, unique membership $y_i \in \{\omega_1, \ldots, \omega_K\}$. We
+assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm
+x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$
+is the probability density function of the $k$th class and $p(\omega_k)$ is the
+prior probability of class membership of the $k$th class. We further assume that
+each of $p(\omega_k)$ is equal, $k = 1, \ldots, K$.
 
 Quadratic discriminant analysis is the optimal Bayesian decision rule with
 respect to a $0-1$ loss function when $p(\bm x | \omega_k)$ is the probability
@@ -256,7 +264,7 @@ so that \eqref{eq:qda} is calculable and has reduced variability in the standard
 bias-variance tradeoff. A common form of the covariance-matrix regularization
 applies a shrinkage factor $\gamma > 0$, so that
 \begin{align}
-	\widehat{\bm \Sigma}_k(\gamma) =  \widehat{\bm \Sigma}_k + \gamma \bm I_p, \label{eq:ridge-estimator}
+	\widehat{\bm \Sigma}_k(\gamma) = \widehat{\bm \Sigma}_k + \gamma \bm I_p, \label{eq:ridge-estimator}
 \end{align}
 similar to a method employed in ridge regression \citep{Hoerl:1970cd}. Equation
 \eqref{eq:ridge-estimator} effectively \emph{shrinks} the sample covariance
@@ -267,6 +275,8 @@ positive definite. For additional covariance-matrix regularization methods, see
 \cite{Ramey:2013ji}, \cite{Xu:2009fl}, and \cite{Ye:2009gd}.
 
 \subsection{Model Specification}
+
+\cite{Halbe:2007ea} demonstrate that  parameterization results in a
 
 Here, we define the \emph{HDRDA} classifier by first formulating the
 covariance-matrix estimator $\widehat{\bm \Sigma}_k(\lambda)$ and demonstrating
@@ -350,6 +360,39 @@ equal to the product of the positive eigenvalues of $\tilde{\bm
 from a grid of candidate models via cross-validation \citep{Hastie:2008dt}. We
 provide an implementation of \eqref{eq:hdrda} in the {\tt hdrda} function in the
 {\tt sparsediscrim} R package, available on CRAN.
+
+\subsection{Relationship with Regularized Discriminant Analysis}
+
+\cite{Friedman:1989tm} proposed regularized discriminant analysis (RDA) by
+incorporating a weighted average of the sample covariance matrix $\widehat{ \bm
+  \Sigma}_k$ and the pooled sample covariance matrix $\widehat{\bm \Sigma}$ to
+estimate $\bm \Sigma_k$ with
+\begin{align}
+    \widehat{\bm \Sigma}_k(\lambda) = n_k^{-1}(\lambda) \bm S_k(\lambda) \quad
+    (k =
+      1, \ldots, K),\label{eq:sig-lambda}
+      \end{align}
+where $\lambda \in [0, 1]$, $n_k(\lambda) = (1 - \lambda) n_k + \lambda N$, $
+\bm S_k = n_k \widehat{\bm \Sigma}_k$, $\bm S = \sum_{k=1}^K \bm S_k$, and $ \bm
+S_k(\lambda) = (1 - \lambda) \bm S_k + \lambda \bm S$. If $\lambda = 0$,
+\eqref{eq:sig-lambda} is equal to $\widehat{\bm \Sigma}_k$ used in
+\eqref{eq:qda}. Alternatively, if $\lambda = 1$, \eqref{eq:sig-lambda} reduces
+to \eqref{eq:pooled-cov}.
+
+To further improve the estimation of $\bm \Sigma_k$ and to stabilize the inverse
+of \eqref{eq:sig-lambda}, \cite{Friedman:1989tm} has proposed the biased
+covariance-matrix estimator
+\begin{align}
+          \widehat{\bm \Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm
+            \Sigma}_k(\lambda) + \gamma \frac{\tr\{\widehat{\bm
+              \Sigma}_k(\lambda)\}}{p} \bm I_p,\label{eq:sig-rda}
+          \end{align}
+where $\gamma \in [0, 1]$ is a regularization parameter that controls the
+shrinkage of \eqref{eq:sig-rda} towards $\bm I_p$ and is weighted by the average
+of the eigenvalues of \eqref{eq:sig-lambda}. Finally, the RDA classifier is
+established by substituting \eqref{eq:sig-rda} into \eqref{eq:qda}.
+
+\section{Properties of the HDRDA}
 
 \subsection{Enhanced Computational Efficiency}
 \label{sec:computational-efficiency}

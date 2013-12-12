@@ -1,26 +1,26 @@
-%% Created using Papers on Thu, 18 Apr 2013.
-%% http://mekentosj.com/papers/
+%% Created using Papers on Thu, 12 Dec 2013.
+%% http://papersapp.com/papers/
 
-@article{Witten:2011kc,
-author = {Witten, Daniela M and Tibshirani, Robert},
-title = {{Penalized classification using Fisher's linear discriminant}},
-journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
-year = {2011},
-volume = {73},
-number = {5},
-pages = {753--772},
-month = aug
+@article{Hoerl:1970cd,
+author = {Hoerl, Arthur E and Kennard, Robert W},
+title = {{Ridge Regression: Biased Estimation for Nonorthogonal Problems}},
+journal = {Technometrics},
+year = {1970},
+volume = {12},
+number = {1},
+pages = {55--67},
+month = feb
 }
 
-@article{Tibshirani:2002ht,
-author = {Tibshirani, Robert and Hastie, Trevor and Narasimhan, Balasubramanian and Chu, Gilbert},
-title = {{Diagnosis of multiple cancer types by shrunken centroids of gene expression.}},
-journal = {Proceedings of the National Academy of Sciences of the United States of America},
-year = {2002},
-volume = {99},
-number = {10},
-pages = {6567--6572},
-month = may
+@article{Halbe:2007ea,
+author = {Halbe, Zohar and Aladjem, Mayer},
+title = {{Regularized mixture discriminant analysis}},
+journal = {Pattern Recognition Letters},
+year = {2007},
+volume = {28},
+number = {15},
+pages = {2104--2115},
+month = nov
 }
 
 @inproceedings{Ye:2006tq,
@@ -63,25 +63,32 @@ pages = {51--61},
 month = feb
 }
 
-@book{Kollo:2005vp,
-author = {Kollo, T{\~o}nu and von Rosen, Dietrich},
-title = {{Advanced Multivariate Statistics with Matrices}},
-publisher = {Springer},
-year = {2005},
-volume = {579},
-series = {Mathematics and Its Applications (New York)},
-address = {Dordrecht}
+@inproceedings{Ye:2006jm,
+author = {Ye, Jieping and Xiong, Tao and Li, Qi and Janardan, Ravi and Bi, Jinbo and Cherkassky, Vladimir and Kambhamettu, Chandra},
+title = {{Efficient model selection for regularized linear discriminant analysis}},
+booktitle = {Proceedings of the 15th ACM International Conference on Information and Knowledge Management},
+year = {2006},
+pages = {532--539},
+publisher = {ACM},
+address = {Arlington, VA, USA},
+annote = {* Notes that the "Classicial LDA is equivalent to maximum likelihood classification assuming normal{\ldots}" (page 3)
+* Shows that a solution to the classical LDA optimization problem in Equation 9 is given by the solution to the generalized eigenvalue problem: S_b x = \lambda S_t x
+* Because this involves the inverse of S_t, which is singular for p {\&}gt; N, S_t needs to be regularized
+* In Section 3, shows that the solution to the generalized eigenvalue problem has a low-rank representation. 
+* Derives explicitly the eigendecomposition of the solution to the generalized eigenvalue problem with regularization
+* Shows that ULDA is the limiting case of RLDA
+* Shows that ULDA maps all points from the same class to a common point; perfect class separation but leads to overfitting. RLDA fixes this.
+* Uses a grid of size m = 1000. It is not clear what the maximum tuning parameter value is.}
 }
 
-@article{Ji:2008wp,
-author = {Ji, Shuiwang and Ye, Jieping},
-title = {{Generalized Linear Discriminant Analysis: A Unified Framework and Efficient Model Selection}},
-journal = {Neural Networks, IEEE Transactions on},
-year = {2008},
-volume = {19},
-number = {10},
-month = oct,
-annote = {This paper is almost identical to Ye's book chapter in 2009. In that chapter, Ye applies the transfer function idea to semi-supervised learning. The first half of that chapter however is given here, except this paper adds a thorough simulation study.}
+@article{Srivastava:2007ww,
+author = {Srivastava, Muni S. and Kubokawa, Tatsuya},
+title = {{Comparison of discrimination methods for high dimensional data}},
+journal = {Journal of the Japan Statistical Society},
+year = {2007},
+volume = {37},
+number = {1},
+pages = {123--134}
 }
 
 @book{Bellman:1961tn,
@@ -113,6 +120,16 @@ pages = {745--771},
 month = apr
 }
 
+@article{Mkhadri:1997gy,
+author = {Mkhadri, A and Celeux, G and Nasroallah, A},
+title = {{Regularization in discriminant analysis: an overview}},
+journal = {Computational Statistics and Data Analysis},
+year = {1997},
+volume = {23},
+number = {3},
+pages = {403--423}
+}
+
 @article{Marco:1987bj,
 author = {Marco, Virgil R and Young, Dean M and Turner, Danny W},
 title = {{The Euclidean distance classifier: an alternative to the linear discriminant function}},
@@ -136,18 +153,6 @@ month = feb,
 annote = {This paper is an extension of DLDA that uses a Stein estimator for the mean. The simulation design is limited, and the authors only considered the Golub data set.
 
 This would be a natural method to consider for comparison with SimDiag.}
-}
-
-@incollection{Ye:2009gd,
-author = {Ye, Jieping and Ji, Shuiwang},
-title = {{Discriminant Analysis for Dimensionality Reduction: An Overview of Recent Developments}},
-booktitle = {Biometrics: Theory, Methods, and Applications},
-year = {2009},
-editor = {Boulgouris, Nikolaos V and Plataniotis, Konstantinos N and Micheli-Tzanakou, Evangelia},
-pages = {1--19},
-publisher = {John Wiley {\&} Sons, Inc.},
-address = {Hoboken, NJ, USA},
-month = oct
 }
 
 @inproceedings{Rao:1971ul,
@@ -294,11 +299,12 @@ address = {New York}
 }
 
 @article{Friedman:1989tm,
-author = {Friedman, Jerome},
+author = {Friedman, Jerome H},
 title = {{Regularized Discriminant Analysis}},
 journal = {Journal of the American Statistical Association},
 year = {1989},
 volume = {84},
+number = {405},
 pages = {165--175}
 }
 
@@ -323,10 +329,21 @@ pages = {77--87},
 month = mar
 }
 
+@book{Ye:2009gd,
+author = {Ye, Jieping and Ji, Shuiwang},
+editor = {Boulgouris, N and Plataniotis, Konstantinos N and Micheli-Tzanakou, E},
+title = {{Discriminant Analysis for Dimensionality Reduction: An Overview of Recent Developments}},
+publisher = {John Wiley {\&} Sons, Inc.},
+year = {2009},
+series = {Biometrics: Theory, Methods, and Applications},
+address = {Hoboken, NJ, USA},
+month = nov
+}
+
 @article{Hoyle:2011vt,
 author = {Hoyle, David C},
 title = {{Accuracy of Pseudo-Inverse Covariance Learning---A Random Matrix Theory Analysis}},
-journal = {IEEE Transactions on Signal Processing},
+journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
 year = {2011},
 volume = {33},
 number = {7},
@@ -345,13 +362,14 @@ month = apr
 }
 
 @article{Guo:2007te,
-author = {Guo, Y and Hastie, T and Tibshirani, R},
+author = {Guo, Yaqian and Hastie, Trevor and Tibshirani, Robert},
 title = {{Regularized linear discriminant analysis and its application in microarrays}},
 journal = {Biostatistics},
 year = {2007},
 volume = {8},
 number = {1},
-pages = {86--100}
+pages = {86--100},
+month = jan
 }
 
 @book{Murphy:2012uq,
@@ -425,6 +443,17 @@ volume = {7},
 pages = {1183--1204}
 }
 
+@article{Ji:2008wp,
+author = {Ji, Shuiwang and Ye, Jieping},
+title = {{Generalized Linear Discriminant Analysis: A Unified Framework and Efficient Model Selection}},
+journal = {IEEE Transactions on Neural Networks},
+year = {2008},
+volume = {19},
+number = {10},
+month = oct,
+annote = {This paper is almost identical to Ye's book chapter in 2009. In that chapter, Ye applies the transfer function idea to semi-supervised learning. The first half of that chapter however is given here, except this paper adds a thorough simulation study.}
+}
+
 @article{Srivastava:2007ud,
 author = {Srivastava, Santosh and Gupta, Maya R and Frigyik, B{\'e}la A},
 title = {{Bayesian quadratic discriminant analysis}},
@@ -456,6 +485,38 @@ pages = {406--413},
 month = nov
 }
 
+@book{Kollo:2005vp,
+author = {Kollo, T{\~o}nu and von Rosen, Dietrich},
+title = {{Advanced Multivariate Statistics with Matrices}},
+publisher = {Springer},
+year = {2005},
+volume = {579},
+series = {Mathematics and Its Applications (New York)},
+address = {Dordrecht}
+}
+
+@article{Tibshirani:2002ht,
+author = {Tibshirani, Robert and Hastie, Trevor and Narasimhan, Balasubramanian and Chu, Gilbert},
+title = {{Diagnosis of multiple cancer types by shrunken centroids of gene expression.}},
+journal = {Proceedings of the National Academy of Sciences of the United States of America},
+year = {2002},
+volume = {99},
+number = {10},
+pages = {6567--6572},
+month = may
+}
+
+@article{Witten:2011kc,
+author = {Witten, Daniela M and Tibshirani, Robert},
+title = {{Penalized classification using Fisher's linear discriminant}},
+journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+year = {2011},
+volume = {73},
+number = {5},
+pages = {753--772},
+month = aug
+}
+
 @article{Mai:2012bf,
 author = {Mai, Q and Zou, H and Yuan, M},
 title = {{A direct approach to sparse discriminant analysis in ultra-high dimensions}},
@@ -466,54 +527,5 @@ number = {1},
 pages = {29--42},
 month = feb,
 annote = {Notice the simulation models. As with Guo's paper and the subsequent papers that discuss diagonal classifiers, the simulation model favors diagonal classifiers.}
-}
-
-@article{Hoerl:1970cd,
-author = {Hoerl, Arthur E and Kennard, Robert W},
-title = {{Ridge Regression: Biased Estimation for Nonorthogonal Problems}},
-journal = {Technometrics},
-year = {1970},
-volume = {12},
-number = {1},
-pages = {55--67},
-month = feb
-}
-
-@inproceedings{Ye:2006jm,
-author = {Ye, Jieping and Xiong, Tao and Li, Qi and Janardan, Ravi and Bi, Jinbo and Cherkassky, Vladimir and Kambhamettu, Chandra},
-title = {{Efficient model selection for regularized linear discriminant analysis}},
-booktitle = {Proceedings of the 15th ACM International Conference on Information and Knowledge Management},
-year = {2006},
-pages = {532--539},
-publisher = {ACM},
-address = {Arlington, VA, USA},
-annote = {* Notes that the "Classicial LDA is equivalent to maximum likelihood classification assuming normal{\ldots}" (page 3)
-* Shows that a solution to the classical LDA optimization problem in Equation 9 is given by the solution to the generalized eigenvalue problem: S_b x = \lambda S_t x
-* Because this involves the inverse of S_t, which is singular for p {\&}gt; N, S_t needs to be regularized
-* In Section 3, shows that the solution to the generalized eigenvalue problem has a low-rank representation. 
-* Derives explicitly the eigendecomposition of the solution to the generalized eigenvalue problem with regularization
-* Shows that ULDA is the limiting case of RLDA
-* Shows that ULDA maps all points from the same class to a common point; perfect class separation but leads to overfitting. RLDA fixes this.
-* Uses a grid of size m = 1000. It is not clear what the maximum tuning parameter value is.}
-}
-
-@article{Srivastava:2007ww,
-author = {Srivastava, Muni S. and Kubokawa, Tatsuya},
-title = {{Comparison of discrimination methods for high dimensional data}},
-journal = {Journal of the Japan Statistical Society},
-year = {2007},
-volume = {37},
-number = {1},
-pages = {123--134}
-}
-
-@article{Mkhadri:1997gy,
-author = {Mkhadri, A and Celeux, G and Nasroallah, A},
-title = {{Regularization in discriminant analysis: an overview}},
-journal = {Computational Statistics and Data Analysis},
-year = {1997},
-volume = {23},
-number = {3},
-pages = {403--423}
 }
 
