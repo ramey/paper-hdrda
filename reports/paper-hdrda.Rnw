@@ -184,47 +184,63 @@ microarray data sets.
 \label{sec:rda}
 
 \subsection{Preliminaries}
+To facilitate our discussion of covariance-matrix regularization and regularized
+discriminant analysis, we require the following notation. Let $\mathbb{R}_{a
+  \times b}$ denotes the matrix space of all $a \times b$ matrices over the real
+field $\mathbb{R}$. Denote by $\bm I_m$ the $m \times m$ identity matrix, and
+let $\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm
+0_m$ is understood to denote $\bm 0_{m \times m}$. Let $\bm A \oplus \bm B$
+denote the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in
+\mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Let $\bm A^{T}$,
+$\bm A^+$, and $\mathcal{N}(\bm A) = \{\bm z \in \mathbb{R}_{p \times 1} : \bm A
+\bm z = \bm 0_{m \times 1}\}$ denote the transpose, the Moore-Penrose
+pseudoinverse, and the null space of $\bm A \in \mathbb{R}_{m \times p}$,
+respectively. Let $\mathbb{R}_{p \times p}^{>}$ denote the cone of real $p
+\times p$ positive-definite matrices. Similarly, let $\mathbb{R}_{p \times
+  p}^{\ge}$ denote the cone of real $p \times p$ positive-semidefinite
+matrices. Let $V^{\perp} = \{\bm y \in \mathbb{R}_{p \times 1} : \bm y^{T} \bm v
+= 0$ for all $\bm v \in V \}$ denote the orthogonal complement of a vector space
+$V \subset \mathbb{R}_{p \times 1}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if
+$c \ne 0$ and $0$ otherwise.
+
 In discriminant analysis we wish to assign correctly an unlabeled
 $p$-dimensional observation vector $\bm x$ to one of $K$ unique, known classes
 (or populations) by constructing a classifier from $N$ training
 observations. Let $\bm x_i = (x_{i1}, \ldots, x_{ip}) \in \mathbb{R}_{p \times
   1}$ be the $i$th observation $(i = 1, \ldots, N)$ with true, unique membership
-$y_i \in \{\omega_1, \ldots, \omega_K\}$, where $\mathbb{R}_{a \times b}$
-denotes the matrix space of all $a \times b$ matrices over the real field
-$\mathbb{R}$. We assume that $(\bm x_i, y_i)$ is a realization from a mixture
-distribution $p(\bm x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where
-$p(\bm x | \omega_k)$ is the probability density function of the $k$th class and
-$p(\omega_k)$ is the prior probability of class membership of the $k$th
-class. We further assume that each of $p(\omega_k)$ is equal, $k = 1, \ldots, K$.
+$y_i \in \{\omega_1, \ldots, \omega_K\}$. We assume that $(\bm x_i, y_i)$ is a
+realization from a mixture distribution $p(\bm x) = \sum_{k=1}^K p(\bm x |
+\omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$ is the probability density
+function of the $k$th class and $p(\omega_k)$ is the prior probability of class
+membership of the $k$th class. We further assume that each of $p(\omega_k)$ is
+equal, $k = 1, \ldots, K$.
 
 Quadratic discriminant analysis is the optimal Bayesian decision rule with
 respect to a $0-1$ loss function when $p(\bm x | \omega_k)$ is the probability
 density function of the multivariate normal distribution with known mean vectors
 $\bm \mu_k \in \mathbb{R}_{p \times 1}$ and known covariance matrices $\bm
-\Sigma_k \in \mathbb{R}_{p \times p}^{>}$, $k = 1, 2, \ldots, K$, where
-$\mathbb{R}_{p \times p}^{>}$ denotes the cone of real $p \times p$
-positive-definite matrices. Because $\bm \mu_k$ and $\bm \Sigma_k$ are typically
-unknown, we assign an unlabeled observation $\bm x$ to class $\omega_k$ with the
-sample quadratic discriminant analysis classifier
+\Sigma_k \in \mathbb{R}_{p \times p}^{>}$, $k = 1, 2, \ldots, K$. Because $\bm
+\mu_k$ and $\bm \Sigma_k$ are typically unknown, we assign an unlabeled
+observation $\bm x$ to class $\omega_k$ with the sample quadratic discriminant
+analysis classifier
 \begin{align}
 	D_{QDA}(\bm x) = \argmin_{k} (\bm x - \xbar_k)^{T}\widehat{\bm
     \Sigma}_k^{-1}(\bm x - \xbar_k) + \log |\widehat{\bm \Sigma}_k|, \label{eq:qda}
 \end{align}
 where $\xbar_k$ and $\widehat{\bm \Sigma}_k$ are the maximum likelihood
-estimators of $\bm \mu_k$ and $\bm \Sigma_k$, respectively, and $\bm A^{T}$
-denotes the matrix transpose of $\bm A \in \mathbb{R}_{m \times p}$. If we
-assume further that $\bm \Sigma_k = \bm \Sigma$, $k = 1, \ldots, K$, then the
-pooled sample covariance matrix $\widehat{\bm \Sigma}$ is substituted for
-$\widehat{ \bm \Sigma}_k$ in \eqref{eq:qda}, where
+estimators of $\bm \mu_k$ and $\bm \Sigma_k$, respectively. If we assume further
+that $\bm \Sigma_k = \bm \Sigma$, $k = 1, \ldots, K$, then the pooled sample
+covariance matrix $\widehat{\bm \Sigma}$ is substituted for $\widehat{ \bm
+  \Sigma}_k$ in \eqref{eq:qda}, where
 \begin{align}
 	\widehat{\bm \Sigma} = N^{-1} \sum_{k=1}^K n_k \widehat{\bm \Sigma}_k \label{eq:pooled-cov}
 \end{align}
 is the maximum likelihood estimator for $\bm \Sigma$. In this case \eqref{eq:qda}
 reduces to the sample linear discriminant analysis classifier, and the
-log-determinant is omitted because it is constant across all classes.
+log-determinant is omitted because it is constant across the $K$ classes.
 
 The smallest eigenvalues and the directions associated with their eigenvectors
-highly influence \eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm
+can highly influence \eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm
   \Sigma}_k$ are well-known to be biased if $p \ge n_k$ such that the smallest
 eigenvalues are underestimated \citep{Seber:2004uh}. Moreover, if $p > n_k$,
 then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which implies that at least $p -
@@ -249,19 +265,6 @@ eigenvalues of $\widehat{\bm \Sigma}_k$ by $\gamma$. Specifically, the zero
 eigenvalues are replaced with $\gamma$, so that \eqref{eq:ridge-estimator} is
 positive definite. For additional covariance-matrix regularization methods, see
 \cite{Ramey:2013ji}, \cite{Xu:2009fl}, and \cite{Ye:2009gd}.
-
-Throughout the remainder of this document we also require the following
-additional notation. Let $\bm I_m$ be the $m \times m$ identity matrix, and let
-$\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm 0_m$ is
-understood to denote $\bm 0_{m \times m}$. For $c \in \mathbb{R}$, let $c^+ =
-1/c$ if $c \ne 0$ and $0$ otherwise. Let $\bm A \oplus \bm B$ denote the direct
-sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in \mathbb{R}_{s \times
-  s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Let $\bm A^+$ and $\mathcal{N}(\bm A)
-= \{\bm z \in \mathbb{R}_{p \times 1} : \bm A \bm z = \bm 0_{m \times 1}\}$
-denote the Moore-Penrose pseudoinverse and null space of $\bm A \in
-\mathbb{R}_{m \times p}$, respectively. Let $V^{\perp} = \{\bm y \in
-\mathbb{R}_{p \times 1} : \bm y^{T} \bm v = 0$ for all $\bm v \in V \}$ denote
-the orthogonal complement of a vector space $V \subset \mathbb{R}_{p \times 1}$.
 
 \subsection{Model Specification}
 
