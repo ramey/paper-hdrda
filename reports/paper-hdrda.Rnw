@@ -105,67 +105,73 @@ max_se <- max(error_rates[["SE_Error"]])
 
 \section{Introduction}
 
-Linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA) are
-classical approaches to supervised learning and are widely used in a variety of
-areas, such as medical research, facial recognition, and TODO
-\cite{Dudoit:2002ev,TODO1,TODO2} Both the LDA and QDA classifiers are based on
-the assumption that the underlying distribution of each of the $K$ classes are
-multivariate normally distributed. While both methods are popular in practice,
-they often cannot be applied to modern data sets because the sample covariance
-matrices employed are singular when the number of features exceeds the total
-sample size $N$. For instance, standard benchmark microarray data sets used in
-biological research often consist of between $p = 10,000$ and $55,000$ probes
-and fewer than $N = 100$ observations, in which case LDA and QDA are
-incalculable.
+Discriminant analysis is a widely used technique to classify an unlabeled
+$p$-dimensional vector $\bm x$ to one of $K$ unique, known classes by
+constructing a classifier from $N$ training observations. This is useful in a
+variety of areas, such as medical research, facial recognition, and TODO
+\cite{Dudoit:2002ev,TODO1,TODO2} because data-driven decision are becoming
+increasingly common.  Although a large number of classification algorithms have
+been proposed, linear discriminant analysis (LDA) and quadratic discriminant
+analysis (QDA) remain popular in practice because of their simplicity, speed of
+computation, and interpretability. Both the LDA and QDA classifiers are based on
+the assumption that each of the $K$ classes is multivariate normally
+distributed. While both methods are popular in practice, they often cannot be
+applied to modern data sets because the sample covariance matrices employed are
+singular when the number of features exceeds the total sample size $N$. For
+instance, standard benchmark microarray data sets used in biological research
+often consist of between $p = 10,000$ and $55,000$ probes and fewer than $N =
+100$ observations, in which case LDA and QDA are incalculable.\footnote{TODO:
+  Bring back the curse of dimensionality reference.}
 
-\cite{Friedman:1989tm} proposed regularized discriminant analysis (RDA), which
-partially pools the individual sample covariance matrices used in the QDA
-classifier with the pooled sample covariance matrix from the LDA
+As a result, several researchers have applied covariance-matrix regularization
+to the LDA and QDA classifiers. Covariance-matrix regularization methods often
+are based on the well-known ridge-regression approach of \cite{Hoerl:1970cd} and
+adjust the eigenvalues of the sample covariance matrices to ensure positive
+definiteness.  \cite*{Zhang:2010va}, \cite{Ye:2009gd}, \cite{Ji:2008wp},
+\cite*{Guo:2007te}, \cite*{Srivastava:2007ud}, \cite{Ye:2006vx}, and
+\cite{Ye:2005uu}, have proposed regularization methods to improve the estimation
+of the population covariance matrices before applying either the LDA or QDA
+classifiers. Alternatively, many researchers, including \cite{Mai:2012bf},
+\cite{Fan:2012iq}, \cite{Merchante:2012vk}, \cite{Clemmensen:2011kr}, and
+\cite{Huang:2010ju}, have introduced restrictions on the population covariance
+matrices to reduce the number of parameters that must be estimated. For
+instance, \cite{Dudoit:2002ev} have modified the linear and quadratic
+discriminant analysis classifiers by assuming that the population covariance
+matrices are diagonal, resulting in classifiers that are special cases of the
+Naive Bayes classifier \citep[Chapter 4]{Hastie:2008dt}. For excellent overviews
+of the regularization problem in discriminant analysis, see \cite{Murphy:2012uq}
+and \cite{Mkhadri:1997gy}.
+
+In a classic paper, \cite{Friedman:1989tm} proposed regularized discriminant
+analysis (RDA), which partially pools the individual sample covariance matrices
+used in the QDA classifier with the pooled sample covariance matrix from the LDA
 classifier. After pooling the covariance matrices, the RDA classifier employs a
 covariance-matrix regularization technique that shrinks the zero eigenvalues of
-the resulting covariance matrices to ensure they are nonsingular. Similarly,
-several researchers, including \cite*{Zhang:2010va}, \cite{Ye:2009gd},
-\cite{Ji:2008wp}, \cite*{Guo:2007te}, \cite*{Srivastava:2007ud},
-\cite{Ye:2006vx}, and \cite{Ye:2005uu}, have proposed regularization methods to
-improve the estimation of the population covariance matrices before applying
-either the LDA or QDA classifiers. Covariance-matrix regularization methods
-often are based on the well-known ridge-regression approach of
-\cite{Hoerl:1970cd} and adjust the eigenvalues of the sample covariance matrices
-to ensure positive definiteness. For excellent overviews of the regularization
-problem in discriminant analysis, see \cite{Murphy:2012uq},
-\cite{Mkhadri:1997gy}, and \cite{Friedman:1989tm}.
+the resulting covariance matrices to ensure they are nonsingular. Given that the
+assumption of equal population covariance matrices for the LDA classifier is
+often too stringent in practice \citep{Clemmensen:2011kr}, the RDA classifier
+can relax the linearity assumption by instead incorporating unequal covariance
+matrices while retaining as special cases the LDA and QDA classifiers. Despite
+its success, the RDA classifier is often impractical because the model-selection
+process for its two tuning parameters requires excessive computation. Moreover,
+the pooling parameter has no clear intrepretation, and others
+complaints\footnote{TODO: Add some more complaints.}\footnote{TODO: Citations
+  needed.}.
 
-% TODO: Should we remove this paragraph? Keep a couple of the recent references
-% though.
-Alternatively, many researchers, including \cite{Mai:2012bf}, \cite{Fan:2012iq},
-\cite{Merchante:2012vk}, \cite{Clemmensen:2011kr}, and \cite{Huang:2010ju}, have
-introduced restrictions on the population covariance matrices in linear and
-quadratic discriminant analysis to reduce the number of covariance parameters
-that must be estimated to ensure that the resulting classifiers are
-calculable. For instance, \cite{Dudoit:2002ev} have modified the linear and
-quadratic discriminant analysis classifiers by assuming that the population
-covariance matrices are diagonal, resulting in classifiers that are special
-cases of the Naive Bayes classifier \citep[Chapter 4]{Hastie:2008dt}.
-
-We reformulate the RDA classifier. Our parameterizaton yields 1) improved
-interpretation, 2) nice properties that facilitate dimension reduction, and 3)
-as a result of the dimension reduction, efficient calculation for
-high-dimensional data.
-
-Here, we propose the high-dimensional regularized discriminant analysis
-(\emph{HDRDA}) classifier by first constructing a pooling matrix as a convex
-combination of the covariance-matrix estimators employed in linear and quadratic
-discriminant analysis. Given that the assumption of equal population covariance
-matrices for linear discriminant analysis is often too stringent in practice
-\citep{Clemmensen:2011kr}, our proposed classifier can relax the linearity
-assumption by instead incorporating unequal covariance matrices while retaining
-linear and quadratic discriminant analysis as special cases. We then establish
-the \emph{HDRDA} classifier by applying covariance-matrix regularization with a
-parameterization that includes a large family of shrinkage methods, such as
-those from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods
-studied by \cite{Ramey:2013ji} and \cite{Xu:2009fl}. This regularization has the
-effect of stabilizing the eigenvalues of the covariance-matrix estimators and
-ensuring that the classifier is well-posed.
+We consider the RDA classifier in an attempt to study rigorously some of its
+properties. Similar to \cite{Hastie:2008dt} and \cite{Halbe:2007ea}, we first
+reparameterize the RDA classifier's covariance-matrix estimator as a convex
+combination of the covariance-matrix estimators employed in the LDA and QDA
+classifiers. Our parameterizaton yields 1) improved interpretation, 2) nice
+properties that facilitate dimension reduction, and 3) as a result of the
+dimension reduction, efficient calculation for high-dimensional data. We then
+establish the high-dimensional RDA (\emph{HDRDA}) classifier by applying
+covariance-matrix regularization with a parameterization that includes a large
+family of shrinkage methods, such as those from \cite{Srivastava:2007ww},
+\cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
+\cite{Xu:2009fl}. This regularization has the effect of stabilizing the
+eigenvalues of the covariance-matrix estimators and ensuring that the classifier
+is well-posed.
 
 We show that our proposed classifier is invariant to any adjustments of the
 eigenvalues corresponding to the null space of the pooled sample covariance
@@ -177,8 +183,9 @@ eigenvalues. This invariance property provides a substantial increase in
 computational efficiency of model training and selection. In fact, we show that
 the inverse and determinants can be reduced to calculations of $n_k \times n_k$
 matrices, where $n_k$ is the sample size of the $k$th class, $k = 1, \ldots, K$.
-This reduction in calculation is clearly advantageous because $n_k$ is often
-quite small in microarray data sets (e.g., 10--20 observations).
+This reduction in calculation is clearly advantageous because $n_k$ can be small
+in modern high-dimensional data sets (e.g., 10--20 observations in
+gene-expression microarray data).
 
 We also demonstrate that the \emph{HDRDA} classifier is often superior to
 several recent classifiers designed for small-sample, high-dimensional data. In
@@ -189,10 +196,7 @@ from \cite{Guo:2007te}, \cite{Pang:2009ik}, \cite{Tong:2012hw}, and
 of the competing classifiers using four small-sample, high-dimensional benchmark
 microarray data sets.
 
-\section{High-Dimensional Regularized Discriminant Analysis}
-\label{sec:rda}
-
-\subsection{Preliminaries}
+\section{Preliminaries}
 To facilitate our discussion of covariance-matrix regularization and regularized
 discriminant analysis, we require the following notation. Let $\mathbb{R}_{a
   \times b}$ denotes the matrix space of all $a \times b$ matrices over the real
@@ -274,7 +278,8 @@ eigenvalues are replaced with $\gamma$, so that \eqref{eq:ridge-estimator} is
 positive definite. For additional covariance-matrix regularization methods, see
 \cite{Ramey:2013ji}, \cite{Xu:2009fl}, and \cite{Ye:2009gd}.
 
-\subsection{Model Specification}
+\section{High-Dimensional Regularized Discriminant Analysis}
+\label{sec:rda}
 
 \cite{Halbe:2007ea} demonstrate that  parameterization results in a
 
@@ -361,7 +366,7 @@ from a grid of candidate models via cross-validation \citep{Hastie:2008dt}. We
 provide an implementation of \eqref{eq:hdrda} in the {\tt hdrda} function in the
 {\tt sparsediscrim} R package, available on CRAN.
 
-\subsection{Relationship with Regularized Discriminant Analysis}
+\subsection{Relationship with Friedman's RDA Classifier}
 
 \cite{Friedman:1989tm} proposed regularized discriminant analysis (RDA) by
 incorporating a weighted average of the sample covariance matrix $\widehat{ \bm
@@ -390,11 +395,10 @@ covariance-matrix estimator
 where $\gamma \in [0, 1]$ is a regularization parameter that controls the
 shrinkage of \eqref{eq:sig-rda} towards $\bm I_p$ and is weighted by the average
 of the eigenvalues of \eqref{eq:sig-lambda}. Finally, the RDA classifier is
-established by substituting \eqref{eq:sig-rda} into \eqref{eq:qda}.
+established by substituting \eqref{eq:sig-rda} into
+\eqref{eq:qda}.\footnote{TODO: Discuss $\alpha_k \equiv 1-\gamma$, etc.}
 
-\section{Properties of the HDRDA}
-
-\subsection{Enhanced Computational Efficiency}
+\subsection{Properties of the HDRDA Classifier}
 \label{sec:computational-efficiency}
 
 Next, we demonstrate that our proposed classifier in \eqref{eq:hdrda} lends
@@ -568,6 +572,8 @@ C = \bm X_k \bm U_1$, we have $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$. Also,
 \eqref{eq:W_k_inv} follows from the well-known Sherman-Woodbury formula
 \citep[Theorem 18.2.8]{Harville:2008wja}.
 \end{proof}
+
+\subsection{Computationally Efficient Model Selection}
 
 Conveniently, we see that the inverse and determinant of $\bm W_k$ are each in
 terms of the inverse and determinant of $\bm Q_k \in \mathbb{R}_{n_k \times
