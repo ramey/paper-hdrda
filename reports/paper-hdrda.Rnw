@@ -295,12 +295,14 @@ the convex combination
 where $\lambda \in [0, 1]$ is the \emph{pooling} parameter. By rewriting
 \eqref{eq:sig-lambda-alternative} in terms of the observations $ \bm x_i$ $(i =
 1, \ldots, N)$, each centered by its class sample mean, we attain a clear
-interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is,
+interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is, from
+\eqref{eq:pooled-cov} we have
 \begin{align}
-	\widehat{\bm \Sigma}_k(\lambda) &= \widehat{\bm \Sigma}_k + \lambda (\widehat{\bm \Sigma} - \widehat{\bm \Sigma}_k) \nonumber\\
-%	&= \widehat{\bm \Sigma}_k + \lambda \left(\sum_{k' = 1}^K \frac{n_k}{N} \widehat{\bm \Sigma}_{k'}  - \widehat{\bm \Sigma}_k \right) \nonumber\\
-	&= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right) \widehat{\bm \Sigma}_k +  \frac{\lambda}{N} \sum_{\substack{k' = 1\\k' \ne k}} n_{k'} \widehat{\bm \Sigma}_{k'} \nonumber \\
-%	&= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right)\sum_{i=1}^N I(y_i = k) x_i x_i^{T} +  \frac{\lambda}{N} \sum_{i=1}^N I(y_i \ne k) x_i x_i^{T} \nonumber \\
+	\widehat{\bm \Sigma}_k(\lambda)
+  &= \left( 1 - \lambda + \frac{\lambda n_k}{N} \right) \widehat{\bm \Sigma}_k +  \frac{\lambda}{N} \sum_{\substack{k' = 1\\k' \ne k}}^K n_{k'} \widehat{\bm \Sigma}_{k'} \nonumber \\
+	&= \left( \frac{1 - \lambda}{n_k} + \frac{\lambda}{N} \right)\sum_{i=1}^N
+  I(y_i = k) \bm x_i \bm x_i^{T} +  \frac{\lambda}{N} \sum_{i=1}^N I(y_i \ne k)
+  \bm x_i \bm x_i^{T} \nonumber \\
 	&= \sum_{i=1}^N c_{ik}(\lambda) \bm x_i \bm x_i^{T},\label{eq:sig-lambda-alternative2}
 \end{align}
 where $c_{ik}(\lambda) = \lambda N^{-1} + (1 - \lambda)n_k^{-1}I(y_i = k)$. We
