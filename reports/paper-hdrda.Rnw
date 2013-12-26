@@ -37,18 +37,23 @@
 
 \begin{abstract}
 
-LDA and QDA suck. Friedman to the rescue with RDA. We reformulate the RDA
-classifier. Our parameterizaton yields 1) improved interpretation, 2) nice
-properties that facilitate dimension reduction, and 3) as a result of the
-dimension reduction, efficient calculation for high-dimensional data.
-
-Here, we propose a new regularized discriminant analysis classifier that
-incorporates dimension reduction and covariance-matrix shrinkage to enable a
-computationally efficient classifier. We demonstrate with four high-dimensional
-microarray data sets that our proposed classifier is often superior to several
-recently proposed sparse and regularized classifiers in terms of classification
-accuracy. Finally, we provide an implementation of our proposed classifier in
-the {\tt sparsediscrim} R package, available on CRAN.
+The popular regularized discriminant analysis (RDA) classifier proposed by
+\citeauthor{Friedman:1989tm} utilizes a biased covariance-matrix estimator that
+partially pools the sample covariance matrices from linear and quadratic
+disriminant analysis before shrinking the resulting estimator towards a scaled
+identity matrix. The RDA classifier's two tuning parameters are typically
+estimated via a computationally burdensome cross-validation procedure from a
+grid of candidate values. We reformulate the RDA classifier in the
+high-dimensional setting and then show that the classification decision rule is
+equivalent to one in a subspace having a much lower dimension. As a result, the
+dimension reduction involved yields a substantial reduction in computation
+during model selection. Our parameterization also offers interpretability
+previously lacking with the RDA classifier. We demonstrate with three artificial
+data sets and four high-dimensional real data sets that our proposed classifier
+is often superior to several recently proposed sparse and regularized
+classifiers in terms of classification accuracy. Finally, we provide an
+implementation of our proposed classifier in the {\tt sparsediscrim} R package,
+available on CRAN.
 
 \end{abstract}
 
@@ -103,103 +108,131 @@ error_rates$Classifier <- factor(as.character(error_rates$Classifier))
 max_se <- max(error_rates[["SE_Error"]])
 @ 
 
+
 \section{Introduction}
 
-Discriminant analysis is a widely used technique to classify an unlabeled
-$p$-dimensional vector $\bm x$ to one of $K$ unique, known classes by
-constructing a classifier from $N$ training observations. This is useful in a
-variety of areas, such as medical research, facial recognition, and TODO
-\cite{Dudoit:2002ev,TODO1,TODO2} because data-driven decision are becoming
-increasingly common.  Although a large number of classification algorithms have
-been proposed, linear discriminant analysis (LDA) and quadratic discriminant
-analysis (QDA) remain popular in practice because of their simplicity, speed of
-computation, and interpretability. Both the LDA and QDA classifiers are based on
-the assumption that each of the $K$ classes is multivariate normally
-distributed. While both methods are popular in practice, they often cannot be
-applied to modern data sets because the sample covariance matrices employed are
-singular when the number of features exceeds the total sample size $N$. For
-instance, standard benchmark microarray data sets used in biological research
-often consist of between $p = 10,000$ and $55,000$ probes and fewer than $N =
-100$ observations, in which case LDA and QDA are incalculable.\footnote{TODO:
-  Bring back the curse of dimensionality reference.}
+As machine-learning algorithms are increasingly utilized to automate data-driven
+decisions, researchers continue to develop a wealth of \emph{classifiers} to
+construct automated pattern-recognition systems in a variety of disciplines,
+such as medical research, facial recognition, remote sensing, and chemical
+analysis \citep{TODO}. Despite the advances in classification to facilitate
+technological advancements, well-established classifiers often degrade in
+accuracy with modern, high-dimensional data sets when the number of features $p$
+exceeds the total sample size $N$, due to the \emph{curse of dimensionality}
+\citep{Bellman:1961tn}. For instance, linear discriminant analysis (LDA) and
+quadratic discriminant analysis (QDA) are popular because of their simplicity,
+speed of computation, and interpretability. However, both methods are
+incalculable when $p > N$ because the class sample covariance matrices are
+singular \citep*{Bouveyron:2007gx}.
 
-As a result, several researchers have applied covariance-matrix regularization
-to the LDA and QDA classifiers. Covariance-matrix regularization methods often
-are based on the well-known ridge-regression approach of \cite{Hoerl:1970cd} and
-adjust the eigenvalues of the sample covariance matrices to ensure positive
-definiteness.  \cite*{Zhang:2010va}, \cite{Ye:2009gd}, \cite{Ji:2008wp},
-\cite*{Guo:2007te}, \cite*{Srivastava:2007ud}, \cite{Ye:2006vx}, and
-\cite{Ye:2005uu}, have proposed regularization methods to improve the estimation
-of the population covariance matrices before applying either the LDA or QDA
-classifiers. Alternatively, many researchers, including \cite{Mai:2012bf},
-\cite{Fan:2012iq}, \cite{Merchante:2012vk}, \cite{Clemmensen:2011kr}, and
-\cite{Huang:2010ju}, have introduced restrictions on the population covariance
+As a result, researchers have emphasized three standard approaches to modifying
+the \emph{LDA} and \emph{QDA} classifiers for application to high-dimensional
+data: 1) covariance-matrix regularization, 2) dimension reduction, and 3) model
+parsimony. Covariance-matrix regularization methods often are based on the
+well-known ridge-regression approach of
+\cite{Hoerl:1970cd}. \cite{Ching:2012fu}, \cite{Zhang:2010va}, \cite{Ye:2009gd},
+\cite{Ji:2008wp}, \cite*{Guo:2007te}, \cite*{Srivastava:2007ud},
+\cite{Ye:2006vx}, and \cite{Ye:2005uu} have proposed regularization methods to
+improve the estimation of the class covariance matrices by adjusting the
+eigenvalues of the sample covariance matrices to ensure positive
+definiteness. Alternatively, dimension reduction typically decomposes a model to
+orthogonal components and retains the components corresponding to the model's
+intrinsic dimension. While some classificatory information may be lost,
+dimension reduction methods have been shown to be effective in practice
+\citep{YePaper,TODO}. Finally, \cite{Mai:2012bf}, \cite{Fan:2012iq},
+\cite{Merchante:2012vk}, \cite{Clemmensen:2011kr}, \cite{Huang:2010ju}, and
+\cite{Dudoit:2002ev} have proposed restrictions on the population covariance
 matrices to reduce the number of parameters that must be estimated. For
-instance, \cite{Dudoit:2002ev} have modified the linear and quadratic
-discriminant analysis classifiers by assuming that the population covariance
-matrices are diagonal, resulting in classifiers that are special cases of the
-Naive Bayes classifier \citep[Chapter 4]{Hastie:2008dt}. For excellent overviews
-of the regularization problem in discriminant analysis, see \cite{Murphy:2012uq}
-and \cite{Mkhadri:1997gy}.
+instance, \cite{Dudoit:2002ev} have assumed the features within each class are
+independent so that the population covariance matrices are diagonal, resulting
+in positive-definite sample covariance matrices. For excellent overviews of the
+regularization problem in discriminant analysis and other techniques, see
+\cite{Murphy:2012uq} and \cite{Mkhadri:1997gy}.
 
-In a classic paper, \cite{Friedman:1989tm} proposed regularized discriminant
-analysis (RDA), which partially pools the individual sample covariance matrices
-used in the QDA classifier with the pooled sample covariance matrix from the LDA
-classifier. After pooling the covariance matrices, the RDA classifier employs a
-covariance-matrix regularization technique that shrinks the zero eigenvalues of
-the resulting covariance matrices to ensure they are nonsingular. Given that the
-assumption of equal population covariance matrices for the LDA classifier is
-often too stringent in practice \citep{Clemmensen:2011kr}, the RDA classifier
-can relax the linearity assumption by instead incorporating unequal covariance
-matrices while retaining as special cases the LDA and QDA classifiers. Despite
-its success, the RDA classifier is often impractical because the model-selection
-process for its two tuning parameters requires excessive computation. Moreover,
-the pooling parameter has no clear intrepretation, and others
-complaints\footnote{TODO: Add some more complaints.}\footnote{TODO: Citations
-  needed.}.
-
-We consider the RDA classifier in an attempt to study rigorously some of its
-properties. Similar to \cite{Hastie:2008dt} and \cite{Halbe:2007ea}, we first
-reparameterize the RDA classifier's covariance-matrix estimator as a convex
-combination of the covariance-matrix estimators employed in the LDA and QDA
-classifiers. Our parameterizaton yields 1) improved interpretation, 2) nice
-properties that facilitate dimension reduction, and 3) as a result of the
-dimension reduction, efficient calculation for high-dimensional data. We then
-establish the high-dimensional RDA (\emph{HDRDA}) classifier by applying
-covariance-matrix regularization with a parameterization that includes a large
-family of shrinkage methods, such as those from \cite{Srivastava:2007ww},
+We consider regularized discriminant analysis (\emph{RDA}) from a classic paper
+by \cite{Friedman:1989tm}, who proposed improvements to the \emph{QDA}
+classifier by employing a covariance matrix estimator that partially pools the
+individual sample covariance matrices with the pooled sample covariance matrix
+from the \emph{LDA} classifier. Given that the assumption of equal population
+covariance matrices for the \emph{LDA} classifier is often too stringent in practice
+\citep{Clemmensen:2011kr}, the \emph{RDA} classifier can relax the linearity
+assumption by instead incorporating unequal covariance matrices while retaining
+as special cases the \emph{LDA} and QDA classifiers. Covariance-matrix
+regularization is then applied to the partially pooled covariance-matrix
+estimator by shrinking it towards a scaled identity matrix to ensure positive
+definiteness. We argue that the \emph{RDA} classifier inherently employs
+dimension reduction in addition to regularization. After parameterizing the
+\emph{RDA} classifier similar to \cite{Hastie:2008dt} and \cite{Halbe:2007ea},
+we demonstrate that the intrinsic dimension of the \emph{RDA} classifier is
+equal to the training sample size of each class.\footnote{TODO: Introduce HDRDA
+  somewhere.} We then show that the \emph{RDA} decision rule is invariant to
+adjustments of the zero eigenvalues. We show that our proposed classifier is
+invariant to any adjustments of the eigenvalues corresponding to the null space
+of the pooled sample covariance matrix. Applying a reasoning similar to
+\cite{Ye:2006tq}, we decompose the decision rule of the \emph{HDRDA} classifier
+and show that the sum related to the null space of the pooled sample covariance
+matrix can be discarded. Hence, no gain in classification performance can be
+obtained by adjusting these zero eigenvalues. This invariance property provides
+a substantial increase in computational efficiency of model training and
+selection. Moreover, the decision rule in the original feature space is
+equivalent to a decision rule in a much lower dimension (i.e., the intrinsic
+dimension), such that the matrix inverses and determinants can be rapidly
+computed. This invariance property as well as the dual optimization problem
+result in substantial reduction in computation. Additionally, our
+parameterization of the \emph{RDA} classifier offers interpretability that has
+been previously lacking \citep{Bensmail:1996fw}. We explicitly show that the
+pooling parameter in the \emph{RDA} covariance-matrix estimator controls the
+contribution of each training observation to the estimation of each class
+covariance matrix. Furthermore, our parameterization includes a large family of
+shrinkage methods, such as those from \cite{Srivastava:2007ww},
 \cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
-\cite{Xu:2009fl}. This regularization has the effect of stabilizing the
-eigenvalues of the covariance-matrix estimators and ensuring that the classifier
-is well-posed.
+\cite{Xu:2009fl}.
 
-We show that our proposed classifier is invariant to any adjustments of the
-eigenvalues corresponding to the null space of the pooled sample covariance
-matrix. Applying a reasoning similar to \cite{Ye:2006tq}, we decompose the
-decision rule of the \emph{HDRDA} classifier and show that the sum related to
-the null space of the pooled sample covariance matrix can be discarded. Hence,
-no gain in classification performance can be obtained by adjusting these zero
-eigenvalues. This invariance property provides a substantial increase in
-computational efficiency of model training and selection. In fact, we show that
-the inverse and determinants can be reduced to calculations of $n_k \times n_k$
-matrices, where $n_k$ is the sample size of the $k$th class, $k = 1, \ldots, K$.
-This reduction in calculation is clearly advantageous because $n_k$ can be small
-in modern high-dimensional data sets (e.g., 10--20 observations in
-gene-expression microarray data).
+Given the \emph{RDA} classifier has been shown to have excellent performance in
+the high-dimensional setting \citep{Webb:2011vu} but is limited by its
+computationally intense model selection procedure, our work enables the
+\emph{RDA} classifier to be employed with high-dimensional data in
+practice. This is reassuring because the \emph{RDA} classifier remains widely
+popular in the literature. In fact, variants of the RDA classifier have been
+applied to microarray data \citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te},
+facial recognition
+\citep{Ching:2012fu,Zhang:2010va,Dai:2007vd,Lu:2005hq,Pima:2004vw,Lu:2003we},
+handwritten digit recognition \citep{Bouveyron:2007gx}, remote sensing
+\citep{Tadjudin:1999fk}, seismic detection \citep{Anderson:2002kg}, and chemical
+spectra \citep{Wu:1996us,Aeberhard:1993fp}.
 
-We also demonstrate that the \emph{HDRDA} classifier is often superior to
-several recent classifiers designed for small-sample, high-dimensional data. In
-particular, we compare our proposed classifier with diagonal linear discriminant
-analysis proposed by \cite{Dudoit:2002ev} and the recently proposed classifiers
-from \cite{Guo:2007te}, \cite{Pang:2009ik}, \cite{Tong:2012hw}, and
-\cite{Witten:2011kc}. We conduct our comparison of the classification accuracy
-of the competing classifiers using four small-sample, high-dimensional benchmark
-microarray data sets.
+After demonstrating that the \emph{HDRDA} classifier can be computed efficiently
+and establishing its improved interpretability, we compare the computational
+runtime of the \emph{HDRDA} classifier with an implementation of the \emph{RDA}
+classifier from the {\tt klaR} R package to illustrate that the \emph{HDRDA}
+classifier greatly reduces computation when $p \gg N$. We then study the
+classification performance of the \emph{HDRDA} classifier on several artificial
+and real high-dimensional data sets. We compare the \emph{HDRDA} classifier with
+several recent several recent classifiers from \cite{Dudoit:2002ev},
+\cite{Guo:2007te}, \cite{Pang:2009ik}, \cite{Tong:2012hw}, and
+\cite{Witten:2011kc}, each of which is designed for small-sample,
+high-dimensional data. We demonstrate that the \emph{HDRDA} classifier often
+attains superior classification accuracy. We also include in our classification
+study a support vector machine (\emph{SVM}) and $k$-nearest neigbors ($kNN$) as
+benchmarks.
+
+The remainder of this document is organized as follows. In Section
+\ref{sec:preliminaries} we presents the discrimination problem and the necessary
+notation to describe our contributions. In Section \ref{sec:rda} we present our
+\emph{HDRDA} classifier along with its interpretation, properties, and
+computationally efficient model-selection procedure. Section \ref{sec:sims}
+describes our simulation studies of artificial and real data sets and also
+describes the experimental results. We conclude with a brief discussion in
+Section \ref{sec:discussion}.
 
 \section{Preliminaries}
+\label{sec:preliminaries}
+
+\subsection{Notation}
+
 To facilitate our discussion of covariance-matrix regularization and regularized
 discriminant analysis, we require the following notation. Let $\mathbb{R}_{a
-  \times b}$ denotes the matrix space of all $a \times b$ matrices over the real
+  \times b}$ denote the matrix space of all $a \times b$ matrices over the real
 field $\mathbb{R}$. Denote by $\bm I_m$ the $m \times m$ identity matrix, and
 let $\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm
 0_m$ is understood to denote $\bm 0_{m \times m}$. Let $\bm A \oplus \bm B$
@@ -208,13 +241,15 @@ denote the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in
 $\bm A^+$, and $\mathcal{N}(\bm A) = \{\bm z \in \mathbb{R}_{p \times 1} : \bm A
 \bm z = \bm 0_{m \times 1}\}$ denote the transpose, the Moore-Penrose
 pseudoinverse, and the null space of $\bm A \in \mathbb{R}_{m \times p}$,
-respectively. Let $\mathbb{R}_{p \times p}^{>}$ denote the cone of real $p
-\times p$ positive-definite matrices. Similarly, let $\mathbb{R}_{p \times
-  p}^{\ge}$ denote the cone of real $p \times p$ positive-semidefinite
-matrices. Let $V^{\perp} = \{\bm y \in \mathbb{R}_{p \times 1} : \bm y^{T} \bm v
-= 0$ for all $\bm v \in V \}$ denote the orthogonal complement of a vector space
-$V \subset \mathbb{R}_{p \times 1}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if
-$c \ne 0$ and $0$ otherwise.
+respectively. Denote by $\mathbb{R}_{p \times p}^{>}$ the cone of real $p \times
+p$ positive-definite matrices. Similarly, let $\mathbb{R}_{p \times p}^{\ge}$
+denote the cone of real $p \times p$ positive-semidefinite matrices. Let
+$V^{\perp} = \{\bm y \in \mathbb{R}_{p \times 1} : \bm y^{T} \bm v = 0$ for all
+$\bm v \in V \}$ denote the orthogonal complement of a vector space $V \subset
+\mathbb{R}_{p \times 1}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$
+and $0$ otherwise.
+
+\subsection{Discriminant Analysis}
 
 In discriminant analysis we wish to assign correctly an unlabeled vector $\bm x
 \in \mathbb{R}_{p \times 1}$ to one of $K$ unique, known classes by constructing
@@ -281,8 +316,6 @@ positive definite. For additional covariance-matrix regularization methods, see
 \section{High-Dimensional Regularized Discriminant Analysis}
 \label{sec:rda}
 
-\cite{Halbe:2007ea} demonstrate that  parameterization results in a
-
 Here, we define the \emph{HDRDA} classifier by first formulating the
 covariance-matrix estimator $\widehat{\bm \Sigma}_k(\lambda)$ and demonstrating
 its clear interpretation as a linear combination of the crossproducts of the
@@ -311,7 +344,41 @@ estimator that borrows from $\widehat{\bm \Sigma}$ in \eqref{eq:pooled-cov} to
 better estimate $ \bm \Sigma_k$. From \eqref{eq:sig-lambda-alternative2},
 $\lambda$ weights the contribution of each of the $N$ observations in estimating
 $\bm \Sigma_k$. Hence, for $0 < \lambda \le 1$, we estimate $\bm \Sigma_k$ with
-$N$ rather than $n_k$ observations. Below, we will show that the pooling
+$N$ rather than $n_k$ observations.\footnote{TODO: Add more to the
+  interpretation here.}
+
+\begin{figure}
+<<rda_weights>>=
+n <- c(50, 25, 15, 10)
+N <- sum(n)
+lambda <- seq(0, 1, length = 1000)
+
+rda_weights <- sapply(seq_along(n), function(k) {
+      lambda / N + (1 - lambda) / n[k]
+      })
+rda_weights <- data.frame(lambda = lambda, rda_weights)
+rda_weights <- melt(rda_weights, id = 'lambda')
+colnames(rda_weights) <- c("lambda", "Class", "Weight")
+levels(rda_weights$Class) <- seq_along(n)
+
+p <- ggplot(rda_weights, aes(lambda, Weight, linetype = Class, color = Class))
+p <- p + geom_line(size = 1)
+p <- p + theme_bw() + xlab(expression(lambda))
+p <- p + theme(axis.text = element_text(size = 10))
+p <- p + theme(strip.text.x = element_text(size = 16))
+p <- p + theme(legend.title = element_text(size = 16, face = "bold"))
+p <- p + theme(legend.text = element_text(size = 15))
+p <- p + theme(legend.key.size = unit(1, "cm"))
+p
+@ 
+\caption{Weights $c_{ik}(\lambda)$ of \emph{RDA} classifier as a function of the
+  pooling parameter $\lambda$ when $n_1 = 50$, $n_2 = 25$, $n_3 = 15$, and $n_4$
+  = 10.}
+\label{fig:hdrda-weights}
+\end{figure}
+
+
+Below, we will show that the pooling
 operation is advantageous in increasing the rank of each $\widehat{\bm
   \Sigma}_k(\lambda)$ from rank$(\widehat{\bm \Sigma}_k)$ to rank$(\widehat{\bm
   \Sigma})$ for $0 < \lambda \le 1$. Notice that if $\lambda = 0$, then the
@@ -403,20 +470,22 @@ established by substituting \eqref{eq:sig-rda} into
 \subsection{Properties of the HDRDA Classifier}
 \label{sec:computational-efficiency}
 
-Next, we demonstrate that our proposed classifier in \eqref{eq:hdrda} lends
-itself to a more efficient calculation. We decompose \eqref{eq:hdrda} into a sum
-of two components, where the first summand consists of matrix operations applied
-to low-dimensional matrices and the second summand corresponds to the null space
-of $\widehat{\bm \Sigma}$ in \eqref{eq:pooled-cov}. We show that the matrix
-operations performed on the null space of $\widehat{\bm \Sigma}$ yield constant
-quadratic forms across all classes and can be omitted. For $p \gg N$, the
-constant component involves determinants and inverses of high-dimensional
-matrices, and by ignoring these calculations, a substantial reduction in
-computational costs is achieved. Furthermore, a byproduct is that adjustments to
-the associated eigenvalues have no effect on \eqref{eq:hdrda}. Lastly, we
-utilize the singular value decomposition to calculate efficiently the eigenvalue
-decomposition of $\widehat{\bm \Sigma}$, further reducing the computational
-costs of the \emph{HDRDA} classifier.
+Next, we establish properties of the covariance-matrix estimator and the
+decision rule employed in the \emph{HDRDA} classifier. By doing so, we
+demonstrate that \eqref{eq:hdrda} lends itself to a more efficient
+calculation. We decompose \eqref{eq:hdrda} into a sum of two components, where
+the first summand consists of matrix operations applied to low-dimensional
+matrices and the second summand corresponds to the null space of $\widehat{\bm
+  \Sigma}$ in \eqref{eq:pooled-cov}. We show that the matrix operations
+performed on the null space of $\widehat{\bm \Sigma}$ yield constant quadratic
+forms across all classes and can be omitted. For $p \gg N$, the constant
+component involves determinants and inverses of high-dimensional matrices, and
+by ignoring these calculations, a substantial reduction in computational costs
+is achieved. Furthermore, a byproduct is that adjustments to the associated
+eigenvalues have no effect on \eqref{eq:hdrda}. Lastly, we utilize the singular
+value decomposition to calculate efficiently the eigenvalue decomposition of
+$\widehat{\bm \Sigma}$, further reducing the computational costs of the
+\emph{HDRDA} classifier.
 
 First, we require the following relationship regarding the null spaces of
 $\widehat{\bm \Sigma}_k(\lambda)$, $\widehat{\bm \Sigma}$, and $\widehat{ \bm
@@ -616,6 +685,7 @@ of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1 \times
 first $q$ columns of $\bm U$.
 
 \section{Classification Study}
+\label{sec:sims}
 
 In this section, we describe four high-dimensional microarray data sets and
 compare our proposed classifier with five classifiers recently proposed for
@@ -650,15 +720,20 @@ rule automatically, we applied this rule in our {\tt R} code. We also utilized
 our implementations of the Dudoit, Pang, and Tong classifiers available in the
 {\tt sparsediscrim} package. We used the default settings for each classifier
 with the exception that we explicitly set prior probabilities as equal, if the
-option was available. For the \emph{HDRDA} classifier
-\eqref{eq:hdrda-decomposed}, we set $\alpha_k = 1$, $k = 1, \ldots, K$, so that
-the covariance-matrix estimator \eqref{eq:hdrda-cov} employed resembled
-\eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21 equidistant
-candidate values between 0 and 1, inclusively. Similarly, we estimated $\gamma$
-from a grid consisting of the values $10^{-1}, \ldots, 10^4$, and $10^5$. We
-selected optimal estimates of $\lambda$ and $\gamma$ using 10-fold
-cross-validation \citep{Hastie:2008dt}. Each of the microarray data sets listed
-below can be found in \ref{suppA}.
+option was available. For the \emph{HDRDA} classifier in
+\eqref{eq:hdrda-decomposed}, we examine the classification performance of two
+models. For the first \emph{HDRDA} model, we set $\alpha_k = 1$, $k = 1, \ldots,
+K$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov} employed
+resembled \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21
+equidistant candidate values between 0 and 1, inclusively. Similarly, we
+estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots, 10^4$,
+and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
+10-fold cross-validation \citep{Hastie:2008dt}. For the second model, we set
+$\alpha_k = 1 - \gamma$, $k = 1, \ldots, K$, to resemble
+\citeauthor{Friedman:1989tm}'s parameterization. We estimated both $\lambda$ and
+$\gamma$ from a grid of 21 equidistant candidate values between 0 and 1,
+inclusively. Each of the microarray data sets listed below can be found in
+\ref{suppA}.
 
 \subsection{\cite{Burczynski:2006ik} Data Set}
 
@@ -808,6 +883,7 @@ classifier \eqref{eq:hdrda-decomposed} can utilize the more parsimonious
 assumption of equal covariance matrices.
 
 \section{Discussion}
+\label{sec:discussion}
 
 In our simulation study, we have compared our proposed \emph{HDRDA} classifier
 to several recently proposed classifiers, including the Dudoit, Pang, Tong, and

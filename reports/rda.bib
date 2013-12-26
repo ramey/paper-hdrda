@@ -1,16 +1,5 @@
-%% Created using Papers on Thu, 12 Dec 2013.
+%% Created using Papers on Sun, 22 Dec 2013.
 %% http://papersapp.com/papers/
-
-@article{Hoerl:1970cd,
-author = {Hoerl, Arthur E and Kennard, Robert W},
-title = {{Ridge Regression: Biased Estimation for Nonorthogonal Problems}},
-journal = {Technometrics},
-year = {1970},
-volume = {12},
-number = {1},
-pages = {55--67},
-month = feb
-}
 
 @article{Halbe:2007ea,
 author = {Halbe, Zohar and Aladjem, Mayer},
@@ -21,251 +10,6 @@ volume = {28},
 number = {15},
 pages = {2104--2115},
 month = nov
-}
-
-@inproceedings{Ye:2006tq,
-author = {Ye, Jieping and Wang, Tie},
-title = {{Regularized Discriminant Analysis for High Dimensional, Low Sample Size Data}},
-booktitle = {The 12th ACM SIGKDD International Conference},
-year = {2006},
-pages = {454},
-publisher = {ACM Press},
-address = {New York, New York, USA},
-annote = {Here's an outline of the paper:
-
-* Replace pooled sample covariance matrix in Friedman's RDA with the total scatter matrix
-* Shows Null(S_t) is a subset of Null(S_b) and Null(S_t) is a subset of Null(\Sigma_k)
-* Decompose the RDA matrix
-* Rewrite the RDA classification rule in terms of the decomposed RDA matrix
-* Shows that the second sum in the RDA decision rule is constant for all classes
-* Derives efficient expressions for the remaining inverses and determinants
-* Notes that a new test point is independent of the inverses and determinants
-* Uses a tuning-parameter grid of 900 parameters b/c the search is fast!}
-}
-
-@book{Seber:2004uh,
-author = {Seber, George A F},
-title = {{Multivariate Observations}},
-publisher = {Wiley-Interscience},
-year = {2004},
-series = {Wiley Series in Probability and Statistics},
-month = aug
-}
-
-@article{Burczynski:2006ik,
-author = {Burczynski, Michael E and Peterson, Ron L and Twine, Natalie C and Zuberek, Krystyna A and Brodeur, Brendan J and Casciotti, Lori and Maganti, Vasu and Reddy, Padma S and Strahs, Andrew and Immermann, Fred and Spinelli, Walter and Schwertschlag, Ulrich and Slager, Anna M and Cotreau, Monette M and Dorner, Andrew J},
-title = {{Molecular Classification of Crohn's Disease and Ulcerative Colitis Patients Using Transcriptional Profiles in Peripheral Blood Mononuclear Cells}},
-journal = {The Journal of Molecular Diagnostics},
-year = {2006},
-volume = {8},
-number = {1},
-pages = {51--61},
-month = feb
-}
-
-@inproceedings{Ye:2006jm,
-author = {Ye, Jieping and Xiong, Tao and Li, Qi and Janardan, Ravi and Bi, Jinbo and Cherkassky, Vladimir and Kambhamettu, Chandra},
-title = {{Efficient model selection for regularized linear discriminant analysis}},
-booktitle = {Proceedings of the 15th ACM International Conference on Information and Knowledge Management},
-year = {2006},
-pages = {532--539},
-publisher = {ACM},
-address = {Arlington, VA, USA},
-annote = {* Notes that the "Classicial LDA is equivalent to maximum likelihood classification assuming normal{\ldots}" (page 3)
-* Shows that a solution to the classical LDA optimization problem in Equation 9 is given by the solution to the generalized eigenvalue problem: S_b x = \lambda S_t x
-* Because this involves the inverse of S_t, which is singular for p {\&}gt; N, S_t needs to be regularized
-* In Section 3, shows that the solution to the generalized eigenvalue problem has a low-rank representation. 
-* Derives explicitly the eigendecomposition of the solution to the generalized eigenvalue problem with regularization
-* Shows that ULDA is the limiting case of RLDA
-* Shows that ULDA maps all points from the same class to a common point; perfect class separation but leads to overfitting. RLDA fixes this.
-* Uses a grid of size m = 1000. It is not clear what the maximum tuning parameter value is.}
-}
-
-@article{Srivastava:2007ww,
-author = {Srivastava, Muni S. and Kubokawa, Tatsuya},
-title = {{Comparison of discrimination methods for high dimensional data}},
-journal = {Journal of the Japan Statistical Society},
-year = {2007},
-volume = {37},
-number = {1},
-pages = {123--134}
-}
-
-@book{Bellman:1961tn,
-author = {Bellman, R.E.},
-title = {{Adaptive Control Processes: A Guided Tour}},
-publisher = {Princeton University Press},
-year = {1961}
-}
-
-@article{Peck:1982tt,
-author = {Peck, Roger and Van Ness, John},
-title = {{The use of shrinkage estimators in linear discriminant analysis.}},
-journal = {Pattern Analysis and Machine Intelligence, IEEE Transactions on},
-year = {1982},
-volume = {4},
-number = {5},
-pages = {530--537},
-month = may
-}
-
-@article{Fan:2012iq,
-author = {Fan, Jianqing and Feng, Yang and Tong, Xin},
-title = {{A road to classification in high dimensional space: the regularized optimal affine discriminant}},
-journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
-year = {2012},
-volume = {74},
-number = {4},
-pages = {745--771},
-month = apr
-}
-
-@article{Mkhadri:1997gy,
-author = {Mkhadri, A and Celeux, G and Nasroallah, A},
-title = {{Regularization in discriminant analysis: an overview}},
-journal = {Computational Statistics and Data Analysis},
-year = {1997},
-volume = {23},
-number = {3},
-pages = {403--423}
-}
-
-@article{Marco:1987bj,
-author = {Marco, Virgil R and Young, Dean M and Turner, Danny W},
-title = {{The Euclidean distance classifier: an alternative to the linear discriminant function}},
-journal = {Communications in Statistics - Simulation and Computation},
-year = {1987},
-volume = {16},
-number = {2},
-pages = {485--505},
-month = jan
-}
-
-@article{Tong:2012hw,
-author = {Tong, T and Chen, L and Zhao, H},
-title = {{Improved mean estimation and its application to diagonal discriminant analysis}},
-journal = {Bioinformatics},
-year = {2012},
-volume = {28},
-number = {4},
-pages = {531--537},
-month = feb,
-annote = {This paper is an extension of DLDA that uses a Stein estimator for the mean. The simulation design is limited, and the authors only considered the Golub data set.
-
-This would be a natural method to consider for comparison with SimDiag.}
-}
-
-@inproceedings{Rao:1971ul,
-author = {Rao, C Radhakrishna and Mitra, Sujit Kumar},
-title = {{Generalized inverse of a matrix and its applications}},
-booktitle = {Proceedings of the Sixth Berkeley Symposium on Mathematical Statistics and Probability},
-year = {1971},
-pages = {601--620},
-publisher = {University of California Press, Berkeley}
-}
-
-@book{Lutkepohl:1996uz,
-author = {L{\"u}tkepohl, Helmut},
-title = {{Handbook of Matrices}},
-publisher = {John Wiley and Sons Ltd.},
-year = {1996},
-address = {Chichester, West Sussex, England}
-}
-
-@article{Antoniadis:2003bk,
-author = {Antoniadis, A and Lambert-Lacroix, S and Leblanc, F},
-title = {{Effective dimension reduction methods for tumor classification using gene expression data}},
-journal = {Bioinformatics},
-year = {2003},
-volume = {19},
-number = {5},
-pages = {563--570},
-month = mar,
-annote = {This paper might be a good model to follow to compare several dimension reduction methods for classification of high-dimensional microarray data.}
-}
-
-@article{Ye:2005uu,
-author = {Ye, Jieping},
-title = {{Characterization of a family of algorithms for generalized discriminant analysis on undersampled problems}},
-journal = {The Journal of Machine Learning Research},
-year = {2005},
-volume = {6},
-pages = {483--502},
-annote = {This is an excellent paper that simultaneously diagonalizes the within-, between-, and total scatter matrices in the singular case to optimize a new optimization criterion involving the Moore-Penrose pseudoinverse.}
-}
-
-@article{Ramey:2013ji,
-author = {Ramey, John and Young, Phil D},
-title = {{A comparison of regularization methods applied to the linear discriminant function with high-dimensional microarray data}},
-journal = {Journal of Statistical Computation and Simulation},
-year = {2013},
-volume = {83},
-number = {3},
-pages = {581--596}
-}
-
-@article{Pang:2009ik,
-author = {Pang, Herbert and Tong, Tiejun and Zhao, Hongyu},
-title = {{Shrinkage-based Diagonal Discriminant Analysis and Its Applications in High-Dimensional Data}},
-journal = {Biometrics},
-year = {2009},
-volume = {65},
-number = {4},
-pages = {1021--1029},
-month = mar
-}
-
-@article{Mkhadri:1995jp,
-author = {Mkhadri, Abdallah},
-title = {{Shrinkage parameter for the modified linear discriminant analysis}},
-journal = {Pattern Recognition Letters},
-year = {1995},
-volume = {16},
-number = {3},
-pages = {267--275},
-month = mar
-}
-
-@article{Singh:2002fh,
-author = {Singh, Dinesh and Febbo, Phillip G and Ross, Kenneth and Jackson, Donald G and Manola, Judith and Ladd, Christine and Tamayo, Pablo and Renshaw, Andrew A and D'Amico, Anthony V and Richie, Jerome P and Lander, Eric S and Loda, Massimo and Kantoff, Philip W and Golub, Todd R and Sellers, William R},
-title = {{Gene expression correlates of clinical prostate cancer behavior}},
-journal = {Cancer Cell},
-year = {2002},
-volume = {1},
-number = {2},
-pages = {203--209},
-month = mar
-}
-
-@book{McLachlan:1992dl,
-author = {McLachlan, Geoffrey J.},
-title = {{Discriminant Analysis and Statistical Pattern Recognition}},
-publisher = {John Wiley and Sons Inc.},
-year = {1992},
-series = {Wiley Series in Probability and Mathematical Statistics: Applied Probability and Statistics},
-address = {New York}
-}
-
-@incollection{Zhu:2010vu,
-author = {Zhu, Xiaojin and Kandola, Jaz and Lafferty, John and Ghahramani, Zoubin},
-title = {{Graph Kernels by Spectral Transforms}},
-booktitle = {Semi-Supervised Learning},
-year = {2010},
-editor = {Chapelle, Olivier and Sch{\"o}lkopf, Bernhard},
-pages = {277--291},
-publisher = {The MIT Press},
-address = {Cambridge, MA, USA}
-}
-
-@article{Huang:2010ju,
-author = {Huang, Song and Tong, Tiejun and Zhao, Hongyu},
-title = {{Bias-Corrected Diagonal Discriminant Rules for High-Dimensional Classification}},
-journal = {Biometrics},
-year = {2010},
-volume = {66},
-number = {4},
-pages = {1096--1106},
-month = mar
 }
 
 @book{Hastie:2008dt,
@@ -279,43 +23,47 @@ edition = {2nd},
 month = dec
 }
 
-@article{Thomaz:2006ef,
-author = {Thomaz, Carlos Eduardo and Kitani, Edson Caoru and Gillies, Duncan Fyfe},
-title = {{A maximum uncertainty LDA-based approach for limited sample size problems --- with application to face recognition}},
-journal = {Journal of the Brazilian Computer Society},
-year = {2006},
-volume = {12},
-number = {2},
-pages = {7--18},
-month = jun
+@article{Shipp:2002ka,
+author = {Shipp, Margaret A and Ross, Ken N and Tamayo, Pablo and Weng, Andrew P and Kutok, Jeffery L and Aguiar, Ricardo C T and Gaasenbeek, Michelle and Angelo, Michael and Reich, Michael and Pinkus, Geraldine S and Ray, Tane S and Koval, Margaret A and Last, Kim W and Norton, Andrew and Lister, T Andrew and Mesirov, Jill and Neuberg, Donna S and Lander, Eric S and Aster, Jon C and Golub, Todd R},
+title = {{Diffuse large B-cell lymphoma outcome prediction by gene-expression profiling and supervised machine learning.}},
+journal = {Nature Medicine},
+year = {2002},
+volume = {8},
+number = {1},
+pages = {68--74},
+month = jan
 }
 
-@book{Harville:2008wja,
-author = {Harville, David A.},
-title = {{Matrix Algebra From a Statistician's Perspective}},
-publisher = {Springer},
-year = {2008},
-address = {New York}
+@article{Hoyle:2011vt,
+author = {Hoyle, David C},
+title = {{Accuracy of Pseudo-Inverse Covariance Learning---A Random Matrix Theory Analysis}},
+journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+year = {2011},
+volume = {33},
+number = {7},
+month = jul
 }
 
-@article{Friedman:1989tm,
-author = {Friedman, Jerome H},
-title = {{Regularized Discriminant Analysis}},
-journal = {Journal of the American Statistical Association},
-year = {1989},
-volume = {84},
-number = {405},
-pages = {165--175}
+@article{Raudys:1998dd,
+author = {Raudys, Sarunas and Duin, Robert P.W.},
+title = {{Expected classification error of the Fisher linear classifier with pseudo-inverse covariance matrix}},
+journal = {Pattern Recognition Letters},
+year = {1998},
+volume = {19},
+number = {5-6},
+pages = {385--392},
+month = apr
 }
 
-@book{Izenman:2008gm,
-author = {Izenman, Alan J.},
-title = {{Modern Multivariate Statistical Techniques}},
-publisher = {Springer},
-year = {2008},
-series = {Springer Texts in Statistics},
-address = {New York},
-annote = {Regression, classification, and manifold learning}
+@article{Tadjudin:1999fk,
+author = {Tadjudin, S and Landgrebe, D A},
+title = {{Covariance estimation with limited training samples}},
+journal = {IEEE Transactions on Geoscience and Remote Sensing},
+year = {1999},
+volume = {37},
+number = {4},
+pages = {2113--2118},
+month = jul
 }
 
 @article{Dudoit:2002ev,
@@ -340,65 +88,27 @@ address = {Hoboken, NJ, USA},
 month = nov
 }
 
-@article{Hoyle:2011vt,
-author = {Hoyle, David C},
-title = {{Accuracy of Pseudo-Inverse Covariance Learning---A Random Matrix Theory Analysis}},
-journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
-year = {2011},
-volume = {33},
-number = {7},
-month = jul
-}
-
-@article{Raudys:1998dd,
-author = {Raudys, Sarunas and Duin, Robert P.W.},
-title = {{Expected classification error of the Fisher linear classifier with pseudo-inverse covariance matrix}},
-journal = {Pattern Recognition Letters},
-year = {1998},
-volume = {19},
-number = {5-6},
-pages = {385--392},
-month = apr
-}
-
-@article{Guo:2007te,
-author = {Guo, Yaqian and Hastie, Trevor and Tibshirani, Robert},
-title = {{Regularized linear discriminant analysis and its application in microarrays}},
-journal = {Biostatistics},
-year = {2007},
+@article{Burczynski:2006ik,
+author = {Burczynski, Michael E and Peterson, Ron L and Twine, Natalie C and Zuberek, Krystyna A and Brodeur, Brendan J and Casciotti, Lori and Maganti, Vasu and Reddy, Padma S and Strahs, Andrew and Immermann, Fred and Spinelli, Walter and Schwertschlag, Ulrich and Slager, Anna M and Cotreau, Monette M and Dorner, Andrew J},
+title = {{Molecular Classification of Crohn's Disease and Ulcerative Colitis Patients Using Transcriptional Profiles in Peripheral Blood Mononuclear Cells}},
+journal = {The Journal of Molecular Diagnostics},
+year = {2006},
 volume = {8},
 number = {1},
-pages = {86--100},
-month = jan
+pages = {51--61},
+month = feb
 }
 
-@book{Murphy:2012uq,
-author = {Murphy, Kevin P},
-title = {{Machine Learning: A Probabilistic Perspective}},
-publisher = {The MIT Press},
-year = {2012},
-address = {Cambridge, Massachusetts},
-month = aug
-}
-
-@article{Nakayama:2007fl,
-author = {Nakayama, Robert and Nemoto, Takeshi and Takahashi, Hiro and Ohta, Tsutomu and Kawai, Akira and Seki, Kunihiko and Yoshida, Teruhiko and Toyama, Yoshiaki and Ichikawa, Hitoshi and Hasegawa, Tadashi},
-title = {{Gene expression analysis of soft tissue sarcomas: characterization and reclassification of malignant fibrous histiocytoma}},
-journal = {Nature},
-year = {2007},
-volume = {20},
-number = {7},
-pages = {749--759},
-month = apr
-}
-
-@article{Zhang:2010va,
-author = {Zhang, Zhihua and Dai, Guang and Xu, Congfu and Jordan, Michael I},
-title = {{Regularized Discriminant Analysis, Ridge Regression and Beyond}},
-journal = {The Journal of Machine Learning Research},
-year = {2010},
-volume = {11},
-month = mar
+@article{Antoniadis:2003bk,
+author = {Antoniadis, A and Lambert-Lacroix, S and Leblanc, F},
+title = {{Effective dimension reduction methods for tumor classification using gene expression data}},
+journal = {Bioinformatics},
+year = {2003},
+volume = {19},
+number = {5},
+pages = {563--570},
+month = mar,
+annote = {This paper might be a good model to follow to compare several dimension reduction methods for classification of high-dimensional microarray data.}
 }
 
 @article{Ambroise:2002fa,
@@ -412,66 +122,36 @@ pages = {6562--6566},
 month = may
 }
 
-@article{Xu:2009fl,
-author = {Xu, Ping and Brock, Guy N and Parrish, Rudolph S},
-title = {{Modified linear discriminant analysis approaches for classification of high-dimensional microarray data}},
-journal = {Computational Statistics and Data Analysis},
-year = {2009},
-volume = {53},
-number = {5},
-pages = {1674--1687},
+@article{Bensmail:1996fw,
+author = {Bensmail, Halima and Celeux, Gilles},
+title = {{Regularized Gaussian Discriminant Analysis through Eigenvalue Decomposition}},
+journal = {Journal of the American Statistical Association},
+year = {1996},
+volume = {91},
+number = {436},
+pages = {1743--1748},
+month = dec
+}
+
+@article{Mkhadri:1995jp,
+author = {Mkhadri, Abdallah},
+title = {{Shrinkage parameter for the modified linear discriminant analysis}},
+journal = {Pattern Recognition Letters},
+year = {1995},
+volume = {16},
+number = {3},
+pages = {267--275},
 month = mar
 }
 
-@inproceedings{Merchante:2012vk,
-author = {Merchante, Luis Francisco Sanchez and Grandvalet, Yves and Govaert, Gerrad},
-title = {{An Efficient Approach to Sparse Linear Discriminant Analysis}},
-booktitle = {Proceedings of the 29th International Conference on Machine Learning},
-year = {2012},
-address = {Edinburgh, Scotland, UK},
-annote = {Excellent paper from ICML 2012.
-
-Given the high quality of this conference proceedings, which is trying to move to a journal format, we should aim for here in the future.}
-}
-
-@article{Ye:2006vx,
-author = {Ye, Jieping and Xiong, Tao},
-title = {{Computational and theoretical analysis of null space and orthogonal linear discriminant analysis}},
-journal = {The Journal of Machine Learning Research},
-year = {2006},
-volume = {7},
-pages = {1183--1204}
-}
-
-@article{Ji:2008wp,
-author = {Ji, Shuiwang and Ye, Jieping},
-title = {{Generalized Linear Discriminant Analysis: A Unified Framework and Efficient Model Selection}},
-journal = {IEEE Transactions on Neural Networks},
-year = {2008},
-volume = {19},
-number = {10},
-month = oct,
-annote = {This paper is almost identical to Ye's book chapter in 2009. In that chapter, Ye applies the transfer function idea to semi-supervised learning. The first half of that chapter however is given here, except this paper adds a thorough simulation study.}
-}
-
-@article{Srivastava:2007ud,
-author = {Srivastava, Santosh and Gupta, Maya R and Frigyik, B{\'e}la A},
-title = {{Bayesian quadratic discriminant analysis}},
-journal = {The Journal of Machine Learning Research},
-year = {2007},
-volume = {8},
-pages = {1277--1305}
-}
-
-@article{Shipp:2002ka,
-author = {Shipp, Margaret A and Ross, Ken N and Tamayo, Pablo and Weng, Andrew P and Kutok, Jeffery L and Aguiar, Ricardo C T and Gaasenbeek, Michelle and Angelo, Michael and Reich, Michael and Pinkus, Geraldine S and Ray, Tane S and Koval, Margaret A and Last, Kim W and Norton, Andrew and Lister, T Andrew and Mesirov, Jill and Neuberg, Donna S and Lander, Eric S and Aster, Jon C and Golub, Todd R},
-title = {{Diffuse large B-cell lymphoma outcome prediction by gene-expression profiling and supervised machine learning.}},
-journal = {Nature Medicine},
-year = {2002},
-volume = {8},
-number = {1},
-pages = {68--74},
-month = jan
+@article{Ramey:2013ji,
+author = {Ramey, John and Young, Phil D},
+title = {{A comparison of regularization methods applied to the linear discriminant function with high-dimensional microarray data}},
+journal = {Journal of Statistical Computation and Simulation},
+year = {2013},
+volume = {83},
+number = {3},
+pages = {581--596}
 }
 
 @article{Clemmensen:2011kr,
@@ -485,25 +165,16 @@ pages = {406--413},
 month = nov
 }
 
-@book{Kollo:2005vp,
-author = {Kollo, T{\~o}nu and von Rosen, Dietrich},
-title = {{Advanced Multivariate Statistics with Matrices}},
-publisher = {Springer},
-year = {2005},
-volume = {579},
-series = {Mathematics and Its Applications (New York)},
-address = {Dordrecht}
-}
-
-@article{Tibshirani:2002ht,
-author = {Tibshirani, Robert and Hastie, Trevor and Narasimhan, Balasubramanian and Chu, Gilbert},
-title = {{Diagnosis of multiple cancer types by shrunken centroids of gene expression.}},
-journal = {Proceedings of the National Academy of Sciences of the United States of America},
-year = {2002},
+@article{Mai:2012bf,
+author = {Mai, Q and Zou, H and Yuan, M},
+title = {{A direct approach to sparse discriminant analysis in ultra-high dimensions}},
+journal = {Biometrika},
+year = {2012},
 volume = {99},
-number = {10},
-pages = {6567--6572},
-month = may
+number = {1},
+pages = {29--42},
+month = feb,
+annote = {Notice the simulation models. As with Guo's paper and the subsequent papers that discuss diagonal classifiers, the simulation model favors diagonal classifiers.}
 }
 
 @article{Witten:2011kc,
@@ -517,15 +188,501 @@ pages = {753--772},
 month = aug
 }
 
-@article{Mai:2012bf,
-author = {Mai, Q and Zou, H and Yuan, M},
-title = {{A direct approach to sparse discriminant analysis in ultra-high dimensions}},
-journal = {Biometrika},
+@book{Lutkepohl:1996uz,
+author = {L{\"u}tkepohl, Helmut},
+title = {{Handbook of Matrices}},
+publisher = {John Wiley and Sons Ltd.},
+year = {1996},
+address = {Chichester, West Sussex, England}
+}
+
+@inproceedings{Merchante:2012vk,
+author = {Merchante, Luis Francisco Sanchez and Grandvalet, Yves and Govaert, Gerrad},
+title = {{An Efficient Approach to Sparse Linear Discriminant Analysis}},
+booktitle = {Proceedings of the 29th International Conference on Machine Learning},
 year = {2012},
-volume = {99},
+address = {Edinburgh, Scotland, UK},
+annote = {Excellent paper from ICML 2012.
+
+Given the high quality of this conference proceedings, which is trying to move to a journal format, we should aim for here in the future.}
+}
+
+@article{Singh:2002fh,
+author = {Singh, Dinesh and Febbo, Phillip G and Ross, Kenneth and Jackson, Donald G and Manola, Judith and Ladd, Christine and Tamayo, Pablo and Renshaw, Andrew A and D'Amico, Anthony V and Richie, Jerome P and Lander, Eric S and Loda, Massimo and Kantoff, Philip W and Golub, Todd R and Sellers, William R},
+title = {{Gene expression correlates of clinical prostate cancer behavior}},
+journal = {Cancer Cell},
+year = {2002},
+volume = {1},
+number = {2},
+pages = {203--209},
+month = mar
+}
+
+@book{Bellman:1961tn,
+author = {Bellman, R.E.},
+title = {{Adaptive Control Processes: A Guided Tour}},
+publisher = {Princeton University Press},
+year = {1961}
+}
+
+@book{Seber:2004uh,
+author = {Seber, George A F},
+title = {{Multivariate Observations}},
+publisher = {Wiley-Interscience},
+year = {2004},
+series = {Wiley Series in Probability and Statistics},
+month = aug
+}
+
+@inproceedings{Rao:1971ul,
+author = {Rao, C Radhakrishna and Mitra, Sujit Kumar},
+title = {{Generalized inverse of a matrix and its applications}},
+booktitle = {Proceedings of the Sixth Berkeley Symposium on Mathematical Statistics and Probability},
+year = {1971},
+pages = {601--620},
+publisher = {University of California Press, Berkeley}
+}
+
+@book{Murphy:2012uq,
+author = {Murphy, Kevin P},
+title = {{Machine Learning: A Probabilistic Perspective}},
+publisher = {The MIT Press},
+year = {2012},
+address = {Cambridge, Massachusetts},
+month = aug
+}
+
+@article{Anderson:2002kg,
+author = {Anderson, D N},
+title = {{Application of Regularized Discrimination Analysis to Regional Seismic Event Identification}},
+journal = {Bulletin of the Seismological Society of America},
+year = {2002},
+volume = {92},
+number = {6},
+pages = {2391--2399},
+month = aug,
+annote = {The paper is written by Dale Anderson, who used to be in the stats group at PNNL.
+
+The article discusses a ridge-regression covariance estimator for outlier detection as well as Friedman's (1989) Regularized Discriminant Analysis (RDA) model for binary classification.
+
+They use a jackknife approach (which they incorrectly call it a "leave-one-out bootstrap" approach) to determine the distribution of the sample Mahalanobis distance with a shrunken covariance matrix. The shrinkage parameter, lambda, is chosen to minimize the 50th and 95th percentiles of this distribution. Then, outliers are determined as observations in the critical region using the 95th percentile using the 'optimal' value of lambda.
+
+The RDA model is used with a leave-one-out cross-validation approach to select the optimal RDA model pair. They present a heatmap of error rates on page 2398. Then, the authors discuss ties in the error rates. To select the optimal model among the best tied rates, they use a plug-in Kullback-Leibler divergence. There are many issues with this approach, some of which I have discussed in a note in the paper.}
+}
+
+@article{Nakayama:2007fl,
+author = {Nakayama, Robert and Nemoto, Takeshi and Takahashi, Hiro and Ohta, Tsutomu and Kawai, Akira and Seki, Kunihiko and Yoshida, Teruhiko and Toyama, Yoshiaki and Ichikawa, Hitoshi and Hasegawa, Tadashi},
+title = {{Gene expression analysis of soft tissue sarcomas: characterization and reclassification of malignant fibrous histiocytoma}},
+journal = {Nature},
+year = {2007},
+volume = {20},
+number = {7},
+pages = {749--759},
+month = apr
+}
+
+@article{Huang:2010ju,
+author = {Huang, Song and Tong, Tiejun and Zhao, Hongyu},
+title = {{Bias-Corrected Diagonal Discriminant Rules for High-Dimensional Classification}},
+journal = {Biometrics},
+year = {2010},
+volume = {66},
+number = {4},
+pages = {1096--1106},
+month = mar
+}
+
+@article{Marco:1987bj,
+author = {Marco, Virgil R and Young, Dean M and Turner, Danny W},
+title = {{The Euclidean distance classifier: an alternative to the linear discriminant function}},
+journal = {Communications in Statistics - Simulation and Computation},
+year = {1987},
+volume = {16},
+number = {2},
+pages = {485--505},
+month = jan
+}
+
+@article{Aeberhard:1993fp,
+author = {Aeberhard, Stefan and Coomans, Danny and Vel, Olivier De},
+title = {{Improvements to the classification performance of RDA}},
+journal = {Journal of Chemometrics},
+year = {1993},
+volume = {7},
+number = {2},
+pages = {99--115}
+}
+
+@article{Peck:1982tt,
+author = {Peck, Roger and Van Ness, John},
+title = {{The use of shrinkage estimators in linear discriminant analysis.}},
+journal = {Pattern Analysis and Machine Intelligence, IEEE Transactions on},
+year = {1982},
+volume = {4},
+number = {5},
+pages = {530--537},
+month = may
+}
+
+@article{Thomaz:2006ef,
+author = {Thomaz, Carlos Eduardo and Kitani, Edson Caoru and Gillies, Duncan Fyfe},
+title = {{A maximum uncertainty LDA-based approach for limited sample size problems --- with application to face recognition}},
+journal = {Journal of the Brazilian Computer Society},
+year = {2006},
+volume = {12},
+number = {2},
+pages = {7--18},
+month = jun
+}
+
+@article{Friedman:1989tm,
+author = {Friedman, Jerome H},
+title = {{Regularized Discriminant Analysis}},
+journal = {Journal of the American Statistical Association},
+year = {1989},
+volume = {84},
+number = {405},
+pages = {165--175}
+}
+
+@article{Lu:2005hq,
+author = {Lu, Juwei and Plataniotis, Konstantinos N and Venetsanopoulos, Anastasios N},
+title = {{Regularization studies of linear discriminant analysis in small sample size scenarios with application to face recognition}},
+journal = {Pattern Recognition Letters},
+year = {2005},
+volume = {26},
+number = {2},
+pages = {181--191}
+}
+
+@article{Wu:1996us,
+author = {Wu, W and Mallet, Y and Walczak, B and Penninckx, W and Massart, D L and Heuerding, S and Erni, F},
+title = {{Comparison of regularized discriminant analysis linear discriminant analysis and quadratic discriminant analysis applied to NIR data}},
+journal = {Analytica Chimica Acta},
+year = {1996},
+volume = {329},
+number = {3},
+pages = {257--265},
+month = aug
+}
+
+@article{Lu:2003we,
+author = {Lu, J and Plataniotis, Konstantinos N},
+title = {{Regularized discriminant analysis for the small sample size problem in face recognition}},
+journal = {Pattern Recognition Letters},
+year = {2003}
+}
+
+@book{McLachlan:1992dl,
+author = {McLachlan, Geoffrey J.},
+title = {{Discriminant Analysis and Statistical Pattern Recognition}},
+publisher = {John Wiley and Sons Inc.},
+year = {1992},
+series = {Wiley Series in Probability and Mathematical Statistics: Applied Probability and Statistics},
+address = {New York}
+}
+
+@article{Ji:2008wp,
+author = {Ji, Shuiwang and Ye, Jieping},
+title = {{Generalized Linear Discriminant Analysis: A Unified Framework and Efficient Model Selection}},
+journal = {IEEE Transactions on Neural Networks},
+year = {2008},
+volume = {19},
+number = {10},
+month = oct,
+annote = {This paper is almost identical to Ye's book chapter in 2009. In that chapter, Ye applies the transfer function idea to semi-supervised learning. The first half of that chapter however is given here, except this paper adds a thorough simulation study.}
+}
+
+@article{Guo:2007te,
+author = {Guo, Yaqian and Hastie, Trevor and Tibshirani, Robert},
+title = {{Regularized linear discriminant analysis and its application in microarrays}},
+journal = {Biostatistics},
+year = {2007},
+volume = {8},
 number = {1},
-pages = {29--42},
+pages = {86--100},
+month = jan
+}
+
+@article{Ching:2012fu,
+author = {Ching, Wai-Ki and Chu, Delin and Liao, Li-Zhi and Wang, Xiaoyan},
+title = {{Regularized orthogonal linear discriminant analysis}},
+journal = {Pattern Recognition},
+year = {2012},
+volume = {45},
+number = {7},
+pages = {2719--2732},
+month = jul
+}
+
+@article{Zhang:2010va,
+author = {Zhang, Zhihua and Dai, Guang and Xu, Congfu and Jordan, Michael I},
+title = {{Regularized Discriminant Analysis, Ridge Regression and Beyond}},
+journal = {The Journal of Machine Learning Research},
+year = {2010},
+volume = {11},
+month = mar
+}
+
+@article{Xu:2009fl,
+author = {Xu, Ping and Brock, Guy N and Parrish, Rudolph S},
+title = {{Modified linear discriminant analysis approaches for classification of high-dimensional microarray data}},
+journal = {Computational Statistics and Data Analysis},
+year = {2009},
+volume = {53},
+number = {5},
+pages = {1674--1687},
+month = mar
+}
+
+@article{Pima:2004vw,
+author = {Pima, Itzik and Aladjem, Mayer},
+title = {{Regularized discriminant analysis for face recognition}},
+journal = {Pattern Recognition},
+year = {2004},
+volume = {37},
+number = {9},
+pages = {1945--1948}
+}
+
+@article{Hoerl:1970cd,
+author = {Hoerl, Arthur E and Kennard, Robert W},
+title = {{Ridge Regression: Biased Estimation for Nonorthogonal Problems}},
+journal = {Technometrics},
+year = {1970},
+volume = {12},
+number = {1},
+pages = {55--67},
+month = feb
+}
+
+@book{Webb:2011vu,
+author = {Webb, Andrew R and Copsey, Keith D},
+title = {{Statistical Pattern Recognition}},
+publisher = {John Wiley {\&} Sons},
+year = {2011},
+address = {Chichester, West Sussex, UK},
+edition = {3rd},
+month = sep
+}
+
+@article{Ye:2006vx,
+author = {Ye, Jieping and Xiong, Tao},
+title = {{Computational and theoretical analysis of null space and orthogonal linear discriminant analysis}},
+journal = {The Journal of Machine Learning Research},
+year = {2006},
+volume = {7},
+pages = {1183--1204}
+}
+
+@article{Srivastava:2007ud,
+author = {Srivastava, Santosh and Gupta, Maya R and Frigyik, B{\'e}la A},
+title = {{Bayesian quadratic discriminant analysis}},
+journal = {The Journal of Machine Learning Research},
+year = {2007},
+volume = {8},
+pages = {1277--1305}
+}
+
+@article{Tibshirani:2002ht,
+author = {Tibshirani, Robert and Hastie, Trevor and Narasimhan, Balasubramanian and Chu, Gilbert},
+title = {{Diagnosis of multiple cancer types by shrunken centroids of gene expression.}},
+journal = {Proceedings of the National Academy of Sciences of the United States of America},
+year = {2002},
+volume = {99},
+number = {10},
+pages = {6567--6572},
+month = may
+}
+
+@book{Harville:2008wja,
+author = {Harville, David A.},
+title = {{Matrix Algebra From a Statistician's Perspective}},
+publisher = {Springer},
+year = {2008},
+address = {New York}
+}
+
+@article{Tai:2007bk,
+author = {Tai, Feng and Pan, Wei},
+title = {{Incorporating prior knowledge of gene functional groups into regularized discriminant analysis of microarray data.}},
+journal = {Bioinformatics},
+year = {2007},
+volume = {23},
+number = {23},
+pages = {3170--3177},
+month = dec
+}
+
+@article{Dai:2007vd,
+author = {Dai, Dao-Qing and Yuen, Pong C},
+title = {{Face recognition by regularized discriminant analysis.}},
+journal = {IEEE transactions on systems, man, and cybernetics. Part B, Cybernetics : a publication of the IEEE Systems, Man, and Cybernetics Society},
+year = {2007},
+volume = {37},
+number = {4},
+pages = {1080--1085},
+month = aug
+}
+
+@inproceedings{Ye:2006jm,
+author = {Ye, Jieping and Xiong, Tao and Li, Qi and Janardan, Ravi and Bi, Jinbo and Cherkassky, Vladimir and Kambhamettu, Chandra},
+title = {{Efficient model selection for regularized linear discriminant analysis}},
+booktitle = {Proceedings of the 15th ACM International Conference on Information and Knowledge Management},
+year = {2006},
+pages = {532--539},
+publisher = {ACM},
+address = {Arlington, VA, USA},
+annote = {* Notes that the "Classicial LDA is equivalent to maximum likelihood classification assuming normal{\ldots}" (page 3)
+* Shows that a solution to the classical LDA optimization problem in Equation 9 is given by the solution to the generalized eigenvalue problem: S_b x = \lambda S_t x
+* Because this involves the inverse of S_t, which is singular for p {\&}gt; N, S_t needs to be regularized
+* In Section 3, shows that the solution to the generalized eigenvalue problem has a low-rank representation. 
+* Derives explicitly the eigendecomposition of the solution to the generalized eigenvalue problem with regularization
+* Shows that ULDA is the limiting case of RLDA
+* Shows that ULDA maps all points from the same class to a common point; perfect class separation but leads to overfitting. RLDA fixes this.
+* Uses a grid of size m = 1000. It is not clear what the maximum tuning parameter value is.}
+}
+
+@article{Mkhadri:1997gy,
+author = {Mkhadri, A and Celeux, G and Nasroallah, A},
+title = {{Regularization in discriminant analysis: an overview}},
+journal = {Computational Statistics and Data Analysis},
+year = {1997},
+volume = {23},
+number = {3},
+pages = {403--423}
+}
+
+@inproceedings{Ye:2006tq,
+author = {Ye, Jieping and Wang, Tie},
+title = {{Regularized Discriminant Analysis for High Dimensional, Low Sample Size Data}},
+booktitle = {The 12th ACM SIGKDD International Conference},
+year = {2006},
+pages = {454},
+publisher = {ACM Press},
+address = {New York, New York, USA},
+annote = {Here's an outline of the paper:
+
+* Replace pooled sample covariance matrix in Friedman's RDA with the total scatter matrix
+* Shows Null(S_t) is a subset of Null(S_b) and Null(S_t) is a subset of Null(\Sigma_k)
+* Decompose the RDA matrix
+* Rewrite the RDA classification rule in terms of the decomposed RDA matrix
+* Shows that the second sum in the RDA decision rule is constant for all classes
+* Derives efficient expressions for the remaining inverses and determinants
+* Notes that a new test point is independent of the inverses and determinants
+* Uses a tuning-parameter grid of 900 parameters b/c the search is fast!}
+}
+
+@article{Tong:2012hw,
+author = {Tong, T and Chen, L and Zhao, H},
+title = {{Improved mean estimation and its application to diagonal discriminant analysis}},
+journal = {Bioinformatics},
+year = {2012},
+volume = {28},
+number = {4},
+pages = {531--537},
 month = feb,
-annote = {Notice the simulation models. As with Guo's paper and the subsequent papers that discuss diagonal classifiers, the simulation model favors diagonal classifiers.}
+annote = {This paper is an extension of DLDA that uses a Stein estimator for the mean. The simulation design is limited, and the authors only considered the Golub data set.
+
+This would be a natural method to consider for comparison with SimDiag.}
+}
+
+@incollection{Zhu:2010vu,
+author = {Zhu, Xiaojin and Kandola, Jaz and Lafferty, John and Ghahramani, Zoubin},
+title = {{Graph Kernels by Spectral Transforms}},
+booktitle = {Semi-Supervised Learning},
+year = {2010},
+editor = {Chapelle, Olivier and Sch{\"o}lkopf, Bernhard},
+pages = {277--291},
+publisher = {The MIT Press},
+address = {Cambridge, MA, USA}
+}
+
+@article{Bouveyron:2007gx,
+author = {Bouveyron, Charles and Girard, St{\'e}phane and Schmid, Cordelia},
+title = {{High-Dimensional Discriminant Analysis}},
+journal = {Communications in Statistics - Theory and Methods},
+year = {2007},
+volume = {36},
+number = {14},
+pages = {2607--2623},
+month = oct
+}
+
+@article{Ye:2005uu,
+author = {Ye, Jieping},
+title = {{Characterization of a family of algorithms for generalized discriminant analysis on undersampled problems}},
+journal = {The Journal of Machine Learning Research},
+year = {2005},
+volume = {6},
+pages = {483--502},
+annote = {This is an excellent paper that simultaneously diagonalizes the within-, between-, and total scatter matrices in the singular case to optimize a new optimization criterion involving the Moore-Penrose pseudoinverse.}
+}
+
+@article{Srivastava:2007ww,
+author = {Srivastava, Muni S. and Kubokawa, Tatsuya},
+title = {{Comparison of discrimination methods for high dimensional data}},
+journal = {Journal of the Japan Statistical Society},
+year = {2007},
+volume = {37},
+number = {1},
+pages = {123--134}
+}
+
+@article{Fan:2012iq,
+author = {Fan, Jianqing and Feng, Yang and Tong, Xin},
+title = {{A road to classification in high dimensional space: the regularized optimal affine discriminant}},
+journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+year = {2012},
+volume = {74},
+number = {4},
+pages = {745--771},
+month = apr
+}
+
+@article{Li:2012ev,
+author = {Li, Ran and Wu, Baolin},
+title = {{Sparse regularized discriminant analysis with application to microarrays.}},
+journal = {Computational biology and chemistry},
+year = {2012},
+volume = {39},
+pages = {14--19},
+month = aug,
+annote = {Provides an excellent approach to simulated data for small n, large p.
+
+Shows that the Singh data set is highly correlated.
+
+Provides an additional 2-class data set.}
+}
+
+@book{Kollo:2005vp,
+author = {Kollo, T{\~o}nu and von Rosen, Dietrich},
+title = {{Advanced Multivariate Statistics with Matrices}},
+publisher = {Springer},
+year = {2005},
+volume = {579},
+series = {Mathematics and Its Applications (New York)},
+address = {Dordrecht}
+}
+
+@article{Pang:2009ik,
+author = {Pang, Herbert and Tong, Tiejun and Zhao, Hongyu},
+title = {{Shrinkage-based Diagonal Discriminant Analysis and Its Applications in High-Dimensional Data}},
+journal = {Biometrics},
+year = {2009},
+volume = {65},
+number = {4},
+pages = {1021--1029},
+month = mar
+}
+
+@book{Izenman:2008gm,
+author = {Izenman, Alan J.},
+title = {{Modern Multivariate Statistical Techniques}},
+publisher = {Springer},
+year = {2008},
+series = {Springer Texts in Statistics},
+address = {New York},
+annote = {Regression, classification, and manifold learning}
 }
 
