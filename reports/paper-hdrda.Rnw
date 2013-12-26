@@ -137,7 +137,7 @@ eigenvalues of the sample covariance matrices to ensure positive
 definiteness. Alternatively, dimension reduction typically transforms the
 original data in the high-dimensional space to a subspace having a much smaller
 dimension such that redundant and noisy information is removed
-\citep{Fan:2012iq,Ye:2009gd,Bouveyron:2007gx,Ye:2006vx,Antoniadis:2003bk}. Finally,
+\citep{Fan:2012iq,Ye:2009gd,Bouveyron:2007gx,Ye:2006vx,Ye:2005hd,Antoniadis:2003bk}. Finally,
 \cite{Mai:2012bf}, \cite{Fan:2012iq}, \cite{Merchante:2012vk},
 \cite{Clemmensen:2011kr}, \cite{Huang:2010ju}, and \cite{Dudoit:2002ev} have
 proposed restrictions on the population covariance matrices to reduce the number
