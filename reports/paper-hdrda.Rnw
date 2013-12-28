@@ -254,16 +254,16 @@ analysis classifier
     \Sigma}_k^{-1}(\bm x - \xbar_k) + \log |\widehat{\bm \Sigma}_k|, \label{eq:qda}
 \end{align}
 where $\xbar_k$ and $\widehat{\bm \Sigma}_k$ are the maximum likelihood
-estimators of $\bm \mu_k$ and $\bm \Sigma_k$, respectively. If we assume further
-that $\bm \Sigma_k = \bm \Sigma$, $k = 1, \ldots, K$, then the pooled sample
-covariance matrix $\widehat{\bm \Sigma}$ is substituted for $\widehat{ \bm
-  \Sigma}_k$ in \eqref{eq:qda}, where
+estimators (MLEs) of $\bm \mu_k$ and $\bm \Sigma_k$, respectively. If we assume
+further that $\bm \Sigma_k = \bm \Sigma$, $k = 1, \ldots, K$, then the pooled
+sample covariance matrix $\widehat{\bm \Sigma}$ is substituted for $\widehat{
+  \bm \Sigma}_k$ in \eqref{eq:qda}, where
 \begin{align}
 	\widehat{\bm \Sigma} = N^{-1} \sum_{k=1}^K n_k \widehat{\bm \Sigma}_k \label{eq:pooled-cov}
 \end{align}
-is the maximum likelihood estimator for $\bm \Sigma$. In this case \eqref{eq:qda}
-reduces to the sample linear discriminant analysis classifier, and the
-log-determinant is omitted because it is constant across the $K$ classes.
+is the MLE for $\bm \Sigma$. In this case \eqref{eq:qda} reduces to the sample
+linear discriminant analysis classifier, and the log-determinant is omitted
+because it is constant across the $K$ classes.
 
 The smallest eigenvalues and the directions associated with their eigenvectors
 can highly influence \eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm
@@ -471,10 +471,10 @@ $\widehat{\bm \Sigma}_k(\lambda)$, $\widehat{\bm \Sigma}$, and $\widehat{ \bm
   \Sigma}_k$.
 
 \begin{lemma}\label{lemma:null-spaces}
-Let $\widehat{\bm \Sigma}_k$ and $\widehat{\bm \Sigma}$ be the maximum
-likelihood estimators of $\bm \Sigma_k$ and $\bm \Sigma$, respectively. Let
-$\widehat{\bm \Sigma}_k(\lambda)$ be defined as in
-\eqref{eq:sig-lambda-alternative}. Then, $\mathcal{N}\{\widehat{\bm \Sigma}_k(\lambda)\} \subset \mathcal{N}(\widehat{
+Let $\widehat{\bm \Sigma}_k$ and $\widehat{\bm \Sigma}$ be the MLEs of $\bm
+\Sigma_k$ and $\bm \Sigma$, respectively. Let $\widehat{\bm \Sigma}_k(\lambda)$
+be defined as in \eqref{eq:sig-lambda-alternative}. Then,
+$\mathcal{N}\{\widehat{\bm \Sigma}_k(\lambda)\} \subset \mathcal{N}(\widehat{
   \bm \Sigma}) \subset \mathcal{N}(\widehat{\bm \Sigma}_k)$, $k = 1, \ldots, K$.
 \end{lemma}
 \begin{proof}
@@ -598,10 +598,10 @@ $\bm U_2^{T} (\bm x - \xbar_k)$ is constant for $k = 1, \ldots, K$.
 
 Thus far, we have shown that our proposed classifier in \eqref{eq:hdrda} is
 invariant to the term $\bm U_2$, thus yielding an equivalent classifier in
-\eqref{eq:hdrda-decomposed} with a substantial reduction in the computational
+\eqref{eq:hdrda-decomposed} with a substantial reduction in computational
 complexity. Here, we demonstrate that the computational efficiency in
-calculating the inverse and determinant of $\bm W_k$ can be further improved
-via standard matrix operations.
+calculating the inverse and determinant of $\bm W_k$ can be further improved via
+standard matrix operations.
 
 \begin{proposition}\label{proposition:hdrda-W_k}
 Let $\bm W_k$ be defined as above, $k = 1, \ldots, K$. Then, $|\bm W_k| = |
