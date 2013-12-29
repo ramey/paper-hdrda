@@ -727,7 +727,7 @@ first $q$ columns of $\bm U$.
    }
   Compute $\widehat{\text{Error}}(\lambda, \gamma) = N^{-1} \sum_{v=1}^V \#\{\text{Error}_v(\lambda, \gamma)\}$
   
-  Report optimal $(\hat{\lambda}, \hat{\gamma}) \leftarrow \argmax_{(\lambda, \gamma)} \widehat{\text{Error}}(\lambda, \gamma)$
+  Report optimal $(\hat{\lambda}, \hat{\gamma}) \leftarrow \argmin_{(\lambda, \gamma)} \widehat{\text{Error}}(\lambda, \gamma)$
   \caption{Model selection for the \emph{HDRDA} classifier}
   \label{algo_hdrda_model_selection}
 \end{algorithm}
