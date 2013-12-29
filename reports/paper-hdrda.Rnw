@@ -2,6 +2,7 @@
 
 \usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm}
 \usepackage{natbib, setspace}
+\usepackage{algorithm2e}
 
 \newcommand{\xbar}{\bar{\bm x}}
 \newcommand{\tr}{\text{tr}}
@@ -608,10 +609,11 @@ Let $\bm W_k$ be defined as above, $k = 1, \ldots, K$. Then, $|\bm W_k| = |
 \bm \Gamma_k| |\bm Q_k|$ and
 	\begin{align}
 		\bm W_k^{-1} &= \bm \Gamma_k^{-1} - \alpha_k(1 - \lambda) \bm \Gamma_k^{-1} \bm U_1^{T} \bm X_k^{T} \bm Q_k^{-1} \bm X_k \bm U_1 \bm \Gamma_k^{-1},\label{eq:W_k_inv}
+    \intertext{where}
+    \bm Q_k &= \bm I_{n_k} + \alpha_k(1 - \lambda) \bm X_k \bm U_1 \bm \Gamma_k^{-1} \bm U_1^{T} \bm X_k^{T}\label{eq:Q_k}
+    \intertext{and}
+    \bm \Gamma_k &= \alpha_k \lambda \bm D_q + \gamma \bm I_q\label{eq:Gamma_k}.
 	\end{align}
-where $\bm Q_k = \bm I_{n_k} + \alpha_k(1 - \lambda) \bm X_k \bm U_1 
-\bm \Gamma_k^{-1} \bm U_1^{T} \bm X_k^{T}$ and $\bm \Gamma_k = \alpha_k \lambda \bm D_q +
-\gamma \bm I_q$.
 \end{proposition}
 \begin{proof}
 To calculate $|\bm W_k|$, we apply Theorem 18.1.1 from \cite{Harville:2008wja},
@@ -646,7 +648,8 @@ $q$ eigenvectors of $\widehat{\bm \Sigma}$. By utilizing a technique similar to
 the so-called kernel trick, we can obtain $\bm U_1$ by computing the
 eigendecomposition of a much smaller $N \times N$ matrix when $p \gg N$
 \citep{Hastie:2008dt}. Recall that the pooled sample covariance matrix is
-$\widehat{\bm \Sigma} = \bm X^{T} \bm X$. Then, because $\bm X = \bm M \bm
+$\widehat{\bm \Sigma} = \bm X^{T} \bm X$\footnote{TODO: $1/N$ is missing. Add
+  this. How much do things change below?} Then, because $\bm X = \bm M \bm
 D^{1/2} \bm U^{T}$ by the singular value decomposition, we have the
 eigendecomposition $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$, where $\bm M
 \in \mathbb{R}_{N \times N}$ is orthogonal, $\bm D^{1/2} \in \mathbb{R}_{N
@@ -662,6 +665,79 @@ of numerically nonzero eigenvalues present in $\bm D$, by calculating the number
 of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1 \times
 10^{-6}$. After calculating $q$, we extract $\bm U_1$ by retaining only the
 first $q$ columns of $\bm U$.
+
+\IncMargin{1em}
+\begin{algorithm}
+  \SetKwData{Left}{left}
+  \SetKwData{This}{this}
+  \SetKwData{Up}{up}
+  \SetKwFunction{Union}{Union}
+  \SetKwFunction{FindCompress}{FindCompress}
+  \SetKwInOut{Input}{input}
+  \SetKwInOut{Output}{output}
+  
+  \Input{
+    Data matrix $\bm X$\\
+    Parameter grid $\{\lambda_g\}_{g=1}^G \times \{\gamma_h\}_{h=1}^H$
+  }
+  \Output{Optimal Estimates, $\hat{\lambda}$ and $\hat{\gamma}$}
+  \BlankLine
+  \For{$v \leftarrow 1$ \KwTo $V$ \tcp*[r]{$V$-fold cross-validation}} {
+    Partition $v$th fold into $\bm X_{train} \in \mathbb{R}_{N \times p}$ and
+    $\bm X_{test} \in \mathbb{R}_{N_T \times p}$
+    
+    \For{$k\leftarrow 1$ \KwTo $K$}{
+      Extract $\bm X_k \in \mathbb{R}_{n_k \times p}$ from $\bm X_{train}$
+      
+      Compute sample mean $\xbar_k$ from $\bm X_k$
+      
+      Center $\bm X_k \leftarrow \bm X_k - \bm j_{n_k} \xbar_k^T$    
+    }
+    
+    $\bm X_c \leftarrow [\bm X_1^T, \ldots, \bm X_K^T]^T$
+    
+    Compute $\bm X_c = \bm M_q \bm D_q \bm U_1^T$
+    
+    Transform $\bm X_c \leftarrow \bm X_c \bm U_1$
+    
+    Transform $\bm X_{test} \leftarrow \bm X_{test} \bm U_1$
+    
+    \For{$k \leftarrow 1$ \KwTo $K$} {
+      Extract $\bm X_k \in \mathbb{R}_{n_k \times q}$ from $\bm X_c$
+      
+      Recompute sample mean $\xbar_k$ from $\bm X_k$
+    }
+    
+    \For{$(\lambda, \gamma) \in \{\lambda_g\}_{g=1}^G \times \{\gamma_h\}_{h=1}^H$} {
+      \For{$k \leftarrow 1$ \KwTo $K$} {      
+        Compute $\bm Q_k$ using \eqref{eq:Q_k}
+        
+        Compute $\bm \Gamma_k$ using \eqref{eq:Gamma_k}
+        
+        Compute $\bm W_k^{-1}$ using \eqref{eq:W_k_inv}
+        
+        Compute $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$
+        
+        Compute $(\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k) + \log | \bm W_k |$ \tcp*[r]{TODO: Use matrix form for test observations}
+      }
+      Classify test observations $\bm X_{test}$ using \eqref{eq:hdrda-decomposed}
+      
+      Compute $\#\{\text{Error}_v(\lambda, \gamma)\} \leftarrow$ misclassified test observations
+    }   
+   }
+  Compute $\widehat{\text{Error}}(\lambda, \gamma) = N^{-1} \sum_{v=1}^V \#\{\text{Error}_v(\lambda, \gamma)\}$
+  
+  Report optimal $(\hat{\lambda}, \hat{\gamma}) \leftarrow \argmax_{(\lambda, \gamma)} \widehat{\text{Error}}(\lambda, \gamma)$
+  \caption{Model selection for the \emph{HDRDA} classifier}
+  \label{algo_hdrda_model_selection}
+\end{algorithm}
+\DecMargin{1em}
+
+The compact SVD is sometimes called the reduced or fast SVD.
+
+
+Let $\bm j_m \in \mathbb{R}_{m \times 1}$ denote a vector of ones.
+
 
 \section{Classification Study}
 \label{sec:sims}
@@ -691,7 +767,7 @@ rate for each classifier. Repeating this process 1000 times, we computed the
 average of the error-rate estimates for each classifier. We remark that our
 simulation design avoids the selection bias discussed in \cite{Ambroise:2002fa}.
 
-We used version 3.0.0 of the open-source statistical software {\tt R} for the
+We used version 3.0.2 of the open-source statistical software {\tt R} for the
 classification study. We used the implementations of the Witten and Guo
 classifiers from the {\tt penalizedLDA} and {\tt rda} packages, respectively, on
 CRAN. Because the {\tt rda} package does not perform the authors' ``Min-Min''
@@ -896,6 +972,16 @@ facial recognition
 handwritten digit recognition \citep{Bouveyron:2007gx}, remote sensing
 \citep{Tadjudin:1999fk}, seismic detection \citep{Anderson:2002kg}, and chemical
 spectra \citep{Wu:1996us,Aeberhard:1993fp}.
+
+The dimension reduction that we have employed in this paper has reduced the
+dimension to the rank$(\widehat{\bm \Sigma})$, $q$. An interesting extension of
+our work would reduce the dimension $q$ further to a lower dimension $q_L < q$
+using some criterion proposed, perhaps similar to that employed in principal
+components analysis. While it is not clear whether classification performance
+would improve via such a method, the efficiency of the training and model
+selection would certainly improve. Moreover, if $q_L = 2$ or $3$ was selected,
+the potential for low-dimensional graphical displays of high-dimensional could
+be accomplished.
 
 \bibliographystyle{plainnat}
 \bibliography{rda}
