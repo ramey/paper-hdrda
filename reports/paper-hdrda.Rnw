@@ -215,8 +215,9 @@ discriminant analysis, we require the following notation. Let $\mathbb{R}_{a
   \times b}$ denote the matrix space of all $a \times b$ matrices over the real
 field $\mathbb{R}$. Denote by $\bm I_m$ the $m \times m$ identity matrix, and
 let $\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm
-0_m$ is understood to denote $\bm 0_{m \times m}$. Let $\bm A \oplus \bm B$
-denote the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in
+0_m$ is understood to denote $\bm 0_{m \times m}$. Define $\bm 1_m \in
+\mathbb{R}_{m \times 1}$ as a vector of ones. Let $\bm A \oplus \bm B$ denote
+the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in
 \mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Let $\bm A^{T}$,
 $\bm A^+$, and $\mathcal{N}(\bm A) = \{\bm z \in \mathbb{R}_{p \times 1} : \bm A
 \bm z = \bm 0_{m \times 1}\}$ denote the transpose, the Moore-Penrose
@@ -448,7 +449,7 @@ established by substituting \eqref{eq:sig-rda} into
 \eqref{eq:qda}.\footnote{TODO: Discuss $\alpha_k \equiv 1-\gamma$, etc.}
 
 \subsection{Properties of the HDRDA Classifier}
-\label{sec:computational-efficiency}
+\label{sec:hdrda-properties}
 
 Next, we establish properties of the covariance-matrix estimator and the
 decision rule employed in the \emph{HDRDA} classifier. By doing so, we
@@ -625,54 +626,28 @@ C = \bm X_k \bm U_1$, we have $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$. Also,
 \citep[Theorem 18.2.8]{Harville:2008wja}.
 \end{proof}
 
-\subsection{Computationally Efficient Model Selection}
+\subsection{Model Selection}
 
-Conveniently, we see that the inverse and determinant of $\bm W_k$ are each in
-terms of the inverse and determinant of $\bm Q_k \in \mathbb{R}_{n_k \times
-  n_k}$, respectively, as well as the diagonal matrix $\bm \Gamma_k \in
-\mathbb{R}_{q \times q}$. Hence, the resulting formulation requires $O(n_k p q)$
-calculations to compute both $\bm W_k^{-1}$ and $| \bm W_k |$ and is especially
-advantageous when the number of classes $K$ is large because $n_k$ is then
-potentially much smaller than $q$. The expressions given in Proposition
-\ref{proposition:hdrda-W_k} also expedite the selection of $\lambda$ and
-$\gamma$ via cross-validation because the most time-consuming matrix operation
-involved in computing $\bm W_k^{-1}$ and $|\bm W_k|$ is $\bm X_k \bm U_1 \in
-\mathbb{R}_{n_k \times q}$, which is independent of $\lambda$ and
-$\gamma$. Therefore, we need calculate $\bm X_k \bm U_1$ only once for each
-cross-validation fold. The subsequent operations in calculating $\bm W_k^{-1}$
-and $|\bm W_K|$ can be simply updated for different pairs of $\lambda$ and
-$\gamma$.
-
-Thus far, we have constructed each $\tilde{\bm \Sigma}_k$ in terms of the first
-$q$ eigenvectors of $\widehat{\bm \Sigma}$. By utilizing a technique similar to
-the so-called kernel trick, we can obtain $\bm U_1$ by computing the
-eigendecomposition of a much smaller $N \times N$ matrix when $p \gg N$
-\citep{Hastie:2008dt}. Recall that the pooled sample covariance matrix is
-$\widehat{\bm \Sigma} = \bm X^{T} \bm X$\footnote{TODO: $1/N$ is missing. Add
-  this. How much do things change below?} Then, because $\bm X = \bm M \bm
-D^{1/2} \bm U^{T}$ by the singular value decomposition, we have the
-eigendecomposition $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$, where $\bm M
-\in \mathbb{R}_{N \times N}$ is orthogonal, $\bm D^{1/2} \in \mathbb{R}_{N
-  \times N}^{\ge}$ is a diagonal matrix consisting of the singular values of
-$\bm X$, and $\bm U \in \mathbb{R}_{p \times N}$ is orthogonal. Now, $\bm X \bm
-X^{T} = \bm M \bm D \bm M^{T}$ is the eigenvalue decomposition of $\bm X \bm
-X^{T}$, where $\bm D$ is the matrix of eigenvalues of $\bm X \bm X^{T}$ and the
-columns of $\bm M$ are the corresponding eigenvectors. Hence, we obtain $\bm M$
-and $\bm D$ from an eigendecomposition of $\bm X \bm X^{T} \in \mathbb{R}_{N
-  \times N}$. Next, we compute $\bm U = \bm X^{T} \bm M \bm D^{+/2}$, where $\bm
-D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then determine $q$, the number
-of numerically nonzero eigenvalues present in $\bm D$, by calculating the number
-of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1 \times
-10^{-6}$. After calculating $q$, we extract $\bm U_1$ by retaining only the
-first $q$ columns of $\bm U$.
+Thus far, we have presented the \emph{HDRDA} classifier and its properties that
+facilitate an efficient calculation of the decision rule. Here, we describe in
+an efficient model-selection procedure to select the optimal estimates for the
+tuning parameters $\lambda$ and $\gamma$. We provide pseudocode for the model
+selection in Algorithm \ref{alg:hdrda_model_selection}. Our goal is to select
+the optimal tuning parameter estimates from the Cartesian product of candidate
+values, $\{\lambda_g\}_{g=1}^G \times \{\gamma_h\}_{h=1}^H$. We utilize $V$-fold
+cross-validation to estimate the conditional error rate for each candidate
+tuning-parameter pair and select the pair that attains the minimum error
+rate. To calculate the $V$-fold cross-validation, we partition the original
+training data into $V$ mutually exclusive and exhaustive folds that have
+approximately the same number of observations. Then, for $v = 1, \ldots, V$, we
+classify the observations in the $v$th fold by training a classifier on the
+remaining $V - 1$ folds for each candidate pair of tuning parameters. We then
+calculate the proportion of misclassified observations across the $V$ folds and
+select the pair $(\widehat{\lambda}, \widehat{\gamma})$ that minimizes the
+considered training error-rate estimator.
 
 \IncMargin{1em}
 \begin{algorithm}
-  \SetKwData{Left}{left}
-  \SetKwData{This}{this}
-  \SetKwData{Up}{up}
-  \SetKwFunction{Union}{Union}
-  \SetKwFunction{FindCompress}{FindCompress}
   \SetKwInOut{Input}{input}
   \SetKwInOut{Output}{output}
   
@@ -680,10 +655,10 @@ first $q$ columns of $\bm U$.
     Data matrix $\bm X$\\
     Parameter grid $\{\lambda_g\}_{g=1}^G \times \{\gamma_h\}_{h=1}^H$
   }
-  \Output{Optimal Estimates, $\hat{\lambda}$ and $\hat{\gamma}$}
+  \Output{Optimal Estimates $(\hat{\lambda}, \hat{\gamma})$}
   \BlankLine
-  \For{$v \leftarrow 1$ \KwTo $V$ \tcp*[r]{$V$-fold cross-validation}} {
-    Partition $v$th fold into $\bm X_{train} \in \mathbb{R}_{N \times p}$ and
+  \For{$v \leftarrow 1$ \KwTo $V$} {
+    Partition $\bm X$ into $\bm X_{train} \in \mathbb{R}_{N \times p}$ and
     $\bm X_{test} \in \mathbb{R}_{N_T \times p}$
     
     \For{$k\leftarrow 1$ \KwTo $K$}{
@@ -691,7 +666,7 @@ first $q$ columns of $\bm U$.
       
       Compute sample mean $\xbar_k$ from $\bm X_k$
       
-      Center $\bm X_k \leftarrow \bm X_k - \bm j_{n_k} \xbar_k^T$    
+      Center $\bm X_k \leftarrow \bm X_k - \bm 1_{n_k} \xbar_k^T$    
     }
     
     $\bm X_c \leftarrow [\bm X_1^T, \ldots, \bm X_K^T]^T$
@@ -729,16 +704,65 @@ first $q$ columns of $\bm U$.
   
   Report optimal $(\hat{\lambda}, \hat{\gamma}) \leftarrow \argmin_{(\lambda, \gamma)} \widehat{\text{Error}}(\lambda, \gamma)$
   \caption{Model selection for the \emph{HDRDA} classifier}
-  \label{algo_hdrda_model_selection}
+  \label{alg:hdrda_model_selection}
 \end{algorithm}
 \DecMargin{1em}
 
-The compact SVD is sometimes called the reduced or fast SVD.
+% TODO: Now that the algorithm has been introduced and described, we need to
+% discuss the details. Let's remove some of the bloat where we talk about the
+% kernel trick, etc. Simply discuss how this technique is fast and cite Hastie's
+% book.
 
+A primary contributing factor to the efficiency of Algorithm
+\ref{alg:hdrda_model_selection} is our usage of the compact singular value
+decomposition (SVD) (sometimes called the reduced or fast SVD), which we
+describe here. Rather than computing the eigenvalue decomposition of
+$\widehat{\bm \Sigma}$ to obtain $\bm U_1$, we instead obtain $\bm U_1$ by
+computing the eigendecomposition of a much smaller $N \times N$ matrix when $p
+\gg N$ \citep{Hastie:2008dt}. Recall that the pooled sample covariance matrix is
+$\widehat{\bm \Sigma} = \bm X^{T} \bm X$\footnote{TODO: $1/N$ is missing. Add
+  this. It will be absorbed into the eigenvalues.}  Then, because $\bm X = \bm M
+\bm D^{1/2} \bm U^{T}$ by the SVD, we have the eigendecomposition $\widehat{\bm
+  \Sigma} = \bm U \bm D \bm U^{T}$, where $\bm M \in \mathbb{R}_{N \times N}$ is
+orthogonal, $\bm D^{1/2} \in \mathbb{R}_{N \times N}^{\ge}$ is a diagonal matrix
+consisting of the singular values of $\bm X$, and $\bm U \in \mathbb{R}_{p
+  \times N}$ is orthogonal. Now, $\bm X \bm X^{T} = \bm M \bm D \bm M^{T}$ is
+the eigenvalue decomposition of $\bm X \bm X^{T}$, where $\bm D$ is the matrix
+of eigenvalues of $\bm X \bm X^{T}$ and the columns of $\bm M$ are the
+corresponding eigenvectors. Hence, we obtain $\bm M$ and $\bm D$ from an
+eigendecomposition of $\bm X \bm X^{T} \in \mathbb{R}_{N \times N}$. Next, we
+compute $\bm U = \bm X^{T} \bm M \bm D^{+/2}$, where $\bm D^{+/2} = \bm
+D_q^{-1/2} \oplus \bm 0_{N-q}$. We then determine $q$, the number of numerically
+nonzero eigenvalues present in $\bm D$, by calculating the number of eigenvalues
+that exceeds some tolerance value, say, $\epsilon = 1 \times 10^{-6}$. After
+calculating $q$, we extract $\bm U_1$ by retaining only the first $q$ columns of
+$\bm U$.
 
-Let $\bm j_m \in \mathbb{R}_{m \times 1}$ denote a vector of ones.
+% TODO: Discuss things that need only be computed once
+% TODO: Discuss operations independent of tuning parameters
 
+\subsection{Computational Complexity}
 
+Conveniently, we see that the inverse and determinant of $\bm W_k$ are each in
+terms of the inverse and determinant of $\bm Q_k \in \mathbb{R}_{n_k \times
+  n_k}$, respectively, as well as the diagonal matrix $\bm \Gamma_k \in
+\mathbb{R}_{q \times q}$. Hence, the resulting formulation requires $O(n_k p q)$
+calculations to compute both $\bm W_k^{-1}$ and $| \bm W_k |$. The expressions
+given in Proposition \ref{proposition:hdrda-W_k} also expedite the selection of
+$\lambda$ and $\gamma$ via cross-validation because the most time-consuming
+matrix operation involved in computing $\bm W_k^{-1}$ and $|\bm W_k|$ is $\bm
+X_k \bm U_1 \in \mathbb{R}_{n_k \times q}$, which is independent of $\lambda$
+and $\gamma$. Therefore, we need calculate $\bm X_k \bm U_1$ only once for each
+cross-validation fold. The subsequent operations in calculating $\bm W_k^{-1}$
+and $|\bm W_K|$ can be simply updated for different pairs of $\lambda$ and
+$\gamma$.
+
+\begin{enumerate}
+  \item $\bm W_k^{-1}$\footnote{TODO: Need complexity for the following}
+  \item $|\bm W_k|$
+  \item (12)
+\end{enumerate}
+  
 \section{Classification Study}
 \label{sec:sims}
 
