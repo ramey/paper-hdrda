@@ -631,22 +631,19 @@ C = \bm X_k \bm U_1$, we have $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$. Also,
 \subsection{Model Selection}
 
 Thus far, we have presented the \emph{HDRDA} classifier and its properties that
-facilitate an efficient calculation of the decision rule. Here, we describe in
-an efficient model-selection procedure to select the optimal estimates for the
-tuning parameters $\lambda$ and $\gamma$. We provide pseudocode for the model
-selection in Algorithm \ref{alg:hdrda_model_selection}. Our goal is to select
-the optimal tuning parameter estimates from the Cartesian product of candidate
-values, $\{\lambda_g\}_{g=1}^G \times \{\gamma_h\}_{h=1}^H$. We utilize $V$-fold
-cross-validation to estimate the conditional error rate for each candidate
-tuning-parameter pair and select the pair that attains the minimum error
-rate. To calculate the $V$-fold cross-validation, we partition the original
-training data into $V$ mutually exclusive and exhaustive folds that have
-approximately the same number of observations. Then, for $v = 1, \ldots, V$, we
-classify the observations in the $v$th fold by training a classifier on the
-remaining $V - 1$ folds for each candidate pair of tuning parameters. We then
-calculate the proportion of misclassified observations across the $V$ folds and
-select the pair $(\widehat{\lambda}, \widehat{\gamma})$ that minimizes the
-considered training error-rate estimator.
+facilitate an efficient calculation of the decision rule. Here, we describe an
+efficient model-selection procedure along with pseudocode in Algorithm
+\ref{alg:hdrda_model_selection} to select the optimal tuning-parameter estimates
+from the Cartesian product of candidate values $\{\lambda_g\}_{g=1}^G \times
+\{\gamma_h\}_{h=1}^H$. We estimate the $V$-fold cross-validation error rate for
+each candidate pair and select $(\widehat{\lambda}, \widehat{\gamma})$ that
+attains the minimum error rate. To calculate the $V$-fold cross-validation, we
+partition the original training data into $V$ mutually exclusive and exhaustive
+folds that have approximately the same number of observations. Then, for $v = 1,
+\ldots, V$, we classify the observations in the $v$th fold by training a
+classifier on the remaining $V - 1$ folds. We then calculate the
+cross-validation error as the proportion of misclassified observations across
+the $V$ folds.
 
 \IncMargin{1em}
 \begin{algorithm}
@@ -673,7 +670,7 @@ considered training error-rate estimator.
     
     $\bm X_c \leftarrow [\bm X_1^T, \ldots, \bm X_K^T]^T$
     
-    Compute $\bm X_c = \bm M_q \bm D_q \bm U_1^T$
+    Compute the compact SVD $\bm X_c = \bm M_q \bm D_q \bm U_1^T$
     
     Transform $\bm X_c \leftarrow \bm X_c \bm U_1$
     
@@ -710,61 +707,54 @@ considered training error-rate estimator.
 \end{algorithm}
 \DecMargin{1em}
 
-% TODO: Now that the algorithm has been introduced and described, we need to
-% discuss the details. Let's remove some of the bloat where we talk about the
-% kernel trick, etc. Simply discuss how this technique is fast and cite Hastie's
-% book.
-
 A primary contributing factor to the efficiency of Algorithm
 \ref{alg:hdrda_model_selection} is our usage of the compact singular value
-decomposition (SVD) (sometimes called the reduced or fast SVD), which we
-describe here. Rather than computing the eigenvalue decomposition of
-$\widehat{\bm \Sigma}$ to obtain $\bm U_1$, we instead obtain $\bm U_1$ by
-computing the eigendecomposition of a much smaller $N \times N$ matrix when $p
-\gg N$ \cite[Chapter~18.3.5]{Hastie:2008dt}. Recall that the pooled sample
-covariance matrix is $\widehat{\bm \Sigma} = \bm X^{T} \bm X$\footnote{TODO:
-  $1/N$ is missing. Add this. It will be absorbed into the eigenvalues.}  Then,
-because $\bm X = \bm M \bm D^{1/2} \bm U^{T}$ by the SVD, we have the
-eigendecomposition $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$, where $\bm M
-\in \mathbb{R}_{N \times N}$ is orthogonal, $\bm D^{1/2} \in \mathbb{R}_{N
-  \times N}^{\ge}$ is a diagonal matrix consisting of the singular values of
-$\bm X$, and $\bm U \in \mathbb{R}_{p \times N}$ is orthogonal. Now, $\bm X \bm
-X^{T} = \bm M \bm D \bm M^{T}$ is the eigenvalue decomposition of $\bm X \bm
-X^{T}$, where $\bm D$ is the matrix of eigenvalues of $\bm X \bm X^{T}$ and the
-columns of $\bm M$ are the corresponding eigenvectors. Hence, we obtain $\bm M$
-and $\bm D$ from an eigendecomposition of $\bm X \bm X^{T} \in \mathbb{R}_{N
-  \times N}$. Next, we compute $\bm U = \bm X^{T} \bm M \bm D^{+/2}$, where $\bm
-D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then determine $q$, the number
-of numerically nonzero eigenvalues present in $\bm D$, by calculating the number
-of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1 \times
-10^{-6}$. After calculating $q$, we extract $\bm U_1$ by retaining only the
-first $q$ columns of $\bm U$.
+decomposition (SVD) (sometimes called the reduced or fast SVD). Rather than
+computing the eigenvalue decomposition of $\widehat{\bm \Sigma}$ to obtain $\bm
+U_1$, we instead obtain $\bm U_1$ by computing the eigendecomposition of a much
+smaller $N \times N$ matrix when $p \gg N$
+\cite[Chapter~18.3.5]{Hastie:2008dt}. Recall that the pooled sample covariance
+matrix is $\widehat{\bm \Sigma} = \bm X^{T} \bm X$\footnote{TODO: $1/N$ is
+  missing. Add this. It will be absorbed into the eigenvalues.}  Then, because
+$\bm X = \bm M \bm D^{1/2} \bm U^{T}$ by the SVD, we have the eigendecomposition
+$\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$, where $\bm M \in \mathbb{R}_{N
+  \times N}$ is orthogonal, $\bm D^{1/2} \in \mathbb{R}_{N \times N}^{\ge}$ is a
+diagonal matrix consisting of the singular values of $\bm X$, and $\bm U \in
+\mathbb{R}_{p \times N}$ is orthogonal. Now, $\bm X \bm X^{T} = \bm M \bm D \bm
+M^{T}$ is the eigenvalue decomposition of $\bm X \bm X^{T}$, where $\bm D$ is
+the matrix of eigenvalues of $\bm X \bm X^{T}$ and the columns of $\bm M$ are
+the corresponding eigenvectors. Hence, we obtain $\bm M$ and $\bm D$ from an
+eigendecomposition of $\bm X \bm X^{T} \in \mathbb{R}_{N \times N}$. Next, we
+compute $\bm U = \bm X^{T} \bm M \bm D^{+/2}$, where $\bm D^{+/2} = \bm
+D_q^{-1/2} \oplus \bm 0_{N-q}$. We then determine $q$, the number of numerically
+nonzero eigenvalues present in $\bm D$, by calculating the number of eigenvalues
+that exceeds some tolerance value, say, $\epsilon = 1 \times 10^{-6}$. After
+calculating $q$, we extract $\bm U_1$ by retaining only the first $q$ columns of
+$\bm U$.
 
 As a result of the compact SVD, we need calculate $\bm X_c \bm U_1$ only once
 per cross-validation fold, requiring $O(p q N) \approx (p N^2)$ calculations.
 Hence, the computational costs of expensive calculations, such as matrix
 inverses and determinants, are greatly reduced because they are performed in the
 $q$-dimensional subspace. Similarly, we reduce the dimension of the test data
-set by calculating $\bm X_c \bm U_1$ once per fold. Conveniently, we see that
-the most costly computation involved in $\bm Q_k$ and $\bm W_k^{-1}$ is $\bm X_k
-\bm U_1$, which can be extracted from $\bm X_c \bm U_1$. Thus, after the initial
-calculation of $\bm X_c \bm U_1$ per cross-validation fold, $\bm Q_k$ requires
-$O(TODO)$ operations. Because $\bm Q_k \in \mathbb{R}_{n_k \times n_k}$, both
-its determinant and inverse requires $O(n_k^3)$ operations. This is especially
-advantageous when $K$ is large, such that $n_k$ is much smaller than $N$. Thus,
-$\bm W_k^{-1}$ requires $O(TODO)$ operations Also, the inverse and determinant
-of the diagonal matrix $\bm \Gamma_k \in \mathbb{R}_{q \times q}$ requires
-$O(q)$ operations. Hence, the $| \bm W_k |$ requires $O(q n_k^3)$ operations,
-which is efficient when $p >> N$.
+set by calculating $\bm X_{test} \bm U_1$ once per fold. Conveniently, we see
+that the most costly computation involved in $\bm Q_k$ and $\bm W_k^{-1}$ is
+$\bm X_k \bm U_1$, which can be extracted from $\bm X_c \bm U_1$. Thus, after
+the initial calculation of $\bm X_c \bm U_1$ per cross-validation fold, $\bm
+Q_k$ requires $O(TODO)$ operations. Because $\bm Q_k \in \mathbb{R}_{n_k \times
+  n_k}$, both its determinant and inverse require $O(n_k^3)$
+operations. Consequently, $\bm W_k^{-1}$ requires $O(TODO)$ operations. Also,
+the inverse and determinant of the diagonal matrix $\bm \Gamma_k \in
+\mathbb{R}_{q \times q}$ requires $O(q)$ operations. Therefore, the $| \bm W_k
+|$ requires $O(q n_k^3)$ operations.
 
 The expressions given in Proposition \ref{proposition:hdrda-W_k} also expedite
 the selection of $\lambda$ and $\gamma$ via cross-validation because the most
 time-consuming matrix operation involved in computing $\bm W_k^{-1}$ and $|\bm
 W_k|$ is $\bm X_k \bm U_1 \in \mathbb{R}_{n_k \times q}$, which is independent
 of $\lambda$ and $\gamma$. The subsequent operations in calculating $\bm
-W_k^{-1}$ and $|\bm W_K|$ can be simply updated for different pairs of $\lambda$
-and $\gamma$.\footnote{TODO: Need to clean up this paragraph so that it flows
-  from above. Also, elaborate.}
+W_k^{-1}$ and $|\bm W_k|$ can be simply updated for different pairs of $\lambda$
+and $\gamma$.
 
 \section{Classification Study}
 \label{sec:sims}
