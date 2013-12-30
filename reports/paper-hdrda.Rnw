@@ -418,7 +418,19 @@ from a grid of candidate models via cross-validation \citep{Hastie:2008dt}. We
 provide an implementation of \eqref{eq:hdrda} in the {\tt hdrda} function in the
 {\tt sparsediscrim} R package, available on CRAN.
 
-\subsection{Relationship with Friedman's RDA Classifier}
+\subsection{Relationship with Other Classifiers}
+
+The addition of the parameter $\alpha_k$ in \eqref{eq:hdrda-cov} is one of
+convenience and allows the flexibility of various covariance-matrix estimators
+proposed in the literature. In practice, we generally are not interested in
+estimating $\alpha_k$ as it would incorporate $K$ additional tuning parameters
+to estimate via cross-validation, which is counterproductive to our goal of
+improving the \emph{RDA} classifier's efficiency. By setting $\alpha_k$ to a
+predefined constant, the \emph{HDRDA} covariance-matrix estimator includes or
+resembles a large family of estimators, some of which we mention below.
+
+
+\subsubsection{\cite{Friedman:1989tm}}
 
 \cite{Friedman:1989tm} proposed regularized discriminant analysis (RDA) by
 incorporating a weighted average of the sample covariance matrix $\widehat{ \bm
@@ -448,7 +460,7 @@ where $\gamma \in [0, 1]$ is a regularization parameter that controls the
 shrinkage of \eqref{eq:sig-rda} towards $\bm I_p$ and is weighted by the average
 of the eigenvalues of \eqref{eq:sig-lambda}. Finally, the RDA classifier is
 established by substituting \eqref{eq:sig-rda} into
-\eqref{eq:qda}.\footnote{TODO: Discuss $\alpha_k \equiv 1-\gamma$, etc.}
+\eqref{eq:qda}.
 
 \subsection{Properties of the HDRDA Classifier}
 \label{sec:hdrda-properties}
