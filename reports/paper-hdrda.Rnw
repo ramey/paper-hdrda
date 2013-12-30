@@ -41,8 +41,8 @@
 \begin{abstract}
 
 \citeauthor{Friedman:1989tm} proposed the popular regularized discriminant
-analysis (RDA) classifier that utilizes a biased covariance-matrix estimator
-that partially pools the sample covariance matrices from linear and quadratic
+analysis (RDA) classifier that utilizes a biased covariance-matrix estimator to
+partially pool the sample covariance matrices from linear and quadratic
 disriminant analysis before shrinking the resulting estimator towards a scaled
 identity matrix. The RDA classifier's two tuning parameters are typically
 estimated via a computationally burdensome cross-validation procedure from a
