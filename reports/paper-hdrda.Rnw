@@ -536,9 +536,9 @@ q \le p$. Then, we have
 \end{lemma}
 \begin{proof}
 From Lemma \ref{lemma:null-spaces}, the columns of $\bm U_2$ span the null space
-of $\widehat{\bm \Sigma}$, which implies that $\widehat{\bm \Sigma}_k \bm U_2 =
-\bm 0_{p \times (p - q)}$. Hence, $\bm U^{T} \widehat{\bm \Sigma}_k \bm U = \bm
-U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 \oplus \bm 0_{p-q}$, $k = 1, \ldots,
+of $\widehat{\bm \Sigma}_k$, which implies that $\widehat{\bm \Sigma}_k \bm U_2
+= \bm 0_{p \times (p - q)}$. Hence, $\bm U^{T} \widehat{\bm \Sigma}_k \bm U =
+\bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 \oplus \bm 0_{p-q}$, $k = 1, \ldots,
 K$. Thus, $\bm U^{T} \tilde{\bm \Sigma}_k \bm U = \alpha_k \{(1 - \lambda) \bm
 U^{T} \widehat{\bm \Sigma}_k \bm U + \lambda \bm D\} + \gamma \bm I_p$, and
 \eqref{eq:rda-matrix} holds because $\bm U$ is orthogonal.
