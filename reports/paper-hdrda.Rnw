@@ -640,6 +640,11 @@ C = \bm X_k \bm U_1$, we have $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$. Also,
 \citep[Theorem 18.2.8]{Harville:2008wja}.
 \end{proof}
 
+Notice that if $\alpha_k$ is constant across the $K$ classes, then $\bm
+\Gamma_k$ in \eqref{eq:Gamma_k} is independent of $k$. Consequently, $|\bm
+\Gamma_k|$ is constant across the $K$ classes and need not be calculated in
+\eqref{eq:hdrda-decomposed}.
+
 \subsection{Model Selection}
 
 Thus far, we have presented the \emph{HDRDA} classifier and its properties that
@@ -752,12 +757,12 @@ set by calculating $\bm X_{test} \bm U_1$ once per fold. Conveniently, we see
 that the most costly computation involved in $\bm Q_k$ and $\bm W_k^{-1}$ is
 $\bm X_k \bm U_1$, which can be extracted from $\bm X_c \bm U_1$. Thus, after
 the initial calculation of $\bm X_c \bm U_1$ per cross-validation fold, $\bm
-Q_k$ requires $O(n_k q^2)$ operations. Because $\bm Q_k \in \mathbb{R}_{n_k \times
-  n_k}$, both its determinant and inverse require $O(n_k^3)$
+Q_k$ requires $O(n_k q^2)$ operations. Because $\bm Q_k \in \mathbb{R}_{n_k
+  \times n_k}$, both its determinant and inverse require $O(n_k^3)$
 operations. Consequently, $\bm W_k^{-1}$ requires $O(n_k q^2)$ operations. Also,
-the inverse and determinant of the diagonal matrix $\bm \Gamma_k \in
-\mathbb{R}_{q \times q}$ requires $O(q)$ operations. Therefore, the $| \bm W_k
-|$ requires $O(q n_k^3)$ operations.
+the inverse of the diagonal matrix $\bm \Gamma_k^{-1} \in \mathbb{R}_{q \times
+  q}$ requires $O(q)$ operations. Finally, $| \bm W_k |$ requires $O(n_k^3)$
+operations.
 
 The expressions given in Proposition \ref{proposition:hdrda-W_k} also expedite
 the selection of $\lambda$ and $\gamma$ via cross-validation because the most
