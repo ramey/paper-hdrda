@@ -708,7 +708,7 @@ the $V$ folds.
       }
       Classify test observations $\bm X_{test}$ using \eqref{eq:hdrda-decomposed}
       
-      Compute $\#\{\text{Error}_v(\lambda, \gamma)\} \leftarrow$ misclassified test observations
+      Compute the number of misclassified test observations $\#\{\text{Error}_v(\lambda, \gamma)\}$ 
     }   
    }
   Compute $\widehat{\text{Error}}(\lambda, \gamma) = N^{-1} \sum_{v=1}^V \#\{\text{Error}_v(\lambda, \gamma)\}$
@@ -725,24 +725,23 @@ decomposition (SVD) (sometimes called the reduced or fast SVD). Rather than
 computing the eigenvalue decomposition of $\widehat{\bm \Sigma}$ to obtain $\bm
 U_1$, we instead obtain $\bm U_1$ by computing the eigendecomposition of a much
 smaller $N \times N$ matrix when $p \gg N$
-\cite[Chapter~18.3.5]{Hastie:2008dt}. Recall that the pooled sample covariance
-matrix is $\widehat{\bm \Sigma} = \bm X^{T} \bm X$\footnote{TODO: $1/N$ is
-  missing. Add this. It will be absorbed into the eigenvalues.}  Then, because
-$\bm X = \bm M \bm D^{1/2} \bm U^{T}$ by the SVD, we have the eigendecomposition
-$\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$, where $\bm M \in \mathbb{R}_{N
-  \times N}$ is orthogonal, $\bm D^{1/2} \in \mathbb{R}_{N \times N}^{\ge}$ is a
-diagonal matrix consisting of the singular values of $\bm X$, and $\bm U \in
-\mathbb{R}_{p \times N}$ is orthogonal. Now, $\bm X \bm X^{T} = \bm M \bm D \bm
-M^{T}$ is the eigenvalue decomposition of $\bm X \bm X^{T}$, where $\bm D$ is
-the matrix of eigenvalues of $\bm X \bm X^{T}$ and the columns of $\bm M$ are
-the corresponding eigenvectors. Hence, we obtain $\bm M$ and $\bm D$ from an
-eigendecomposition of $\bm X \bm X^{T} \in \mathbb{R}_{N \times N}$. Next, we
-compute $\bm U = \bm X^{T} \bm M \bm D^{+/2}$, where $\bm D^{+/2} = \bm
-D_q^{-1/2} \oplus \bm 0_{N-q}$. We then determine $q$, the number of numerically
-nonzero eigenvalues present in $\bm D$, by calculating the number of eigenvalues
-that exceeds some tolerance value, say, $\epsilon = 1 \times 10^{-6}$. After
-calculating $q$, we extract $\bm U_1$ by retaining only the first $q$ columns of
-$\bm U$.
+\cite[Chapter~18.3.5]{Hastie:2008dt}. Applying the SVD, we decompose $\bm X_c =
+\bm M \bm \Delta \bm U^{T}$, where $\bm M \in \mathbb{R}_{N \times p}$ is
+orthogonal, $\bm \Delta \in \mathbb{R}_{p \times p}^{\ge}$ is a diagonal matrix
+consisting of the singular values of $\bm X_c$, and $\bm U \in \mathbb{R}_{p
+  \times p}$ is orthogonal. Recalling that $\widehat{\bm \Sigma} = N^{-1} \bm
+X_c^{T} \bm X_c$, we have the eigendecomposition $\widehat{\bm \Sigma} = \bm U
+\bm D \bm U^{T}$, where $\bm U$ is the matrix of eigenvectors of $\widehat{\bm
+  \Sigma}$ and $\bm D = N^{-1} \bm \Delta$ is the diagonal matrix of eigenvalues
+of $\widehat{\bm \Sigma}$. Now, we can obtain $\bm M$ and $\bm D$ efficiently
+from the eigenvalue decomposition of $\bm X_c \bm X_c^{T} = \bm M \bm D \bm
+M^{T}$. Hence, we eigendecomposition of $\bm X_c \bm X_c^{T} \in \mathbb{R}_{N
+  \times N}$. Next, we compute $\bm U = \bm X_c^{T} \bm M \bm D^{+/2}$, where
+$\bm D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then determine $q$, the
+number of numerically nonzero eigenvalues present in $\bm D$, by calculating the
+number of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1
+\times 10^{-6}$. After calculating $q$, we extract $\bm U_1$ by retaining only
+the first $q$ columns of $\bm U$.
 
 As a result of the compact SVD, we need calculate $\bm X_c \bm U_1$ only once
 per cross-validation fold, requiring $O(p q N) \approx (p N^2)$ calculations.
@@ -753,9 +752,9 @@ set by calculating $\bm X_{test} \bm U_1$ once per fold. Conveniently, we see
 that the most costly computation involved in $\bm Q_k$ and $\bm W_k^{-1}$ is
 $\bm X_k \bm U_1$, which can be extracted from $\bm X_c \bm U_1$. Thus, after
 the initial calculation of $\bm X_c \bm U_1$ per cross-validation fold, $\bm
-Q_k$ requires $O(TODO)$ operations. Because $\bm Q_k \in \mathbb{R}_{n_k \times
+Q_k$ requires $O(n_k q^2)$ operations. Because $\bm Q_k \in \mathbb{R}_{n_k \times
   n_k}$, both its determinant and inverse require $O(n_k^3)$
-operations. Consequently, $\bm W_k^{-1}$ requires $O(TODO)$ operations. Also,
+operations. Consequently, $\bm W_k^{-1}$ requires $O(n_k q^2)$ operations. Also,
 the inverse and determinant of the diagonal matrix $\bm \Gamma_k \in
 \mathbb{R}_{q \times q}$ requires $O(q)$ operations. Therefore, the $| \bm W_k
 |$ requires $O(q n_k^3)$ operations.
@@ -766,7 +765,7 @@ time-consuming matrix operation involved in computing $\bm W_k^{-1}$ and $|\bm
 W_k|$ is $\bm X_k \bm U_1 \in \mathbb{R}_{n_k \times q}$, which is independent
 of $\lambda$ and $\gamma$. The subsequent operations in calculating $\bm
 W_k^{-1}$ and $|\bm W_k|$ can be simply updated for different pairs of $\lambda$
-and $\gamma$.
+and $\gamma$ without repeating the costly computations.
 
 \section{Classification Study}
 \label{sec:sims}
