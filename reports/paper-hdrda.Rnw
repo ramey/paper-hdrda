@@ -640,10 +640,14 @@ C = \bm X_k \bm U_1$, we have $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$. Also,
 \citep[Theorem 18.2.8]{Harville:2008wja}.
 \end{proof}
 
-Notice that if $\alpha_k$ is constant across the $K$ classes, then $\bm
-\Gamma_k$ in \eqref{eq:Gamma_k} is independent of $k$. Consequently, $|\bm
-\Gamma_k|$ is constant across the $K$ classes and need not be calculated in
-\eqref{eq:hdrda-decomposed}.
+The application of the Sherman-Woodbury formula requires that $\bm \Gamma_k$ be
+nonsingular. This assumption is not met when $(\lambda, \gamma) = (0, 0)$ as
+$\bm \Gamma_k = \bm 0_q$, corresponding to the \emph{QDA} classifier. In this
+special case we apply a small amount of eigenvalue shrinkage and set $\gamma =
+0.01$ to circumvent the singularity issue. Also, notice that if $\alpha_k$ is
+constant across the $K$ classes, then $\bm \Gamma_k$ in \eqref{eq:Gamma_k} is
+independent of $k$. Consequently, $|\bm \Gamma_k|$ is constant across the $K$
+classes and need not be calculated in \eqref{eq:hdrda-decomposed}.
 
 \subsection{Model Selection}
 
