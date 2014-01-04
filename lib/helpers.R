@@ -201,8 +201,15 @@ dudoit <- function(train_x, train_y) {
   rev(order(F_stat))
 }
 
-# Classifier from Clemmensen, Hastie, Witten and Ersbøll (2012) - Technometrics
-Clemmensen <- function(train_x, train_y, test_x, normalize_data = FALSE, cv_variables = FALSE, num_folds = 10, ...) {
+# Classifier from Clemmensen, Hastie, Witten and Ersbøll (2011) - Technometrics
+#
+# NOTE: We had to increase the L2-regularization term, lambda, from the
+# default of 1e-6 to 1e-3 to circumvent the following error:
+# Error in lda.default(x, grouping, ...)
+# variables 1 2 appear to be constant within groups
+Clemmensen <- function(train_x, train_y, test_x, normalize_data = TRUE,
+                       cv_variables = FALSE, num_folds = 10, lambda = 1e-3,
+                       verbose = FALSE, ...) {
   if (normalize_data) {
     normalize_out <- normalize(train_x)
     train_x <- normalize_out$Xc
@@ -231,7 +238,7 @@ Clemmensen <- function(train_x, train_y, test_x, normalize_data = FALSE, cv_vari
       # For each reduced dimension considered, we calculate the number of test errors
       # resulting for the current cross-validation fold.
       cv_num_vars <- sapply(num_vars, function(q) {
-        sda_predict <- try_default(predict(sda(x = trn_x, y = trn_y, stop = -q), tst_x)$class, NA, quiet = TRUE)
+        sda_predict <- try_default(predict(sda(x = trn_x, y = trn_y, stop = -q, lambda = lambda), tst_x)$class, NA, quiet = TRUE)
         sum(sda_predict != tst_y)
       })
     })
@@ -244,8 +251,13 @@ Clemmensen <- function(train_x, train_y, test_x, normalize_data = FALSE, cv_vari
   } else {
     num_vars <- ncol(train_x)
   }
-     
-  predict(sda(x = train_x, y = train_y, stop = -num_vars), test_x)$class
+
+  sda_out <- sda(x = train_x,
+                 y = train_y,
+                 stop = -num_vars,
+                 lambda = lambda,
+                 trace = verbose)
+  predict(sda_out, test_x)$class
 }
 
 # Classifier from Cao, Boitard, and Besse (2011) - BMC Bioinformatics
