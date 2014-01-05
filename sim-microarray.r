@@ -2,23 +2,22 @@ library('ProjectTemplate')
 load.project()
 
 set.seed(42)
-num_cores <- 3
+num_cores <- 1
 
-train_pct <- 2/3
-num_iterations <- 5
-#data_sets <- as.character(describe_data()$author)
-#data_sets <- c("burczynski", "nakayama", "shipp", "singh")
-data_sets <- c("sorlie", "christensen")
+train_pct <- 0.6
+num_iterations <- 50
+num_variables <- 1000
+
+data_sets <- c("burczynski", "nakayama", "shipp", "singh")
 
 sim_config <- sim_factors(data_sets = data_sets, num_reps = num_iterations,
                           stringsAsFactors = FALSE)
 
 results <- mclapply(seq_len(nrow(sim_config)), function(i) {
-  message("Dataset: ", data_set, " -- Sim Config: ", i, " of ", nrow(sim_config))
-  set.seed(i)
-  
   # Load data and randomly partition into training/test data sets.
   data_set <- sim_config$data_set[i]
+  message("Dataset: ", data_set, " -- Sim Config: ", i, " of ", nrow(sim_config))
+  set.seed(i)
   data <- load_microarray(data_set)
   data$x <- as.matrix(data$x)
   rand_split <- rand_partition(y = data$y, num_partitions = 1,
@@ -32,30 +31,17 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
   rm(data)
   gc(reset = TRUE)
 
+  # Apply Dudoit variable selection to select the top 'num_variables' features
+  vars_selected <- dudoit(train_x, train_y, num_variables = num_variables)
+
+  # For each value of 'd', we compute the error-rate estimates for each of the
+  # classifiers.
+  train_x <- train_x[, vars_selected]
+  test_x <- test_x[, vars_selected]
+
   # Sets the prior probabilities as equal
   num_classes <- nlevels(train_y)
   prior_probs <- rep(1, num_classes) / num_classes  
-
-  # Clemmensen, Hastie, Witten and Ersbøll (2011) - Technometrics
-  Clemmensen_errors <- try({
-      Clemmensen_out <- Clemmensen(train_x = train_x,
-                                   train_y = train_y,
-                                   test_x = test_x,
-                                   normalize_data = TRUE,
-                                   lambda = 1e-3,
-                                   verbose = TRUE)
-      mean(Clemmensen_out != test_y)
-  })
-
-  # Friedman (1989)
-  rda_errors <- try({
-      rda_out <- klaR:::rda(x = train_x,
-                            grouping = train_y,
-                            prior = prior_probs,
-                            output = TRUE)
-      rda_class <- klaR:::predict.rda(rda_out, test_x)$class
-      mean(rda_class != test_y)
-  })
 
   # kNN
   knn_errors <- try({
@@ -91,14 +77,11 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
 
   # Guo, Hastie, and Tibshirani (2007) - Biostatistics
   Guo_errors <- try({
-      Guo_out <- scrda_train(x = train_x, y = train_y, prior = prior_probs)
-      Guo_pred <- scrda_predict(rda_out = Guo_out$rda_out,
-                                train_x = train_x,
-                                train_y = train_y,
-                                test_x = test_x,
-                                alpha = Guo_out$alpha,
-                                delta = Guo_out$delta)
-      mean(Guo_pred != test_y)
+      Guo_out <- Guo(train_x = train_x,
+                     train_y = train_y,
+                     test_x = test_x,
+                     prior = prior_probs)
+      mean(Guo_out != test_y)
   })
 
   # HDRDA - Ridge
@@ -140,16 +123,22 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
       mean(predict(Tong_out, test_x)$class != test_y)
   })
 
-  list(errors = list(
-         HDRDA_Ridge = hdrda_ridge_errors,
-         HDRDA_Convex = hdrda_convex_errors,
-         Guo = Guo_errors,
-         Tong = Tong_errors,
-         Witten = Witten_errors,
-         RDA = rda_errors,
-         kNN = knn_errors,
-         SVM_Radial = ksvm_radial_errors
-    ), data_set = data_set, hdrda_ridge = hdrda_ridge, hdrda_convex = hdrda_convex)
+  error_rates <- list(
+    Guo = Guo_errors,
+    HDRDA_Ridge = hdrda_ridge_errors,
+    HDRDA_Convex = hdrda_convex_errors,
+    kNN = knn_errors,
+    SVM_Radial = ksvm_radial_errors,
+    Tong = Tong_errors,
+    Witten = Witten_errors
+  )
+
+  list(error_rates = error_rates,
+       num_variables = num_variables,
+       data_set = data_set,
+       hdrda_ridge = hdrda_ridge,
+       hdrda_convex = hdrda_convex
+  )
 }, mc.cores = num_cores)
 
 save(results, file = 'data/results-microarray.RData')

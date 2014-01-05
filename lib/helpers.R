@@ -191,14 +191,25 @@ load_microarray <- function(dataset) {
 #'
 #' @param train_x data matrix of training training observations
 #' @param train_y vector of training labels for the training observations
+#' @param num_variables the number of variables to select. Default: All of them
 #' @return vector containing the Dudoit variable scores in descending order.
 #' The largest scores indicate that the variables should be kept.
-dudoit <- function(train_x, train_y) {
+dudoit <- function(train_x, train_y, num_variables = NULL) {
   library('multtest')
+
+  if (is.null(num_variables)) {
+    num_variables <- ncol(train_x)
+  } else {
+    num_variables <- as.integer(num_variables)
+    if (num_variables < 0 || num_variables > ncol(train_x)) {
+      warning("Number of variables must be between 1 and ncol(train_x).")
+      num_variables <- ncol(train_x)
+    }
+  }
 
   F_stat <- mt.teststat(t(train_x), train_y, test = "f")
 
-  rev(order(F_stat))
+  head(rev(order(F_stat)), n = num_variables)
 }
 
 # Classifier from Clemmensen, Hastie, Witten and Ersbøll (2011) - Technometrics
@@ -271,10 +282,19 @@ Cao <- function(train_x, train_y, test_x) {
 
 
 # Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
-scrda_train <- function(x, y, prior) {
-  x <- t(x)
-  rda_out <- rda(x = x, y = y, prior = prior)
-  rda_cv_out <- rda.cv(rda_out, x = x, y = y, prior = prior)
+Guo <- function(train_x, train_y, test_x, prior = NULL) {
+  train_x <- t(train_x)
+  test_x <- t(test_x)
+  group_names <- levels(train_y)
+  if (is.null(prior)) {
+    prior <- table(train_y) / length(train_y)
+  }
+
+  # Annoying: Class labels must be specified as integers
+  train_y_int <- as.integer(train_y)
+  
+  rda_out <- rda:::rda(x = train_x, y = train_y_int, prior = prior)
+  rda_cv_out <- rda:::rda.cv(rda_out, x = train_x, y = train_y_int, prior = prior)
 
   # Which alpha and delta give min cv error?
   min_cv_error <- with(rda_cv_out, which(cv.err == min(cv.err), arr.ind = TRUE))
@@ -291,14 +311,12 @@ scrda_train <- function(x, y, prior) {
   alpha <- as.numeric(rownames(rda_cv_out$cv.err)[alpha_delta[1]])
   delta <- as.numeric(colnames(rda_cv_out$cv.err)[alpha_delta[2]])
 
-  list(rda_out = rda_out, rda_cv_out = rda_cv_out, alpha = alpha, delta = delta)
-}
-
-# Classifier from Guo, Hastie, and Tibshirani (2007) - Biostatistics
-scrda_predict <- function(rda_out, train_x, train_y, test_x, alpha, delta) {
-  group_names <- levels(train_y)
-  factor(
-    predict(rda_out, x = t(train_x), y = train_y, xnew = t(test_x), alpha = alpha, delta = delta),
-    levels = seq_along(group_names), labels = group_names)
+  rda_class <- predict(rda_out,
+                       x = train_x,
+                       y = train_y_int,
+                       xnew = test_x,
+                       alpha = alpha,
+                       delta = delta)
+  factor(rda_class, levels = seq_along(group_names), labels = group_names)
 }
 
