@@ -1,5 +1,5 @@
 library(sparsediscrim)
-library(classify)
+library(sortinghat)
 library(microbenchmark)
 library(klaR)
 
