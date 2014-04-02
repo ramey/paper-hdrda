@@ -1,12 +1,12 @@
 library(sparsediscrim)
-library(classify)
+library(sortinghat)
 library(microbenchmark)
 library(klaR)
 
 # Simulation Parameters
 K <- 4
 n <- rep.int(x = 25, times = K)
-p <- 250
+p <- 500
 means <- lapply(c(-3, -1, 1, 3), rep.int, times = p)
 cov_mat <- diag(p)
 
