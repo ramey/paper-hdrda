@@ -46,7 +46,7 @@ partially pool the sample covariance matrices from linear and quadratic
 disriminant analysis before shrinking the resulting estimator towards a scaled
 identity matrix. The RDA classifier's two tuning parameters are typically
 estimated via a computationally burdensome cross-validation procedure from a
-grid of candidate values. We reformulate the RDA classifier in the
+grid of candidate values. We reformulate the RDA classifier in the small-sample,
 high-dimensional setting and then show that the classification decision rule is
 equivalent to one in a subspace having a much lower dimension. As a result, the
 dimension reduction involved yields a substantial reduction in computation
@@ -170,19 +170,21 @@ We reparameterize the \emph{RDA} classifier similar to \cite{Hastie:2008dt} and
 the \emph{HDRDA} classifier determines the contribution of each training
 observation to the estimation of each class covariance matrix, enabling
 interpretability that has been previously lacking with the \emph{RDA} classifier
-\citep{Bensmail:1996fw}. Furthermore, the \emph{HDRDA} classifier includes a
-large family of shrinkage methods, such as those from \cite{Srivastava:2007ww},
-\cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
-\cite{Xu:2009fl}. Next, applying a reasoning similar to \cite{Ye:2006tq}, we
-show that the matrix operations corresponding to the null space of the pooled
-sample covariance matrix are redundant and can be discarded from the
+\citep{Bensmail:1996fw}. Next, applying a reasoning similar to \cite{Ye:2006tq},
+we establish that the matrix operations corresponding to the null space of the
+pooled sample covariance matrix are redundant and can be discarded from the
 \emph{HDRDA} decision rule without loss of classificatory information. Moreover,
 because the \emph{HDRDA} decision rule is invariant to adjustments to the zero
 eigenvalues, the decision rule in the original feature space is equivalent to a
 decision rule in a much lower dimension (i.e., the intrinsic dimension), such
 that the matrix inverses and determinants of relatively small matrices can be
 rapidly computed. Thus, the dimension reduction inherent in the \emph{HDRDA}
-classifier yields a substantial reduction in computation during model selection.
+classifier yields a substantial reduction in computation during model
+selection. Also, as a result, we show that a large number of shrinkage methods
+that are special cases of the \emph{HDRDA} classifier have no effect on the zero
+eigenvalues of the covariance-matrix estimators. Such methods include work from
+\cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods studied by
+\cite{Ramey:2013ji} and \cite{Xu:2009fl}.
 
 We provide an efficient algorithm that expedites the model-selection process for
 the \emph{HDRDA} classifier and then compare its computational runtime with an
@@ -234,9 +236,9 @@ and $0$ otherwise.
 
 \subsection{Discriminant Analysis}
 
-In discriminant analysis we wish to assign correctly an unlabeled vector $\bm x
-\in \mathbb{R}_{p \times 1}$ to one of $K$ unique, known classes by constructing
-a classifier from $N$ training observations. Let $\bm x_i = (x_{i1}, \ldots,
+In discriminant analysis we wish to assign an unlabeled vector $\bm x \in
+\mathbb{R}_{p \times 1}$ to one of $K$ unique, known classes by constructing a
+classifier from $N$ training observations. Let $\bm x_i = (x_{i1}, \ldots,
 x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots,
 N)$ with true, unique membership $y_i \in \{\omega_1, \ldots, \omega_K\}$. We
 assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm
@@ -269,15 +271,15 @@ is the MLE for $\bm \Sigma$. In this case \eqref{eq:qda} reduces to the sample
 linear discriminant analysis classifier, and the log-determinant is omitted
 because it is constant across the $K$ classes.
 
-The smallest eigenvalues and the directions associated with their eigenvectors
-can highly influence \eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm
-  \Sigma}_k$ are well-known to be biased if $p \ge n_k$ such that the smallest
-eigenvalues are underestimated \citep{Seber:2004uh}. Moreover, if $p > n_k$,
-then rank$(\widehat{\bm \Sigma}_k) \le n_k$, which implies that at least $p -
-n_k$ eigenvalues of $\widehat{\bm \Sigma}_k$ are zero. Furthermore, although
-more feature information is available to discriminate among the $K$ classes, if
-$p > n_k$, \eqref{eq:qda} is incalculable because $\widehat{\bm \Sigma}_k^{-1}$
-does not exist.
+The smallest eigenvalues of $\widehat{\bm \Sigma}_k$ and the directions
+associated with their eigenvectors can highly influence \eqref{eq:qda}. In fact,
+the eigenvalues of $\widehat{ \bm \Sigma}_k$ are well-known to be biased if $p
+\ge n_k$ such that the smallest eigenvalues are underestimated
+\citep{Seber:2004uh}. Moreover, if $p > n_k$, then rank$(\widehat{\bm \Sigma}_k)
+\le n_k$, which implies that at least $p - n_k$ eigenvalues of $\widehat{\bm
+  \Sigma}_k$ are zero. Furthermore, although more feature information is
+available to discriminate among the $K$ classes, if $p > n_k$, \eqref{eq:qda} is
+incalculable because $\widehat{\bm \Sigma}_k^{-1}$ does not exist.
 
 Several regularization methods, such as the methods considered by
 \citet*{Xu:2009fl}, \citet*{Guo:2007te}, and \cite{Mkhadri:1995jp} have been
@@ -311,8 +313,7 @@ the convex combination
 where $\lambda \in [0, 1]$ is the \emph{pooling} parameter. By rewriting
 \eqref{eq:sig-lambda-alternative} in terms of the observations $ \bm x_i$ $(i =
 1, \ldots, N)$, each centered by its class sample mean, we attain a clear
-interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is, from
-\eqref{eq:pooled-cov} we have
+interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is,
 \begin{align}
 	\widehat{\bm \Sigma}_k(\lambda)
   &= \left( 1 - \lambda + \frac{\lambda n_k}{N} \right) \widehat{\bm \Sigma}_k +  \frac{\lambda}{N} \sum_{\substack{k' = 1\\k' \ne k}}^K n_{k'} \widehat{\bm \Sigma}_{k'} \nonumber \\
@@ -328,56 +329,25 @@ better estimate $ \bm \Sigma_k$. From \eqref{eq:sig-lambda-alternative2},
 $\lambda$ weights the contribution of each of the $N$ observations in estimating
 $\bm \Sigma_k$. Hence, for $0 < \lambda \le 1$, we estimate $\bm \Sigma_k$ with
 $N$ rather than $n_k$ observations.\footnote{TODO: Add more to the
-  interpretation here and reference Figure \ref{fig:hdrda-weights}.}
+  interpretation here.}
 
-\begin{figure}
-<<rda_weights>>=
-n <- c(50, 25, 15, 10)
-N <- sum(n)
-lambda <- seq(0, 1, length = 1000)
+Below, we will show that the pooling operation is advantageous in increasing the
+rank of each $\widehat{\bm \Sigma}_k(\lambda)$ from rank$(\widehat{\bm
+  \Sigma}_k)$ to rank$(\widehat{\bm \Sigma})$ for $0 < \lambda \le 1$. Notice
+that if $\lambda = 0$, then the observations from the remaining $K - 1$ classes
+do not contribute to the estimation of $\bm \Sigma_k$, corresponding to
+$\widehat{\bm \Sigma}_k$. Furthermore, if $\lambda = 1$, the weights
+$c_{ik}(\lambda)$ in \eqref{eq:sig-lambda-alternative2} reduce to $1/N$,
+corresponding to $\widehat{\bm \Sigma}$. For brevity, when $\lambda = 1$, we
+define $\bm X = [\sqrt{c_{1k}(1)} \bm x_1^{T}, \ldots, \sqrt{c_{Nk}(1)} \bm
+  x_N^{T}]^{T}$ such that $\widehat{\bm \Sigma} = \bm X^{T} \bm X$. Similarly,
+for $\lambda = 0$, we define $\bm X_k = [\sqrt{c_{1k}(0)} \bm x_1^{T}, \ldots,
+  \sqrt{c_{Nk}(0)} \bm x_N^{T}]^{T}$ such that $\widehat{\bm \Sigma}_k = \bm
+X_k^{T} \bm X_k$. In Figure \ref{fig:hdrda-contours} we plot the contours of
+five multivariate normal populations for $\lambda = 0$ with unequal covariance
+matrices. As $\lambda$ approaches 1, the contours become more similar, resulting
+in identical contours for $\lambda = 1$.
 
-rda_weights <- sapply(seq_along(n), function(k) {
-      lambda / N + (1 - lambda) / n[k]
-      })
-rda_weights <- data.frame(lambda = lambda, rda_weights)
-rda_weights <- melt(rda_weights, id = 'lambda')
-colnames(rda_weights) <- c("lambda", "Class", "Weight")
-levels(rda_weights$Class) <- seq_along(n)
-
-p <- ggplot(rda_weights, aes(lambda, Weight, linetype = Class, color = Class))
-p <- p + geom_line(size = 1)
-p <- p + theme_bw() + xlab(expression(lambda))
-p <- p + theme(axis.text = element_text(size = 10))
-p <- p + theme(strip.text.x = element_text(size = 16))
-p <- p + theme(legend.title = element_text(size = 16, face = "bold"))
-p <- p + theme(legend.text = element_text(size = 15))
-p <- p + theme(legend.key.size = unit(1, "cm"))
-p
-@ 
-\caption{Weights $c_{ik}(\lambda)$ of \emph{RDA} classifier as a function of the
-  pooling parameter $\lambda$ when $n_1 = 50$, $n_2 = 25$, $n_3 = 15$, and $n_4$
-  = 10. TODO: Scale down figure.}
-\label{fig:hdrda-weights}
-\end{figure}
-
-
-Below, we will show that the pooling
-operation is advantageous in increasing the rank of each $\widehat{\bm
-  \Sigma}_k(\lambda)$ from rank$(\widehat{\bm \Sigma}_k)$ to rank$(\widehat{\bm
-  \Sigma})$ for $0 < \lambda \le 1$. Notice that if $\lambda = 0$, then the
-observations from the remaining $K - 1$ classes do not contribute to the
-estimation of $\bm \Sigma_k$, corresponding to $\widehat{\bm
-  \Sigma}_k$. Furthermore, if $\lambda = 1$, the weights in
-\eqref{eq:sig-lambda-alternative2} reduce to $1/N$, corresponding to
-$\widehat{\bm \Sigma}$. For brevity, when $\lambda = 1$, we define $\bm X =
-      [\sqrt{c_{1k}(1)} \bm x_1^{T}, \ldots, \sqrt{c_{Nk}(1)} \bm x_N^{T}]^{T}$
-      such that $\widehat{\bm \Sigma} = \bm X^{T} \bm X$. Similarly, for
-      $\lambda = 0$, we define $\bm X_k = [\sqrt{c_{1k}(0)} \bm x_1^{T}, \ldots,
-        \sqrt{c_{Nk}(0)} \bm x_N^{T}]^{T}$ such that $\widehat{\bm \Sigma}_k =
-      \bm X_k^{T} \bm X_k$. In Figure \ref{fig:hdrda-contours} we plot the
-      contours of five multivariate normal populations for $\lambda = 0$ with
-      unequal covariance matrices. As $\lambda$ approaches 1, the contours
-      become more similar, resulting in identical contours for $\lambda = 1$.
 \begin{figure}
 <<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', fig.show='hold'>>=
 rda_contours(lambda = 0)
@@ -389,6 +359,7 @@ rda_contours(lambda = 1)
   pooling parameter $\lambda$.}
 \label{fig:hdrda-contours}
 \end{figure}
+
 As we have discussed above, several eigenvalue adjustment methods have been
 proposed to increase eigenvalues (approximately) equal to 0. To further improve
 the estimation of $\bm \Sigma_k$ and to stabilize the estimator's inverse, we
@@ -429,7 +400,6 @@ improving the \emph{RDA} classifier's efficiency. By setting $\alpha_k$ to a
 predefined constant, the \emph{HDRDA} covariance-matrix estimator includes or
 resembles a large family of estimators, some of which we mention below.
 
-
 \subsubsection{\cite{Friedman:1989tm}}
 
 \cite{Friedman:1989tm} proposed regularized discriminant analysis (RDA) by
@@ -460,9 +430,16 @@ where $\gamma \in [0, 1]$ is a regularization parameter that controls the
 shrinkage of \eqref{eq:sig-rda} towards $\bm I_p$ and is weighted by the average
 of the eigenvalues of \eqref{eq:sig-lambda}. Finally, the RDA classifier is
 established by substituting \eqref{eq:sig-rda} into
-\eqref{eq:qda}.
+\eqref{eq:qda}.\footnote{TODO: Mention the values of $\alpha_k$ and $\gamma$
+  needed to resemble HDRDA.}
 
-\subsection{Properties of the HDRDA Classifier}
+\subsubsection{Ridge-Like Estimators}
+
+TODO: List a few estimators here along with $\alpha_k = 1$ such that HDRDA
+includes them all. For example, set $\gamma = \text{trace}(\widehat{\bm
+  \Sigma}_k) / \min(n_k, p)$ for Srivastava and Kubokawa.
+
+\section{Properties of the HDRDA Classifier}
 \label{sec:hdrda-properties}
 
 Next, we establish properties of the covariance-matrix estimator and the
@@ -557,13 +534,10 @@ The proof follows by setting $\gamma = 0$ in Lemma \ref{lemma:rda-tilde-Sigma_k}
 \end{proof}
 
 Thus, by incorporating each $\bm x_i$ into the estimation of $\bm \Sigma_k$, we
-increase the rank of $\widehat{\bm \Sigma}_k(\lambda)$ to $q$ if $\lambda \ne
-0$. The results is that the \emph{HDRDA} classifier has the advantage over
-\eqref{eq:qda} in that the rank$(\widehat{\bm \Sigma}_k) \le n_k$. Next, we
-provide an essential result that enables us to prove that \eqref{eq:hdrda} is
-invariant to adjustments to the eigenvalues of $\tilde{ \bm \Sigma}_k$
-corresponding to the null space of $\widehat{\bm \Sigma}$ for any unlabeled
-observation $\bm x \in \mathbb{R}_{p \times 1}$.
+increase the rank of $\widehat{\bm \Sigma}_k(\lambda)$ to $q \approx N$ if
+$\lambda \ne 0$. Next, we provide an essential result that enables us to prove
+that \eqref{eq:hdrda} is invariant to adjustments to the eigenvalues of $\tilde{
+  \bm \Sigma}_k$ corresponding to the null space of $\widehat{\bm \Sigma}$.
 
 \begin{lemma}\label{lemma:RDA-constant-term}
 Let $\bm U_2$ be defined as above. Then, for all $\bm x \in \mathbb{R}_{p \times
@@ -620,8 +594,8 @@ calculating the inverse and determinant of $\bm W_k$ can be further improved via
 standard matrix operations.
 
 \begin{proposition}\label{proposition:hdrda-W_k}
-Let $\bm W_k$ be defined as above, $k = 1, \ldots, K$. Then, $|\bm W_k| = |
-\bm \Gamma_k| |\bm Q_k|$ and
+Let $\bm W_k$ be defined as above. Then, $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$
+and
 	\begin{align}
 		\bm W_k^{-1} &= \bm \Gamma_k^{-1} - \alpha_k(1 - \lambda) \bm \Gamma_k^{-1} \bm U_1^{T} \bm X_k^{T} \bm Q_k^{-1} \bm X_k \bm U_1 \bm \Gamma_k^{-1},\label{eq:W_k_inv}
     \intertext{where}
@@ -713,7 +687,8 @@ the $V$ folds.
         
         Compute $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$
         
-        Compute $(\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k) + \log | \bm W_k |$ \tcp*[r]{TODO: Use matrix form for test observations}
+        Compute $(\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x -
+        \xbar_k) + \log | \bm W_k |$ for each row $\bm x$ of $\bm X_{test}$
       }
       Classify test observations $\bm X_{test}$ using \eqref{eq:hdrda-decomposed}
       
@@ -743,14 +718,13 @@ X_c^{T} \bm X_c$, we have the eigendecomposition $\widehat{\bm \Sigma} = \bm U
 \bm D \bm U^{T}$, where $\bm U$ is the matrix of eigenvectors of $\widehat{\bm
   \Sigma}$ and $\bm D = N^{-1} \bm \Delta$ is the diagonal matrix of eigenvalues
 of $\widehat{\bm \Sigma}$. Now, we can obtain $\bm M$ and $\bm D$ efficiently
-from the eigenvalue decomposition of $\bm X_c \bm X_c^{T} = \bm M \bm D \bm
-M^{T}$. Hence, we eigendecomposition of $\bm X_c \bm X_c^{T} \in \mathbb{R}_{N
-  \times N}$. Next, we compute $\bm U = \bm X_c^{T} \bm M \bm D^{+/2}$, where
-$\bm D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then determine $q$, the
-number of numerically nonzero eigenvalues present in $\bm D$, by calculating the
-number of eigenvalues that exceeds some tolerance value, say, $\epsilon = 1
-\times 10^{-6}$. After calculating $q$, we extract $\bm U_1$ by retaining only
-the first $q$ columns of $\bm U$.
+from the eigenvalue decomposition of the $N \times N$ matrix $\bm X_c \bm
+X_c^{T} = \bm M \bm D \bm M^{T}$. Next, we compute $\bm U = \bm X_c^{T} \bm M
+\bm D^{+/2}$, where $\bm D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then
+determine $q$, the number of numerically nonzero eigenvalues present in $\bm D$,
+by calculating the number of eigenvalues that exceeds some tolerance value, say,
+$\epsilon = 1 \times 10^{-6}$. After calculating $q$, we extract $\bm U_1$ by
+retaining only the first $q$ columns of $\bm U$.
 
 As a result of the compact SVD, we need calculate $\bm X_c \bm U_1$ only once
 per cross-validation fold, requiring $O(p q N) \approx (p N^2)$ calculations.
@@ -774,7 +748,15 @@ time-consuming matrix operation involved in computing $\bm W_k^{-1}$ and $|\bm
 W_k|$ is $\bm X_k \bm U_1 \in \mathbb{R}_{n_k \times q}$, which is independent
 of $\lambda$ and $\gamma$. The subsequent operations in calculating $\bm
 W_k^{-1}$ and $|\bm W_k|$ can be simply updated for different pairs of $\lambda$
-and $\gamma$ without repeating the costly computations.
+and $\gamma$ without repeating the costly computations. When calculating the
+discriminant scores of each test observation in $\bm X_{test}$, rather than
+calculating each score individually, we can more efficiently calculate the
+quadratic forms via a single matrix operation. That is, rather than calculating
+$(\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k)$
+individually for each row $\bm x$ of $\bm X_{test}$, we can instead calculate
+$(\bm X_{test} - \xbar_k \bm 1_k')' \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm
+X_{test} - \xbar_k \bm 1_k')$. The diagonal elements of the resulting matrix
+contain the individual quadratic form of each test observation, $\bm x_t$.
 
 \section{Classification Study}
 \label{sec:sims}
@@ -788,7 +770,8 @@ analysis from \cite{Witten:2011kc}. We also consider two modifications of
 diagonal linear discriminant analysis from \cite{Tong:2012hw} and
 \cite{Pang:2009ik}, where the former employs an improved mean estimator and the
 latter utilizes an improved variance estimator. Below, we refer to each
-classifier by the first author's surname.
+classifier by the first author's surname.\footnote{TODO: Consider adding a
+  heatmap of error rates of a single $(\lambda, \gamma)$ grid.}
 
 We evaluated the classification performance of each classifier by randomly
 partitioning the data set under consideration such that $2/3$ of the
