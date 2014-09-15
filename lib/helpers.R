@@ -62,7 +62,7 @@ rand_partition <- function(y, num_partitions = 10, train_pct = 1/2) {
 # This function rounds to the nearest digits and does not truncated leading
 # zeroes, unlike the 'round' function.
 round_digits <- function(x, num_digits = 3) {
-  sprintf(paste("%.", num_digits, "f", sep = ""), round(x, num_digits))
+  sprintf(paste0("%.", num_digits, "f"), round(x, num_digits))
 }
 
 #' Generates a 2x2 rotation matrix using the given angle

@@ -2,21 +2,20 @@ library('ProjectTemplate')
 load.project()
 
 set.seed(42)
-num_cores <- 1
+num_cores <- 4
 
 train_pct <- 0.6
-num_iterations <- 50
-num_variables <- 1000
+num_iterations <- 100
 
 data_sets <- c("burczynski", "nakayama", "shipp", "singh")
+sim_config <- rep(data_sets, each=num_iterations)
 
-sim_config <- sim_factors(data_sets = data_sets, num_reps = num_iterations,
-                          stringsAsFactors = FALSE)
+flog.logger("sim", INFO, appender=appender.file('sim-microarray.log'))
 
-results <- mclapply(seq_len(nrow(sim_config)), function(i) {
+results <- mclapply(seq_along(sim_config), function(i) {
   # Load data and randomly partition into training/test data sets.
-  data_set <- sim_config$data_set[i]
-  message("Dataset: ", data_set, " -- Sim Config: ", i, " of ", nrow(sim_config))
+  data_set <- sim_config[i]
+  flog.info("Dataset: %s -- Sim Config: %s of %s", data_set, i, length(sim_config), name="sim")
   set.seed(i)
   data <- load_microarray(data_set)
   data$x <- as.matrix(data$x)
@@ -30,14 +29,6 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
   # Removes the loaded data from memory and then garbage collects.
   rm(data)
   gc(reset = TRUE)
-
-  # Apply Dudoit variable selection to select the top 'num_variables' features
-  vars_selected <- dudoit(train_x, train_y, num_variables = num_variables)
-
-  # For each value of 'd', we compute the error-rate estimates for each of the
-  # classifiers.
-  train_x <- train_x[, vars_selected]
-  test_x <- test_x[, vars_selected]
 
   # Sets the prior probabilities as equal
   num_classes <- nlevels(train_y)
@@ -90,6 +81,7 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
                          y = train_y,
                          prior = prior_probs)
       hdrda_ridge <- list(lambda = cv_out$lambda, gamma = cv_out$gamma)
+      flog.info("HDRDA Ridge. Lambda: %s. Gamma: %s", cv_out$lambda, cv_out$gamma, name="sim")
       hdrda_ridge_out <- hdrda(x = train_x,
                                y = train_y,
                                lambda = cv_out$lambda,
@@ -104,6 +96,7 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
                          y = train_y,
                          prior = prior_probs,
                          shrinkage_type = "convex")
+      flog.info("HDRDA Convex. Lambda: %s. Gamma: %s", cv_out$lambda, cv_out$gamma, name="sim")
       hdrda_convex <- list(lambda = cv_out$lambda, gamma = cv_out$gamma)
       hdrda_convex_out <- hdrda(x = train_x,
                                 y = train_y,
@@ -123,18 +116,26 @@ results <- mclapply(seq_len(nrow(sim_config)), function(i) {
       mean(predict(Tong_out, test_x)$class != test_y)
   })
 
+  # Pang, Tong, and Zhao (2009) - Bioinformatics
+  Pang_errors <- try({
+      Pang_out <- sdlda(x = train_x,
+                        y = train_y,
+                        prior = prior_probs)
+      mean(predict(Pang_out, test_x)$class != test_y)
+  })
+
   error_rates <- list(
     Guo = Guo_errors,
     HDRDA_Ridge = hdrda_ridge_errors,
     HDRDA_Convex = hdrda_convex_errors,
     kNN = knn_errors,
+    Pang = Pang_errors,
     SVM_Radial = ksvm_radial_errors,
     Tong = Tong_errors,
     Witten = Witten_errors
   )
 
   list(error_rates = error_rates,
-       num_variables = num_variables,
        data_set = data_set,
        hdrda_ridge = hdrda_ridge,
        hdrda_convex = hdrda_convex
