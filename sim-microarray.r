@@ -82,12 +82,7 @@ results <- mclapply(seq_along(sim_config), function(i) {
                          prior = prior_probs)
       hdrda_ridge <- list(lambda = cv_out$lambda, gamma = cv_out$gamma)
       flog.info("HDRDA Ridge. Lambda: %s. Gamma: %s", cv_out$lambda, cv_out$gamma, name="sim")
-      hdrda_ridge_out <- hdrda(x = train_x,
-                               y = train_y,
-                               lambda = cv_out$lambda,
-                               gamma = cv_out$gamma,
-                               prior = prior_probs)
-      mean(predict(hdrda_ridge_out, test_x)$class != test_y)
+      mean(predict(cv_out, test_x)$class != test_y)
   })
 
   # HDRDA - Convex
@@ -95,16 +90,11 @@ results <- mclapply(seq_along(sim_config), function(i) {
       cv_out <- hdrda_cv(x = train_x,
                          y = train_y,
                          prior = prior_probs,
+                         num_gamma = 21,
                          shrinkage_type = "convex")
-      flog.info("HDRDA Convex. Lambda: %s. Gamma: %s", cv_out$lambda, cv_out$gamma, name="sim")
       hdrda_convex <- list(lambda = cv_out$lambda, gamma = cv_out$gamma)
-      hdrda_convex_out <- hdrda(x = train_x,
-                                y = train_y,
-                                lambda = cv_out$lambda,
-                                gamma = cv_out$gamma,
-                                prior = prior_probs,
-                                shrinkage_type = "convex")
-      mean(predict(hdrda_convex_out, test_x)$class != test_y)
+      flog.info("HDRDA Convex. Lambda: %s. Gamma: %s", cv_out$lambda, cv_out$gamma, name="sim")
+      mean(predict(cv_out, test_x)$class != test_y)
   })
 
   # Tong, Chen, and Zhao (2012) - Bioinformatics
@@ -142,5 +132,8 @@ results <- mclapply(seq_along(sim_config), function(i) {
   )
 }, mc.cores = num_cores)
 
-save(results, file = 'data/results-microarray.RData')
+results <- list(sim_results=results,
+                train_pct=train_pct,
+                num_iterations=num_iterations)
 
+save(results, file = 'data/results-microarray.RData')
