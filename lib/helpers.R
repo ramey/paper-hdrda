@@ -272,7 +272,7 @@ Clemmensen <- function(train_x, train_y, test_x, normalize_data = TRUE,
 }
 
 # Classifier from Cao, Boitard, and Besse (2011) - BMC Bioinformatics
-# We use the 'max.dist' 
+# We use the 'max.dist'
 Cao <- function(train_x, train_y, test_x) {
   plsda_out <- plsda(X = train_x, Y = train_y)
   plsda_predict <- predict(plsda_out, test_x, method = "max.dist")
@@ -292,7 +292,7 @@ Guo <- function(train_x, train_y, test_x, prior = NULL) {
 
   # Annoying: Class labels must be specified as integers
   train_y_int <- as.integer(train_y)
-  
+
   rda_out <- rda:::rda(x = train_x, y = train_y_int, prior = prior)
   rda_cv_out <- rda:::rda.cv(rda_out, x = train_x, y = train_y_int, prior = prior)
 
@@ -320,3 +320,61 @@ Guo <- function(train_x, train_y, test_x, prior = NULL) {
   factor(rda_class, levels = seq_along(group_names), labels = group_names)
 }
 
+
+#' Generates contaminated MVN populations with block-autocorrelated cov matrices
+#'
+#' @param n vector of the sample sizes of each class. The length of \code{n}
+#' determines the number of classes \code{K}.
+#' @param mu matrix containing the mean vectors for each class. Expected to have
+#' \code{p} rows and \code{K} columns.
+#' @param num_blocks the number of block matrices. See details.
+#' @param block_size the dimensions of the square block matrix. See details.
+#' @param rho vector of the values of the autocorrelation parameter for each
+#' class covariance matrix. Must equal the length of \code{n} (i.e., equal to
+#' \code{K}).
+#' @param uncontaminated_var vector of the variance coefficients for each class
+#' covariance matrix. Must equal the length of \code{n} (i.e., equal to
+#' \code{K}).
+#' @param contaminated_var vector of the variance coefficients for each class
+#' covariance matrix when an observation is contaminated. Must equal the length
+#' of \code{n} (i.e., equal to \code{K}).
+#' @param contaminated_prob probability that an observation is drawn from its
+#' class' contaminated distribution
+#' @return named list with elements:
+#' \itemize{
+#'   \item \code{x}: matrix of observations with \code{n} rows and \code{p}
+#' columns
+#'   \item \code{y}: vector of class labels that indicates class membership for
+#' each observation (row) in \code{x}.
+#' }
+generate_contaminated <- function(n, mu, num_blocks, block_size, rho,
+                                  uncontaminated_var = rep(1, K),
+                                  contaminated_var = rep(100, K),
+                                  contamination_prob = 0.05) {
+  n <- as.integer(n)
+  block_size <- as.integer(block_size)
+  num_blocks <- as.integer(num_blocks)
+  rho <- as.numeric(rho)
+  mu <- as.matrix(mu)
+
+  K <- length(n)
+  num_uncontaminated <- rbinom(rep(1, K), n, prob=1 - contamination_prob)
+  num_contaminated <- n - num_uncontaminated
+
+  uncontaminated_data <- generate_blockdiag(n=num_uncontaminated,
+                                            mu=cbind(mu1, mu2, mu3),
+                                            block_size=block_size,
+                                            num_blocks=num_blocks,
+                                            rho=autocorrelations,
+                                            sigma2=uncontaminated_var)
+
+  contaminated_data <- generate_blockdiag(n=num_contaminated,
+                                          mu=cbind(mu1, mu2, mu3),
+                                          block_size=block_size,
+                                          num_blocks=num_blocks,
+                                          rho=autocorrelations,
+                                          sigma2=contaminated_var)
+
+  list(x=rbind(uncontaminated_data$x, contaminated_data$x),
+       y=c(uncontaminated_data$y, contaminated_data$y))
+}
