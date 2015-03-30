@@ -71,6 +71,16 @@ results <- mclapply(seq_along(sim_config), function(i) {
       mean(knn_out != test_y)
   })
 
+  # Random Forest
+  rf_errors <- try({
+    rf_out <- randomForest(x=train_x,
+                           y=train_y,
+                           ntree=500,
+                           maxnodes=100)
+    rf_predict <- predict(rf_out, test_x)
+    mean(rf_predict != test_y)
+  })
+
   # SVM with Radial Basis Functions
   ksvm_radial_errors <- try({
       ksvm_out <- ksvm(x = train_x,
@@ -144,6 +154,7 @@ results <- mclapply(seq_along(sim_config), function(i) {
     HDRDA_Convex = hdrda_convex_errors,
     kNN = knn_errors,
     Pang = Pang_errors,
+    Random_Forest = rf_errors,
     SVM_Radial = ksvm_radial_errors,
     Tong = Tong_errors,
     Witten = Witten_errors
