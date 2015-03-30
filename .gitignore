@@ -1,2 +1,6 @@
 .Rhistory
 *.log
+*.aux
+*.bbl
+*.blg
+*.tex
