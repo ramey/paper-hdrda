@@ -4,8 +4,8 @@ load.project()
 set.seed(42)
 num_cores <- 4
 
-train_pct <- 0.6
-num_iterations <- 100
+train_pct <- 2/3
+num_iterations <- 1000
 
 data_sets <- c("burczynski", "nakayama", "shipp", "singh")
 sim_config <- rep(data_sets, each=num_iterations)
