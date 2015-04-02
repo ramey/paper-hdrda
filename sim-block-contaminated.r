@@ -4,75 +4,34 @@ load.project()
 set.seed(42)
 num_cores <- 2
 
-#num_iterations <- 1000
-num_iterations <- 10
+num_iterations <- 1000
 
 K <- 3
 sample_sizes <- rep(25, K)
 autocorrelations <- c(0.1, 0.5, 0.9)
-#feature_dim <- seq(50, 500, by=50)
-feature_dim <- 50
+feature_dim <- seq(50, 500, by=50)
 block_size <- 25
+contamination_probs <- c(0.05, 0.1, 0.15)
+uncontaminated_var <- rep(1, K)
+contaminated_var <- rep(100, K)
 
 # The number of observations to generate from each population as a test data set.
 test_sizes <- rep(1000, K)
 
-sim_config <- rep(feature_dim, each=num_iterations)
+iter_product <- itertools2::iproduct(p=feature_dim,
+                                     contamination_prob=contamination_probs,
+                                     times=num_iterations)
+sim_config <- itertools2::ienum(iter_product)
+num_iterations <- length(feature_dim) * length(contamination_probs) * num_iterations
 
-flog.logger("sim", INFO, appender=appender.file('sim-block-autocorrelation-contaminated.log'))
+flog.logger("sim", INFO, appender=appender.file('sim-block-contaminated.log'))
 
-n <- sample_sizes
-K <- length(n)
-uncontaminated_var <- rep(1, K)
-contaminated_var <- rep(100, K)
-
-contamination_prob <- 0.1
-
-num_uncontaminated <- rbinom(rep(1, K), n, prob=1 - contamination_prob)
-num_contaminated <- n - num_uncontaminated
-
-
-# TODO:
-# 1. Fix error when 0 contaminated samples for a class
-# 2. Update simulation to iterate through several values of p as well as
-#    contamination probs 0.05, 0.1, 0.15. NOTE: Original block sims are
-#    contamination prob = 0. Might be useful to draw this connection in paper.
-# 3. Finalize sim code
-# 4. Try code locally with small number of reps
-# 5. Run all the sims on EC2 instance
-
-uncontaminated_data <- generate_blockdiag(n=num_uncontaminated,
-                                          mu=cbind(mu1, mu2, mu3),
-                                          block_size=block_size,
-                                          num_blocks=num_blocks,
-                                          rho=autocorrelations,
-                                          sigma2=uncontaminated_var)
-
-contaminated_data <- generate_blockdiag(n=num_contaminated,
-                                        mu=cbind(mu1, mu2, mu3),
-                                        block_size=block_size,
-                                        num_blocks=num_blocks,
-                                        rho=autocorrelations,
-                                        sigma2=contaminated_var)
-
-
-contaminated_data <- generate_contaminated(n=sample_sizes,
-                                           mu=cbind(mu1, mu2, mu3),
-                                           block_size=block_size,
-                                           num_blocks=num_blocks,
-                                           rho=autocorrelations,
-                                           uncontaminated_var=uncontaminated_var,
-                                           contaminated_var=contaminated_var,
-                                           contamination_prob=0.01)
-
-
-
-
-
-
-results <- mclapply(seq_along(sim_config), function(i) {
-  p <- sim_config[i]
-  flog.info("Dimension: %s -- Sim:  %s of %s", p, i, length(sim_config), name="sim")
+results <- mclapply(sim_config, function(sim_i) {
+  i <- sim_i$index
+  p <- sim_i$value$p
+  contamination_prob <- sim_i$value$contamination_prob
+  flog.info("Dimension: %s. Contamination Prob: %s -- Sim:  %s of %s",
+            p, contamination_prob, i, num_iterations, name="sim")
   set.seed(i)
 
   mu1 <- rep(0, p)
@@ -81,22 +40,26 @@ results <- mclapply(seq_along(sim_config), function(i) {
   num_blocks <- p / block_size
 
   # Generates training data
-  train_data <- generate_blockdiag(n=sample_sizes,
-                                   mu=cbind(mu1, mu2, mu3),
-                                   block_size=block_size,
-                                   num_blocks=num_blocks,
-                                   rho=autocorrelations)
-
+  train_data <- generate_contaminated(n=sample_sizes,
+                                      mu=cbind(mu1, mu2, mu3),
+                                      block_size=block_size,
+                                      num_blocks=num_blocks,
+                                      rho=autocorrelations,
+                                      uncontaminated_var=uncontaminated_var,
+                                      contaminated_var=contaminated_var,
+                                      contamination_prob=contamination_prob)
   train_x <- train_data$x
   train_y <- train_data$y
 
   # Generates test data
-  test_data <- generate_blockdiag(n=test_sizes,
-                                  mu=cbind(mu1, mu2, mu3),
-                                  block_size=block_size,
-                                  num_blocks=num_blocks,
-                                  rho=autocorrelations)
-
+  test_data <- generate_contaminated(n=test_sizes,
+                                     mu=cbind(mu1, mu2, mu3),
+                                     block_size=block_size,
+                                     num_blocks=num_blocks,
+                                     rho=autocorrelations,
+                                     uncontaminated_var=uncontaminated_var,
+                                     contaminated_var=contaminated_var,
+                                     contamination_prob=contamination_prob)
   test_x <- test_data$x
   test_y <- test_data$y
 
@@ -213,13 +176,14 @@ results <- mclapply(seq_along(sim_config), function(i) {
 
   list(error_rates = error_rates,
        p = p,
+       contamination_prob = contamination_prob,
        hdrda_ridge = hdrda_ridge,
        hdrda_convex = hdrda_convex
   )
 }, mc.cores = num_cores)
 
-results_block_autocorrelation <- list(sim_results=results,
-                                      num_iterations=num_iterations)
+results_block_contaminated <- list(sim_results=results,
+                                   num_iterations=num_iterations)
 
 save(results_block_contaminated,
      file='data/results-sim-block-contaminated.RData')

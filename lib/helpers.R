@@ -358,23 +358,25 @@ generate_contaminated <- function(n, mu, num_blocks, block_size, rho,
   mu <- as.matrix(mu)
 
   K <- length(n)
-  num_uncontaminated <- rbinom(rep(1, K), n, prob=1 - contamination_prob)
-  num_contaminated <- n - num_uncontaminated
+  num_contaminated <- rbinom(rep(1, K), n, prob=contamination_prob)
+  num_uncontaminated <- n - num_contaminated
 
   uncontaminated_data <- generate_blockdiag(n=num_uncontaminated,
-                                            mu=cbind(mu1, mu2, mu3),
+                                            mu=mu,
                                             block_size=block_size,
                                             num_blocks=num_blocks,
                                             rho=autocorrelations,
                                             sigma2=uncontaminated_var)
 
   contaminated_data <- generate_blockdiag(n=num_contaminated,
-                                          mu=cbind(mu1, mu2, mu3),
+                                          mu=mu,
                                           block_size=block_size,
                                           num_blocks=num_blocks,
                                           rho=autocorrelations,
                                           sigma2=contaminated_var)
 
-  list(x=rbind(uncontaminated_data$x, contaminated_data$x),
-       y=c(uncontaminated_data$y, contaminated_data$y))
+  x <- rbind(uncontaminated_data$x, contaminated_data$x)
+  y <- c(as.character(uncontaminated_data$y),
+         as.character(contaminated_data$y))
+  list(x=x, y=factor(y))
 }
