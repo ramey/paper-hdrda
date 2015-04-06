@@ -33,9 +33,11 @@ results <- mclapply(sim_config, function(sim_i) {
             p, contamination_prob, i, num_iterations, name="sim")
   set.seed(i)
 
+  # Difference in means in the first 50 variables (2 * block_size)
+  num_vars_signal <- 2 * block_size
   mu1 <- rep(0, p)
-  mu2 <- c(rep(1/2, p), rep(0, p - 50))
-  mu3 <- c(rep(-1/2, p), rep(0, p - 50))
+  mu2 <- c(rep(1/2, num_vars_signal), rep(0, p - num_vars_signal))
+  mu3 <- c(rep(-1/2, num_vars_signal), rep(0, p - num_vars_signal))
   num_blocks <- p / block_size
 
   # Generates training data
