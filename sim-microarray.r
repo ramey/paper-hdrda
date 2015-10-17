@@ -2,9 +2,9 @@ library(ProjectTemplate)
 load.project()
 
 set.seed(42)
-num_cores <- 4
+num_cores <- 8
 
-train_pct <- 3/4
+train_pct <- 2/3
 num_iterations <- 50
 
 data_sets <- c("burczynski", "nakayama", "shipp", "singh")
