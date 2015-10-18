@@ -15,7 +15,7 @@ flog.logger("sim", INFO, appender=appender.file('sim-microarray.log'))
 results <- mclapply(seq_along(sim_config), function(i) {
   # Load data and randomly partition into training/test data sets.
   data_set <- sim_config[i]
-  flog.info("Dataset: %s -- Sim Config: %s of %s", data_set, i, length(sim_config), name="sim")
+
   set.seed(i)
   data <- load_microarray(data_set)
   data$x <- as.matrix(data$x)
@@ -25,6 +25,12 @@ results <- mclapply(seq_along(sim_config), function(i) {
   train_y <- data$y[rand_split$training]
   test_x <- as.matrix(data$x[rand_split$test, ])
   test_y <- data$y[rand_split$test]
+
+  flog.info("Training Data: (Observations, Dimension): (%s, %s) -- Data Set: %s -- Sim Config: %s of %s",
+            nrow(train_x), ncol(train_x), data_set, i, length(sim_config), name="sim")
+
+  flog.info("Test Data: (Observations, Dimension): (%s, %s) -- Data Set: %s -- Sim Config: %s of %s",
+            nrow(test_x), ncol(test_x), data_set, i, length(sim_config), name="sim")
 
   # Removes the loaded data from memory and then garbage collects.
   rm(data)
@@ -47,6 +53,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
       mean(knn_out != test_y)
   })
 
+  flog.info("kNN Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            knn_errors, data_set, i, length(sim_config), name="sim")
+
   # Random Forest
   rf_errors <- try({
     rf_out <- randomForest(x=train_x,
@@ -56,6 +65,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
     rf_predict <- predict(rf_out, test_x)
     mean(rf_predict != test_y)
   })
+
+  flog.info("Random Forest Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            rf_errors, data_set, i, length(sim_config), name="sim")
 
   # SVM with Radial Basis Functions
   ksvm_radial_errors <- try({
@@ -68,6 +80,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
       mean(ksvm_radial != test_y)
   })
 
+  flog.info("SVM Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            ksvm_radial_errors, data_set, i, length(sim_config), name="sim")
+
   # Witten and Tibshirani (2011) - JRSS B
   Witten_errors <- try({
       Witten_out <- Witten_Tibshirani(train_x=train_x,
@@ -75,6 +90,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
                                       test_x=test_x)
       mean(Witten_out$predictions != test_y)
   })
+
+  flog.info("Witten Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            Witten_errors, data_set, i, length(sim_config), name="sim")
 
   # Guo, Hastie, and Tibshirani (2007) - Biostatistics
   Guo_errors <- try({
@@ -85,6 +103,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
       mean(Guo_out != test_y)
   })
 
+  flog.info("Guo Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            Guo_errors, data_set, i, length(sim_config), name="sim")
+
   # HDRDA - Ridge
   hdrda_ridge_errors <- try({
       cv_out <- hdrda_cv(x=train_x,
@@ -94,6 +115,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
       flog.info("HDRDA Ridge. Lambda: %s. Gamma: %s", cv_out$lambda, cv_out$gamma, name="sim")
       mean(predict(cv_out, test_x)$class != test_y)
   })
+
+  flog.info("HDRDA Ridge Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            hdrda_ridge_errors, data_set, i, length(sim_config), name="sim")
 
   # HDRDA - Convex
   hdrda_convex_errors <- try({
@@ -107,6 +131,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
       mean(predict(cv_out, test_x)$class != test_y)
   })
 
+  flog.info("HDRDA Convex Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            hdrda_convex_errors, data_set, i, length(sim_config), name="sim")
+
   # Tong, Chen, and Zhao (2012) - Bioinformatics
   Tong_errors <- try({
       Tong_out <- dlda(x=train_x,
@@ -116,6 +143,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
       mean(predict(Tong_out, test_x)$class != test_y)
   })
 
+  flog.info("Tong Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            Tong_errors, data_set, i, length(sim_config), name="sim")
+
   # Pang, Tong, and Zhao (2009) - Bioinformatics
   Pang_errors <- try({
       Pang_out <- sdlda(x=train_x,
@@ -123,6 +153,9 @@ results <- mclapply(seq_along(sim_config), function(i) {
                         prior=prior_probs)
       mean(predict(Pang_out, test_x)$class != test_y)
   })
+
+  flog.info("Pang Error Rate: %s -- Data Set: %s -- Sim Config: %s of %s",
+            Pang_errors, data_set, i, length(sim_config), name="sim")
 
   error_rates <- list(
     Guo=Guo_errors,
