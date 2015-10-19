@@ -5,7 +5,7 @@ set.seed(42)
 num_cores <- 8
 
 train_pct <- 2/3
-num_iterations <- 50
+num_iterations <- 250
 
 data_sets <- c("burczynski", "nakayama", "shipp", "singh")
 sim_config <- rep(data_sets, each=num_iterations)
