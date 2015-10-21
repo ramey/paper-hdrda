@@ -32,7 +32,7 @@
 
 \title{High-Dimensional Regularized Discriminant Analysis}
 
-\author{John A. Ramey, Caleb K. Stein, and Dean M. Young}
+\author{John A. Ramey, Caleb K. Stein, Phil D. Young, and Dean M. Young}
 
 \maketitle
 
@@ -68,15 +68,15 @@ options(digits = 3)
 opts_chunk$set(fig.align = 'default', dev = 'png', message = FALSE,
                warning = FALSE, cache = TRUE, echo = FALSE, autodep = TRUE,
                fig.width = 12, fig.height = 12, out.width = "\\linewidth")
-@ 
-  
+@
+
 <<setup>>=
 setwd("..")
 library(ProjectTemplate)
 load.project()
 
 max_se <- 1234567890
-@ 
+@
 
 
 \section{Introduction}
@@ -163,10 +163,10 @@ classifier on three artificial and four real high-dimensional data sets. We
 demonstrate that the \emph{HDRDA} classifier often attains superior
 classification accuracy to several recent classifiers designed for small-sample,
 high-dimensional data from \cite{Tong:2012hw}, \cite{Witten:2011kc},
-\cite{Pang:2009ik}, \cite{Guo:2007te}, and \cite{Dudoit:2002ev}. We also include
-as benchmarks support vector machines (\emph{SVM}) and $k$-nearest neigbors
-($k$-NN) in our classification study.\footnote{TODO: If we change any of the
-  classifiers in the simulations, they should be updated here.}
+\cite{Pang:2009ik}, and \cite{Guo:2007te}. We also include as a benchmark the
+random forest from \cite{Breiman:2001fb} because \cite{FernandezDelgado:2014ul}
+has concluded that the random forest is often superior to other classifiers in
+benchmark studies.
 
 The remainder of this document is organized as follows. In Section
 \ref{sec:preliminaries} we present the discrimination problem and the necessary
@@ -323,7 +323,7 @@ rda_contours(lambda = 0.4)
 rda_contours(lambda = 0.6)
 rda_contours(lambda = 0.8)
 rda_contours(lambda = 1)
-@ 
+@
 \caption{Contours of five multivariate normal populations as a function of the
   pooling parameter $\lambda$.}
 \label{fig:hdrda-contours}
@@ -462,7 +462,7 @@ with $\bm D = \bm D_q \oplus \bm 0_{p-q}$, $\bm D_q \in \mathbb{R}_{q \times
   q}^{>}$ is the diagonal matrix consisting of the positive eigenvalues of
 $\widehat{\bm \Sigma}$, the columns of $\bm U \in \mathbb{R}_{p \times p}$ are
 the corresponding orthonormal eigenvectors of $\widehat{\bm \Sigma}$, and
-rank$(\widehat{\bm \Sigma}) = q$. Then, we partition $\bm U = (\bm U_1, 
+rank$(\widehat{\bm \Sigma}) = q$. Then, we partition $\bm U = (\bm U_1,
 \bm U_2)$ such that $\bm U_1 \in \mathbb{R}_{p \times q}$ and $\bm U_2 \in
 \mathbb{R}_{p \times (p - q)}$.
 
@@ -617,7 +617,7 @@ the $V$ folds.
 \begin{algorithm}
   \SetKwInOut{Input}{input}
   \SetKwInOut{Output}{output}
-  
+
   \Input{
     Data matrix $\bm X$\\
     Parameter grid $\{\lambda_g\}_{g=1}^G \times \{\gamma_h\}_{h=1}^H$
@@ -627,49 +627,49 @@ the $V$ folds.
   \For{$v \leftarrow 1$ \KwTo $V$} {
     Partition $\bm X$ into $\bm X_{train} \in \mathbb{R}_{N \times p}$ and
     $\bm X_{test} \in \mathbb{R}_{N_T \times p}$
-    
+
     \For{$k\leftarrow 1$ \KwTo $K$}{
       Extract $\bm X_k \in \mathbb{R}_{n_k \times p}$ from $\bm X_{train}$
-      
+
       Compute sample mean $\xbar_k$ from $\bm X_k$
-      
-      Center $\bm X_k \leftarrow \bm X_k - \bm 1_{n_k} \xbar_k^T$    
+
+      Center $\bm X_k \leftarrow \bm X_k - \bm 1_{n_k} \xbar_k^T$
     }
-    
+
     $\bm X_c \leftarrow [\bm X_1^T, \ldots, \bm X_K^T]^T$
-    
+
     Compute the compact SVD $\bm X_c = \bm M_q \bm D_q \bm U_1^T$
-    
+
     Transform $\bm X_c \leftarrow \bm X_c \bm U_1$
-    
+
     Transform $\bm X_{test} \leftarrow \bm X_{test} \bm U_1$
-    
+
     \For{$k \leftarrow 1$ \KwTo $K$} {
       Extract $\bm X_k \in \mathbb{R}_{n_k \times q}$ from $\bm X_c$
-      
+
       Recompute sample mean $\xbar_k$ from $\bm X_k$
     }
-    
+
     \For{$(\lambda, \gamma) \in \{\lambda_g\}_{g=1}^G \times \{\gamma_h\}_{h=1}^H$} {
-      \For{$k \leftarrow 1$ \KwTo $K$} {      
+      \For{$k \leftarrow 1$ \KwTo $K$} {
         Compute $\bm Q_k$ using \eqref{eq:Q_k}
-        
+
         Compute $\bm \Gamma_k$ using \eqref{eq:Gamma_k}
-        
+
         Compute $\bm W_k^{-1}$ using \eqref{eq:W_k_inv}
-        
+
         Compute $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$
-        
+
         Compute $(\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x -
         \xbar_k) + \log | \bm W_k |$ for each row $\bm x$ of $\bm X_{test}$
       }
       Classify test observations $\bm X_{test}$ using \eqref{eq:hdrda-decomposed}
-      
-      Compute the number of misclassified test observations $\#\{\text{Error}_v(\lambda, \gamma)\}$ 
-    }   
+
+      Compute the number of misclassified test observations $\#\{\text{Error}_v(\lambda, \gamma)\}$
+    }
    }
   Compute $\widehat{\text{Error}}(\lambda, \gamma) = N^{-1} \sum_{v=1}^V \#\{\text{Error}_v(\lambda, \gamma)\}$
-  
+
   Report optimal $(\hat{\lambda}, \hat{\gamma}) \leftarrow \argmin_{(\lambda, \gamma)} \widehat{\text{Error}}(\lambda, \gamma)$
   \caption{Model selection for the \emph{HDRDA} classifier}
   \label{alg:hdrda_model_selection}
@@ -734,55 +734,125 @@ contain the individual quadratic form of each test observation, $\bm x_t$.
 \section{Classification Study}
 \label{sec:sims}
 
-In this section, we describe four high-dimensional microarray data sets and
-compare our proposed classifier with five classifiers recently proposed for
-small-sample, high-dimensional data. Our competitors include diagonal linear
-discriminant analysis from \cite{Dudoit:2002ev}, shrunken centroids regularized
-discriminant analysis from \cite{Guo:2007te}, and penalized linear discriminant
-analysis from \cite{Witten:2011kc}. We also consider two modifications of
-diagonal linear discriminant analysis from \cite{Tong:2012hw} and
-\cite{Pang:2009ik}, where the former employs an improved mean estimator and the
-latter utilizes an improved variance estimator. Below, we refer to each
-classifier by the first author's surname.\footnote{TODO: Consider adding a
-  heatmap of error rates of a single $(\lambda, \gamma)$ grid.}
+In this section, we compare our proposed classifier with four classifiers
+recently proposed for small-sample, high-dimensional data along with the
+random-forest classifier from \cite{Breiman:2001fb} as a benchmark. Our
+competitors include shrunken centroids regularized discriminant analysis from
+\cite{Guo:2007te} and penalized linear discriminant analysis from
+\cite{Witten:2011kc}. We also consider two modifications of diagonal linear
+discriminant analysis from \cite{Tong:2012hw} and \cite{Pang:2009ik}, where the
+former employs an improved mean estimator and the latter utilizes an improved
+variance estimator. Below, we refer to each classifier by the first author's
+surname.\footnote{TODO: Consider adding a heatmap of error rates of a single
+  $(\lambda, \gamma)$ grid.}
 
-We evaluated the classification performance of each classifier by randomly
-partitioning the data set under consideration such that $2/3$ of the
-observations were allocated as training data and the remaining $1/3$ of the
-observations were allocated as a test data set. For each random partition, we
-applied the feature-selection method from \cite{Dudoit:2002ev} to the training
-data to choose the $d$ features having the largest ratio of their between-group
-to within-group sums of squares.  We then filtered the test data set with the
-corresponding $d$ features. After training each classifier from the filtered
-training data, we classified the filtered test data sets and computed the
-proportion of mislabeled test observations to estimate the classification error
-rate for each classifier. Repeating this process 1000 times, we computed the
-average of the error-rate estimates for each classifier.
-
-We used version 3.1.0 of the open-source statistical software {\tt R} for the
+We used version 3.2.2 of the open-source statistical software {\tt R} for the
 classification study. We used the implementations of the Witten and Guo
-classifiers from the {\tt penalizedLDA} and {\tt rda} packages, respectively, on
-CRAN. Because the {\tt rda} package does not perform the authors' ``Min-Min''
-rule automatically, we applied this rule in our {\tt R} code. We also utilized
-our implementations of the Dudoit, Pang, and Tong classifiers available in the
-{\tt sparsediscrim} package. We used the default settings for each classifier
-with the exception that we explicitly set prior probabilities as equal if the
-classifier allowed the option. For the \emph{HDRDA} classifier in
-\eqref{eq:hdrda-decomposed}, we examine the classification performance of two
-models. For the first \emph{HDRDA} model, we set $\alpha_k = 1$, $k = 1, \ldots,
-K$, so that the covariance-matrix estimator \eqref{eq:hdrda-cov} employed
-resembled \eqref{eq:ridge-estimator}. We estimated $\lambda$ from a grid of 21
-equidistant candidate values between 0 and 1, inclusively. Similarly, we
-estimated $\gamma$ from a grid consisting of the values $10^{-1}, \ldots, 10^4$,
-and $10^5$. We selected optimal estimates of $\lambda$ and $\gamma$ using
-$V$-fold cross-validation with $V = 10$ \citep{Hastie:2008dt}. For the second
-model, we set $\alpha_k = 1 - \gamma$, $k = 1, \ldots, K$, to resemble
-\citeauthor{Friedman:1989tm}'s parameterization. We estimated both $\lambda$ and
-$\gamma$ from a grid of 21 equidistant candidate values between 0 and 1,
-inclusively. Here, we provide a concise description of each high-dimensional
+classifiers from the {\tt penalizedLDA} and {\tt rda} packages, respectively.
+Because the {\tt rda} package does not perform the authors' ``Min-Min'' rule
+automatically, we applied this rule within our {\tt R} code. We also utilized
+the implementations of the Pang and Tong classifiers available in the {\tt
+  sparsediscrim} package. We used the implementation of the random-forest
+classifier from the {\tt randomForest} package. For each classifer we explicitly
+set prior probabilities as equal if applicable. All other classifier options
+were set to their default settings.
+
+For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examine the
+classification performance of two models. For the first \emph{HDRDA} model, we
+set $\alpha_k = 1$, $k = 1, \ldots, K$, so that the covariance-matrix estimator
+\eqref{eq:hdrda-cov} employed resembled \eqref{eq:ridge-estimator}. We estimated
+$\lambda$ from a grid of 21 equidistant candidate values between 0 and 1,
+inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the
+values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of
+$\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$
+\citep{Hastie:2008dt}. For the second model, we set $\alpha_k = 1 - \gamma$, $k
+= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s parameterization. We
+estimated both $\lambda$ and $\gamma$ from a grid of 21 equidistant candidate
+values between 0 and 1, inclusively.
+
+\subsection{Simulation Study}
+
+We compared the \emph{HDRDA} classifer to the five competing classifiers in a
+simulaton study. We simulated $K = 3$ $p$-dimensional multivariate normal
+populations with a common positive-definite covariance matrix having a
+block-diagonal covariance structure, which is intended to resemble
+gene-expression data. That is, within each block of pathways, genes are
+positively correlated and that this correlation decays as a function of the
+distance between any two genes. Thus, we simulated $K = 3$ multivariate normal
+populations with the common positive-definite covariance matrix
+
+\begin{align*}
+  \bm\Sigma = \bm\Sigma^{(\rho)} \oplus \bm\Sigma^{(-\rho)} \oplus \ldots \oplus \bm\Sigma^{(\rho)},
+\end{align*}
+
+where the $(i,j)$th entry of $\bm\Sigma^{(\rho)} \in \mathbb{R}_{25 \times 25}$ is
+
+\begin{align*}
+\bm\Sigma_{ij}^{(\rho)} = \{ \rho^{|i - j|} \}_{1 \le i,j \le 25},
+\end{align*}
+
+altering positive and negative values of $\rho$ are used from block to block. In
+our simulation study, we considered three different values of $\rho$, 0.1, 0.5,
+and 0.9, to explore the effect of autocorrelation on classification accuracy,
+especially given that the classifiers from \cite{Tong:2012hw} and
+\cite{Pang:2009ik} assume independence among features.
+
+Furthermore, we set the population of mean of class 1 to be a $p$-dimensional
+vector of zeros. Next, we set class 2's population mean to a vector equaling 1/2
+for the first 50 features and 0 after ($\mu_j = 1/2$ if $j \le 50$ and $\mu_j =
+0$ if $j > 50$). Similarly, we set class 3's population mean to a vector equaling -1/2
+for the first 50 features and 0 after ($\mu_j = -1/2$ if $j \le 50$ and $\mu_j =
+0$ if $j > 50$). The three populations differ in their mean vectors in the first
+50 features corresponding to the first two blocks. No difference in the means
+occurs in the remaining blocks.
+
+The block-diagonal simulation design considered is widely used within the
+high-dimensional classification literature, including the studies by
+\cite{Ramey:2013ji}, \cite{Witten:2011kc}, and \cite{Guo:2007te}. While the
+design is indeed standard, the simulation configuration is based on an ideal
+scenario where no artifacts, often observed in real data, are present. As a
+result, we wished to investigate the effect of outliers on the high-dimensional
+classifiers. To do this, we generalized the block-diagonal simulation
+configuration by sampling from a $p$-dimensional multivariate
+$\epsilon$-contaminated normal distribution, where $\epsilon in [0, 1]$. For
+$\epsilon = 0$, we have the benchmark block-diagonal simulations considered in
+the literature. As $\epsilon$ is increased, the number of outliers is increased
+(on average). We consider the values of $\epsilon = 0, 0.05, 0.1, 0.15,
+0.2$. For the contamination simulation, we define the probability density
+function of the $k$th class to be
+
+\begin{align*}
+  p(\bm x | \omega_k) = (1 - \epsilon) N_p(\bm x | \bm \mu_k, \bm \Sigma) + \epsilon N_p(\bm x | \bm \mu_k, 100 * \bm \Sigma)
+\end{align*}
+
+From each of the $K=3$ populations, we sampled 25 training observations ($n_k =
+25$ for all $k$) and 1000 test observations. After training each classifier on
+the training data, we classified the test data sets and computed the proportion
+of mislabeled test observations to estimate the classification error rate for
+each classifier. Repeating this process 250 times, we computed the average of
+the error-rate estimates for each classifier. We allowed the number of features
+to vary from $p = 100$ to $p = 500$ in increments of 100 to examine the increase
+in dimension while maintaining a small sample size.
+
+Despite the claims of \cite{FernandezDelgado:2014ul} that the random forest
+classifier is typically superior, we observed that the classifiers designed for
+high-dimensional data were indeed superior.
+
+\subsection{Application to Gene Expression Data}
+
+We compared the \emph{HDRDA} classifer to the five competing classifiers on four
+benchmark gene-expression microarray data sets. We evaluated the classification
+performance of each classifier by randomly partitioning the data set under
+consideration such that $2/3$ of the observations were allocated as training
+data and the remaining $1/3$ of the observations were allocated as a test data
+set. After training each classifier on the training data, we classified the test
+data sets and computed the proportion of mislabeled test observations to
+estimate the classification error rate for each classifier. Repeating this
+process 250 times, we computed the average of the error-rate estimates for each
+classifier. Here, we provide a concise description of each high-dimensional
 data set examined in our classification study.
 
-\subsection{\cite{Burczynski:2006ik} Data Set}
+\subsubsection{\cite{Burczynski:2006ik} Data Set}
 
 \cite{Burczynski:2006ik} acquired peripheral blood mononuclear cells (PBMC)
 through hybridization to microarrays from 127 individuals resulting in 22,283
@@ -791,7 +861,7 @@ and 26 had ulcerative colitis (UC). The goal of \cite{Burczynski:2006ik} was to
 improve accuracy in the discrimination of Inflammatory Bowel Disease (IBD) using
 the PBMC-based gene expression signature of a patient.
 
-\subsection{\cite{Nakayama:2007fl} Data Set}
+\subsubsection{\cite{Nakayama:2007fl} Data Set}
 
 \cite{Nakayama:2007fl} acquired 105 gene-expression samples of 10 types of soft
 tissue tumors through an oligonucleotide microarray, including 16 samples of
@@ -806,7 +876,7 @@ WDLS, and part of DDLS; (4) Spindle cell and pleomorophic sarcomas including
 DDLS, MFS, LMS, MPNST, FS, and MFH. Following \cite{Witten:2011kc}, we restrict
 our analysis to the five tumor types having at least 15 observations.
 
-\subsection{\cite{Shipp:2002ka} Data Set}
+\subsubsection{\cite{Shipp:2002ka} Data Set}
 
 Approximately 30-40\% of adult non-Hodgkin lymphomas are diffuse large B-cell
 lymphomas (DLBCLs) \cite{Shipp:2002ka}.  However, only a small proportion of
@@ -822,7 +892,7 @@ cyclophosphamide, adriamycin, vincristine, and prednisone (CHOP)-based
 chemotherapy.  Among the 58 DLBCL patient samples, 32 are from cured patients
 while 26 are from patients with fatal or refractory disease.
 
-\subsection{\cite{Singh:2002fh} Data Set}
+\subsubsection{\cite{Singh:2002fh} Data Set}
 
 \cite{Singh:2002fh} have examined 235 radical prostatectomy specimens from
 surgery patients between 1995 and 1997. The authors used oligonucleotide
@@ -830,7 +900,7 @@ microarrays containing probes for approximately 12,600 genes and expressed
 sequence tags. They have reported that 102 of the radical prostatectomy
 specimens are of high quality: 52 prostate tumor samples and 50 non-tumor
 prostate samples.
- 
+
 \subsection{Classification Results}
 
 For the microarray data sets, we computed error-rate estimates for the competing
@@ -889,7 +959,7 @@ subset of the features to perform competitively in our study.
 \begin{figure}
 <<error_rates, fig.width=8, fig.height=8, out.width='.65\\linewidth'>>=
 print(NULL)
-@ 
+@
 \caption{Averages of the 1000 error-rate estimates of the competing classifiers
   for each data set as a function of $d$. Approximate standard errors are no
   greater than \Sexpr{max_se}.}
@@ -964,5 +1034,4 @@ be accomplished.
 \bibliographystyle{plainnat}
 \bibliography{rda}
 
-\end{document} 
-
+\end{document}
