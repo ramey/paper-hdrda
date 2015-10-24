@@ -82,10 +82,10 @@ max_se <- 1234567890
 \section{Introduction}
 
 As machine-learning algorithms are increasingly utilized to automate data-driven
-decisions, researchers continue to develop a wealth of \emph{classifiers} to
-construct automated pattern-recognition systems in a variety of disciplines,
-such as medical research, facial recognition, remote sensing, and chemical
-analysis \citep{Ching:2012fu,Li:2012ev,Zhang:2010va}. Despite the advances in
+decisions, researchers continue to develop a wealth of \emph{classifiers}
+employed in a variety of disciplines, such as medical research, facial
+recognition, remote sensing, and chemical analysis
+\citep{Ching:2012fu,Li:2012ev,Zhang:2010va}. Despite the advances in
 classification to facilitate technological advancements, well-established
 classifiers often degrade in accuracy with modern, high-dimensional data sets
 when the number of features $p$ exceeds the total sample size $N$, due to the
@@ -119,54 +119,46 @@ covariance matrices. For excellent overviews of the regularization problem in
 discriminant analysis and other techniques, see \cite{Murphy:2012uq} and
 \cite{Mkhadri:1997gy}.
 
-We consider regularized discriminant analysis (\emph{RDA}) from a classic paper
-by \cite{Friedman:1989tm}, who proposed improvements to the \emph{QDA}
-classifier by employing a covariance matrix estimator that partially pools the
-individual sample covariance matrices with the pooled sample covariance matrix
-from the \emph{LDA} classifier. Given that the assumption of equal population
-covariance matrices for the \emph{LDA} classifier is often too stringent in
-practice \citep{Clemmensen:2011kr}, the \emph{RDA} classifier's partial pooling
-can relax the linearity assumption by instead incorporating unequal covariance
-matrices while retaining as special cases the \emph{LDA} and QDA
-classifiers. Covariance-matrix regularization is then applied to the partially
-pooled covariance-matrix estimator by shrinking it towards a scaled identity
-matrix to ensure positive definiteness.
+Here, we present a new classification method intended for the $p > N$ case that
+builds on the classic regularized discriminant analysis (\emph{RDA}) proposed by
+\cite{Friedman:1989tm}. Our proposed high-dimensional \emph{RDA} (\emph{HDRDA})
+classifier employs a biased covariance matrix estimator that partially pools the
+individual sample covariance matrices from the \emph{QDA} classifier with the
+pooled sample covariance matrix from the \emph{LDA} classifier. We then shrink
+the resulting covariance-matrix estimator towards a scaled identity matrix to
+ensure positive definiteness. By reparameterizing the \emph{RDA} classifier
+similar to \cite{Hastie:2008dt} and \cite{Halbe:2007ea}, we first show the
+pooling parameter in the \emph{HDRDA} classifier determines the contribution of
+each training observation to the estimation of each class covariance matrix,
+enabling interpretability that has been previously lacking with the \emph{RDA}
+classifier \citep{Bensmail:1996fw}.
 
-We reparameterize the \emph{RDA} classifier similar to \cite{Hastie:2008dt} and
-\cite{Halbe:2007ea} and refer to our parameterization as the high-dimensional
-\emph{RDA} (\emph{HDRDA}) classifier. First, we show the pooling parameter in
-the \emph{HDRDA} classifier determines the contribution of each training
-observation to the estimation of each class covariance matrix, enabling
-interpretability that has been previously lacking with the \emph{RDA} classifier
-\citep{Bensmail:1996fw}. Next, applying a reasoning similar to \cite{Ye:2006tq},
-we establish that the matrix operations corresponding to the null space of the
-pooled sample covariance matrix are redundant and can be discarded from the
-\emph{HDRDA} decision rule without loss of classificatory information. Moreover,
-because the \emph{HDRDA} decision rule is invariant to adjustments to the zero
-eigenvalues, the decision rule in the original feature space is equivalent to a
-decision rule in a much lower dimension (i.e., the intrinsic dimension), such
-that the matrix inverses and determinants of relatively small matrices can be
-rapidly computed. Thus, the dimension reduction inherent in the \emph{HDRDA}
-classifier yields a substantial reduction in computation during model
-selection. Also, as a result, we show that a large number of shrinkage methods
-that are special cases of the \emph{HDRDA} classifier have no effect on the zero
+Next, we achieve a substantial reduction in dimension to reduce greatly the
+computation during model selection by applying a reasoning similar to
+\cite{Ye:2006tq}. We establish that the matrix operations corresponding to the
+null space of the pooled sample covariance matrix are redundant and can be
+discarded from the \emph{HDRDA} decision rule without loss of classificatory
+information. Moreover, because the \emph{HDRDA} decision rule is invariant to
+adjustments to the zero eigenvalues, the decision rule in the original feature
+space is equivalent to a decision rule in a much lower dimension, such that the
+matrix inverses and determinants of relatively small matrices can be rapidly
+computed. Furthermore, we show that a large number of shrinkage methods that are
+special cases of the \emph{HDRDA} classifier have no effect on the zero
 eigenvalues of the covariance-matrix estimators. Such methods include work from
 \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods studied by
 \cite{Ramey:2013ji} and \citet*{Xu:2009fl}.
 
 We provide an efficient algorithm that expedites the model-selection process for
-the \emph{HDRDA} classifier and then compare its computational runtime with an
-implementation of the \emph{RDA} classifier from the {\tt klaR} R package to
-illustrate that the \emph{HDRDA} classifier greatly reduces computation when $p
-\gg N$. We then study the classification performance of the \emph{HDRDA}
-classifier on three artificial and four real high-dimensional data sets. We
-demonstrate that the \emph{HDRDA} classifier often attains superior
-classification accuracy to several recent classifiers designed for small-sample,
-high-dimensional data from \cite{Tong:2012hw}, \cite{Witten:2011kc},
-\cite{Pang:2009ik}, \cite{Guo:2007te}, and \cite{Dudoit:2002ev}. We also include
-as benchmarks support vector machines (\emph{SVM}) and $k$-nearest neigbors
-($k$-NN) in our classification study.\footnote{TODO: If we change any of the
-  classifiers in the simulations, they should be updated here.}
+the \emph{HDRDA} classifier when $p \gg N$. We then study the classification
+performance of the \emph{HDRDA} classifier on three artificial and four real
+high-dimensional data sets. We demonstrate that the \emph{HDRDA} classifier
+often attains superior classification accuracy to several recent classifiers
+designed for small-sample, high-dimensional data from \cite{Tong:2012hw},
+\cite{Witten:2011kc}, \cite{Pang:2009ik}, \cite{Guo:2007te}, and
+\cite{Dudoit:2002ev}. We also include as benchmarks support vector machines
+(\emph{SVM}) and $k$-nearest neigbors ($k$-NN) in our classification
+study.\footnote{TODO: If we change any of the classifiers in the simulations,
+  they should be updated here.}
 
 The remainder of this document is organized as follows. In Section
 \ref{sec:preliminaries} we present the discrimination problem and the necessary
