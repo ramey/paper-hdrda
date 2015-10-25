@@ -726,53 +726,40 @@ contain the individual quadratic form of each test observation, $\bm x_t$.
 \section{Classification Study}
 \label{sec:sims}
 
-% TODO: Combine first two paragraphs -- list R package along with authors
-
 In this section, we compare our proposed classifier with four classifiers
-recently proposed for small-sample, high-dimensional data. Our
-competitors include shrunken centroids regularized discriminant analysis from
-\cite{Guo:2007te} and penalized linear discriminant analysis from
-\cite{Witten:2011kc}.
+recently proposed for small-sample, high-dimensional data along with the random
+forest from \cite{Breiman:2001fb} using version 3.2.2 of the open-source
+statistical software {\tt R}. Within our study, we included penalized linear
+discriminant analysis from \cite{Witten:2011kc}, implemented in the {\tt
+  penalizedLDA} package. We also considered shrunken centroids regularized
+discriminant analysis from \cite{Guo:2007te} in the {\tt rda} package. Because
+the {\tt rda} package does not perform the authors' ``Min-Min'' rule
+automatically, we applied this rule within our {\tt R} code. We included two
+modifications of diagonal linear discriminant analysis from \cite{Tong:2012hw}
+and \cite{Pang:2009ik}, where the former employs an improved mean estimator and
+the latter utilizes an improved variance estimator. Both classifiers are
+available in the {\tt sparsediscrim} package. Finally, we incorporated the
+random forest as a benchmark based on the findings of
+\cite{FernandezDelgado:2014ul}, who concluded that the random forest is often
+superior to other classifiers in benchmark studies. We used the implementation
+of the random-forest classifier from the {\tt randomForest} package with 250
+trees and 100 maximum nodes. For each classifer we explicitly set prior
+probabilities as equal, if applicable. All other classifier options were set to
+their default settings. Below, we refer to each classifier by the first
+author's surname.
 
-We used the implementations of the Witten and Guo
-classifiers from the {\tt penalizedLDA} and {\tt rda} packages, respectively.
-Because the {\tt rda} package does not perform the authors' ``Min-Min'' rule
-automatically, we applied this rule within our {\tt R} code. 
-
-
-
-We also consider two modifications of diagonal linear discriminant analysis from
-\cite{Tong:2012hw} and \cite{Pang:2009ik}, where the former employs an improved
-mean estimator and the latter utilizes an improved variance estimator. We also
-utilized the implementations of the Pang and Tong classifiers available in the
-{\tt sparsediscrim} package.
-
-
-We also included the random forest from \cite{Breiman:2001fb} as a benchmark
-based on the findings of \cite{FernandezDelgado:2014ul}, who has concluded that
-the random forest is often superior to other classifiers in benchmark studies.
-We used the implementation of the random-forest classifier from the {\tt
-  randomForest} package with 250 trees and 100 maximum nodes.
-
-For each classifer we explicitly set prior probabilities as equal if
-applicable. All other classifier options were set to their default settings.
-We used version 3.2.2 of the open-source statistical software {\tt R} for the
-classification study.  Below, we refer to each classifier by the first author's
-surname.
-
-
-For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examine the
+For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examined the
 classification performance of two models. For the first \emph{HDRDA} model, we
 set $\alpha_k = 1$, $k = 1, \ldots, K$, so that the covariance-matrix estimator
-\eqref{eq:hdrda-cov} employed resembled \eqref{eq:ridge-estimator}. We estimated
+\eqref{eq:hdrda-cov} resembled \eqref{eq:ridge-estimator}. We estimated
 $\lambda$ from a grid of 21 equidistant candidate values between 0 and 1,
 inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the
 values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of
 $\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$
 \citep{Hastie:2008dt}. For the second model, we set $\alpha_k = 1 - \gamma$, $k
-= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s parameterization. We
-estimated both $\lambda$ and $\gamma$ from a grid of 21 equidistant candidate
-values between 0 and 1, inclusively.
+= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s
+parameterization. We estimated both $\lambda$ and $\gamma$ from a grid of 21
+equidistant candidate values between 0 and 1, inclusively.
 
 \subsection{Simulation Study}
 
