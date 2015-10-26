@@ -2,7 +2,7 @@ library('ProjectTemplate')
 load.project()
 
 set.seed(42)
-num_cores <- 8
+num_cores <- 16
 
 num_iterations <- 250
 
