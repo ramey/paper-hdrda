@@ -16,7 +16,7 @@ uncontaminated_var <- rep(1, K)
 contaminated_var <- rep(100, K)
 
 # The number of observations to generate from each population as a test data set.
-test_sizes <- rep(1000, K)
+test_sizes <- rep(10000, K)
 
 iter_product <- itertools2::iproduct(p=feature_dim,
                                      contamination_prob=contamination_probs,
