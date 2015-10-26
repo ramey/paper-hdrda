@@ -20,6 +20,7 @@ test_sizes <- rep(1000, K)
 
 iter_product <- itertools2::iproduct(p=feature_dim,
                                      contamination_prob=contamination_probs,
+                                     rho=autocorrelations,
                                      times=num_iterations)
 sim_config <- itertools2::ienum(iter_product)
 num_iterations <- length(feature_dim) * length(contamination_probs) * num_iterations
@@ -29,6 +30,7 @@ flog.logger("sim", INFO, appender=appender.file('sim-block-contaminated.log'))
 results <- mclapply(sim_config, function(sim_i) {
   i <- sim_i$index
   p <- sim_i$value$p
+  rho <- rep(sim_i$value$rho, K)
   contamination_prob <- sim_i$value$contamination_prob
   flog.info("Dimension: %s. Contamination Prob: %s -- Sim: %s of %s",
             p, contamination_prob, i, num_iterations, name="sim")
@@ -46,7 +48,7 @@ results <- mclapply(sim_config, function(sim_i) {
                                       mu=cbind(mu1, mu2, mu3),
                                       block_size=block_size,
                                       num_blocks=num_blocks,
-                                      rho=autocorrelations,
+                                      rho=rho,
                                       uncontaminated_var=uncontaminated_var,
                                       contaminated_var=contaminated_var,
                                       contamination_prob=contamination_prob)
@@ -200,6 +202,7 @@ results <- mclapply(sim_config, function(sim_i) {
 
   list(error_rates = error_rates,
        p = p,
+       rho=rho,
        contamination_prob = contamination_prob,
        hdrda_ridge = hdrda_ridge,
        hdrda_convex = hdrda_convex
