@@ -4,7 +4,7 @@ load.project()
 set.seed(42)
 num_cores <- 8
 
-num_iterations <- 250
+num_iterations <- 500
 
 K <- 3
 sample_sizes <- rep(25, K)
@@ -82,21 +82,6 @@ results <- mclapply(sim_config, function(sim_i) {
   num_classes <- nlevels(train_y)
   prior_probs <- rep(1, num_classes) / num_classes
 
-  # kNN
-  knn_errors <- try({
-      tune.knn_out <- tune.knn(x = train_x,
-                               y = train_y,
-                               k = 1:5,
-                               tunecontrol = tune.control(sampling = "cross", cross = 10))
-      knn_out <- knn(train = train_x,
-                     cl = train_y,
-                     test = test_x,
-                     k = tune.knn_out$best.model$k)
-      mean(knn_out != test_y)
-  })
-
-  flog.info("kNN Error Rate: %s -- Sim: %s of %s", knn_errors, i, num_iterations, name="sim")
-
   # Random Forest
   rf_errors <- try({
     rf_out <- randomForest(x=train_x,
@@ -108,19 +93,6 @@ results <- mclapply(sim_config, function(sim_i) {
   })
 
   flog.info("Random Forest Error Rate: %s -- Sim: %s of %s", rf_errors, i, num_iterations, name="sim")
-
-  # SVM with Radial Basis Functions
-  ksvm_radial_errors <- try({
-      ksvm_out <- ksvm(x = train_x,
-                       y = train_y,
-                       kernel = "rbfdot",
-                       kpar = "automatic",
-                       cross = 10)
-      ksvm_radial <- predict(ksvm_out, test_x)
-      mean(ksvm_radial != test_y)
-  })
-
-  flog.info("SVM Error Rate: %s -- Sim: %s of %s", ksvm_radial_errors, i, num_iterations, name="sim")
 
   # Witten and Tibshirani (2011) - JRSS B
   Witten_errors <- try({
@@ -194,10 +166,8 @@ results <- mclapply(sim_config, function(sim_i) {
     Guo = Guo_errors,
     HDRDA_Ridge = hdrda_ridge_errors,
     HDRDA_Convex = hdrda_convex_errors,
-    kNN = knn_errors,
     Pang = Pang_errors,
     Random_Forest = rf_errors,
-    SVM_Radial = ksvm_radial_errors,
     Tong = Tong_errors,
     Witten = Witten_errors
   )
