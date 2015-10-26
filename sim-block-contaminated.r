@@ -8,9 +8,10 @@ num_iterations <- 250
 
 K <- 3
 sample_sizes <- rep(25, K)
+means <- c(1/2, 1)
 autocorrelations <- c(0.1, 0.5, 0.9)
 feature_dim <- seq(100, 500, by=100)
-block_size <- 25
+block_size <- 100
 contamination_probs <- seq(0, 0.2, by=0.05)
 uncontaminated_var <- rep(1, K)
 contaminated_var <- rep(100, K)
@@ -20,27 +21,28 @@ test_sizes <- rep(10000, K)
 
 iter_product <- itertools2::iproduct(p=feature_dim,
                                      contamination_prob=contamination_probs,
+                                     mu=means,
                                      rho=autocorrelations,
                                      times=num_iterations)
 sim_config <- itertools2::ienum(iter_product)
-num_iterations <- length(feature_dim) * length(contamination_probs) * num_iterations
+num_iterations <- length(feature_dim) * length(contamination_probs) * length(means) * length(autocorrelations) * num_iterations
 
 flog.logger("sim", INFO, appender=appender.file('sim-block-contaminated.log'))
 
 results <- mclapply(sim_config, function(sim_i) {
   i <- sim_i$index
   p <- sim_i$value$p
+  mu <- sim_i$value$mu
   rho <- rep(sim_i$value$rho, K)
   contamination_prob <- sim_i$value$contamination_prob
   flog.info("Dimension: %s. Contamination Prob: %s -- Sim: %s of %s",
             p, contamination_prob, i, num_iterations, name="sim")
   set.seed(i)
 
-  # Difference in means in the first 50 variables (2 * block_size)
-  num_vars_signal <- 2 * block_size
+  # Difference in means in the first 100 variables (first block)
   mu1 <- rep(0, p)
-  mu2 <- c(rep(1/2, num_vars_signal), rep(0, p - num_vars_signal))
-  mu3 <- c(rep(-1/2, num_vars_signal), rep(0, p - num_vars_signal))
+  mu2 <- c(rep(mu, block_size), rep(0, p - block_size))
+  mu3 <- -mu2
   num_blocks <- p / block_size
 
   # Generates training data
@@ -202,6 +204,7 @@ results <- mclapply(sim_config, function(sim_i) {
 
   list(error_rates = error_rates,
        p = p,
+       mu=mu,
        rho=rho,
        contamination_prob = contamination_prob,
        hdrda_ridge = hdrda_ridge,
