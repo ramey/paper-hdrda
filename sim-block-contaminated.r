@@ -4,7 +4,7 @@ load.project()
 set.seed(42)
 num_cores <- 8
 
-num_iterations <- 500
+num_iterations <- 250
 
 K <- 3
 sample_sizes <- rep(25, K)
@@ -35,8 +35,8 @@ results <- mclapply(sim_config, function(sim_i) {
   mu <- sim_i$value$mu
   rho <- rep(sim_i$value$rho, K)
   contamination_prob <- sim_i$value$contamination_prob
-  flog.info("Dimension: %s. Contamination Prob: %s -- Sim: %s of %s",
-            p, contamination_prob, i, num_iterations, name="sim")
+  flog.info("Dimension: %s. Mu: %s. Rho: %s. Contamination Prob: %s -- Sim: %s of %s",
+            p, mu, rho[1], contamination_prob, i, num_iterations, name="sim")
   set.seed(i)
 
   # Difference in means in the first 100 variables (first block)
