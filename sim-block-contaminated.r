@@ -4,7 +4,7 @@ load.project()
 set.seed(42)
 num_cores <- 16
 
-num_iterations <- 250
+num_iterations <- 100
 
 K <- 3
 sample_sizes <- rep(25, K)
