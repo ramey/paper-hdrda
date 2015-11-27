@@ -4,15 +4,15 @@ load.project()
 set.seed(42)
 num_cores <- 16
 
-num_iterations <- 100
+num_iterations <- 500
 
 K <- 3
 sample_sizes <- rep(25, K)
-means <- c(1/2, 1)
-autocorrelations <- c(0.1, 0.5, 0.9)
+means <- 1/2
+autocorrelations <- 0.9
 feature_dim <- seq(100, 500, by=100)
 block_size <- 100
-contamination_probs <- seq(0, 0.2, by=0.05)
+contamination_probs <- seq(0, 0.5, by=0.05)
 uncontaminated_var <- rep(1, K)
 contaminated_var <- rep(100, K)
 
