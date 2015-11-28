@@ -365,14 +365,14 @@ generate_contaminated <- function(n, mu, num_blocks, block_size, rho,
                                             mu=mu,
                                             block_size=block_size,
                                             num_blocks=num_blocks,
-                                            rho=autocorrelations,
+                                            rho=rho,
                                             sigma2=uncontaminated_var)
 
   contaminated_data <- generate_blockdiag(n=num_contaminated,
                                           mu=mu,
                                           block_size=block_size,
                                           num_blocks=num_blocks,
-                                          rho=autocorrelations,
+                                          rho=rho,
                                           sigma2=contaminated_var)
 
   x <- rbind(uncontaminated_data$x, contaminated_data$x)
