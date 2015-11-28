@@ -65,7 +65,7 @@ results <- mclapply(sim_config, function(sim_i) {
                                      mu=cbind(mu1, mu2, mu3),
                                      block_size=block_size,
                                      num_blocks=num_blocks,
-                                     rho=autocorrelations,
+                                     rho=rho,
                                      uncontaminated_var=uncontaminated_var,
                                      contaminated_var=contaminated_var,
                                      contamination_prob=contamination_prob)
