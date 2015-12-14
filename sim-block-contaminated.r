@@ -8,7 +8,7 @@ num_iterations <- 500
 
 K <- 3
 sample_sizes <- rep(25, K)
-means <- 1/2
+means <- 1
 autocorrelations <- 0.9
 feature_dim <- seq(100, 500, by=100)
 block_size <- 100
