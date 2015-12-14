@@ -826,6 +826,46 @@ small sample size. Furthermore, although \cite{Guo:2007te} consider $\rho =
 autocorrelation on classification accuracy, especially given that the Tong,
 Pang, and Guo classifiers assume independence among features.
 
+\subsubsection{Results}
+
+As expected, regardless of the values of $p$, $\rho$, or $\bm \mu$, as the
+contaminated probability increases, the average error rate increases.  Also, as
+can be expected, the average error rates were typically higher for $\bm \mu=0.5$
+than for $\bm \mu=1$. The difference in the average error rates for the methods
+of Pang, Tong, and Witten all yielded increasingly higher average error rates
+than HDRDA ridge, HDRDA complex, Guo, or random forests as the contaminated
+probability increased. The correlation coefficient appears to have had little,
+if any, effect on the average error rates for any of the considered classifiers.
+
+Regardless of the value of $rho$, $p$, or $\bm \mu$, random forests consistently
+yielded the highest average error rate, and the average error rate for random
+forests was much more pronounced when $\bm \mu=0.5$. However, as the
+contaminated probability increased, random forests became increasingly
+competitive, and, in some cases, e.g, $\bm \mu=0.5$, $p=100$, and contaminated
+probability greater than 0.05 yielded the lowest average error rate.
+
+Pang and Tong's methods yielded practically the same and consistently the worst
+average error rates when the contaminated probability was greater than 0,
+regardless of the value of $\bm \mu$, $p$, or $\rho$. Witten's method performed
+only slightly better as the contaminated probability increased, however, when
+$\bm \mu = 0.5$, Witten's method became increasingly competitive with Pang and
+Tong for yielding the highest average error rate as $p$ increased.
+
+Guo's method always outperformed Pang, Witten, and Tong, but never outperformed
+the HDRDA methods. For the considered parameter configurations, Guo's method
+performed similarly to random forests when the contaminated probability was
+greater than 0 and yielded similar results to HDRDA ridge, HDRDA convex when the
+contaminated probability was equal to 0. However, as the contaminated
+probability increased, Guo's method was often outperformed by HDRDA ridge, HDRDA
+convex, and random forests.
+
+HDRDA ridge and HDRDA complex yielded the lowest average error rates, regardless
+of the value of $\bm \mu$, $p$, or $\rho$, with HDRDA ridge typically
+outperforming HDRDA complex when the contaminated probability was greater than
+0. HDRDA ridge only seemed to have competition with random forests when the
+contaminated probability was 0.20. Moreover, neither HDRDA ridge nor HDRDA
+complex seem to be affected by $p$.
+
 \subsection{Application to Gene Expression Data}
 
 We compared the \emph{HDRDA} classifer to the five competing classifiers on four
