@@ -8,8 +8,7 @@ num_iterations <- 500
 
 K <- 3
 sample_sizes <- rep(25, K)
-means <- 1
-autocorrelations <- 0.9
+means <- c(0.5, 1)
 feature_dim <- seq(100, 500, by=100)
 block_size <- 100
 contamination_probs <- seq(0, 0.5, by=0.05)
@@ -22,10 +21,9 @@ test_sizes <- rep(10000, K)
 iter_product <- itertools2::iproduct(p=feature_dim,
                                      contamination_prob=contamination_probs,
                                      mu=means,
-                                     rho=autocorrelations,
                                      times=num_iterations)
 sim_config <- itertools2::ienum(iter_product)
-num_iterations <- length(feature_dim) * length(contamination_probs) * length(means) * length(autocorrelations) * num_iterations
+num_iterations <- length(feature_dim) * length(contamination_probs) * length(means) * num_iterations
 
 flog.logger("sim", INFO, appender=appender.file('sim-block-contaminated.log'))
 
@@ -33,10 +31,10 @@ results <- mclapply(sim_config, function(sim_i) {
   i <- sim_i$index
   p <- sim_i$value$p
   mu <- sim_i$value$mu
-  rho <- rep(sim_i$value$rho, K)
+  rho <- c(0.1, 0.5, 0.9)
   contamination_prob <- sim_i$value$contamination_prob
-  flog.info("Dimension: %s. Mu: %s. Rho: %s. Contamination Prob: %s -- Sim: %s of %s",
-            p, mu, rho[1], contamination_prob, i, num_iterations, name="sim")
+  flog.info("Dimension: %s. Mu: %s. Contamination Prob: %s -- Sim: %s of %s",
+            p, mu, contamination_prob, i, num_iterations, name="sim")
   set.seed(i)
 
   # Difference in means in the first 100 variables (first block)
@@ -99,9 +97,9 @@ results <- mclapply(sim_config, function(sim_i) {
 
   # Witten and Tibshirani (2011) - JRSS B
   Witten_errors <- try({
-      Witten_out <- Witten_Tibshirani(train_x = train_x,
-                                      train_y = train_y,
-                                      test_x = test_x)
+      Witten_out <- Witten_Tibshirani(train_x=train_x,
+                                      train_y=train_y,
+                                      test_x=test_x)
       mean(Witten_out$predictions != test_y)
   })
 
@@ -110,10 +108,10 @@ results <- mclapply(sim_config, function(sim_i) {
 
   # Guo, Hastie, and Tibshirani (2007) - Biostatistics
   Guo_errors <- try({
-      Guo_out <- Guo(train_x = train_x,
-                     train_y = train_y,
-                     test_x = test_x,
-                     prior = prior_probs)
+      Guo_out <- Guo(train_x=train_x,
+                     train_y=train_y,
+                     test_x=test_x,
+                     prior=prior_probs)
       mean(Guo_out != test_y)
   })
 
@@ -122,10 +120,10 @@ results <- mclapply(sim_config, function(sim_i) {
 
   # HDRDA - Ridge
   hdrda_ridge_errors <- try({
-      cv_out <- hdrda_cv(x = train_x,
-                         y = train_y,
-                         prior = prior_probs)
-      hdrda_ridge <- list(lambda = cv_out$lambda, gamma = cv_out$gamma)
+      cv_out <- hdrda_cv(x=train_x,
+                         y=train_y,
+                         prior=prior_probs)
+      hdrda_ridge <- list(lambda=cv_out$lambda, gamma=cv_out$gamma)
       flog.info("HDRDA Ridge. Lambda: %s. Gamma: %s",
                 cv_out$lambda, cv_out$gamma, name="sim")
       mean(predict(cv_out, test_x)$class != test_y)
@@ -136,12 +134,12 @@ results <- mclapply(sim_config, function(sim_i) {
 
   # HDRDA - Convex
   hdrda_convex_errors <- try({
-      cv_out <- hdrda_cv(x = train_x,
-                         y = train_y,
-                         prior = prior_probs,
-                         num_gamma = 21,
-                         shrinkage_type = "convex")
-      hdrda_convex <- list(lambda = cv_out$lambda, gamma = cv_out$gamma)
+      cv_out <- hdrda_cv(x=train_x,
+                         y=train_y,
+                         prior=prior_probs,
+                         num_gamma=21,
+                         shrinkage_type="convex")
+      hdrda_convex <- list(lambda=cv_out$lambda, gamma=cv_out$gamma)
       flog.info("HDRDA Convex. Lambda: %s. Gamma: %s",
                 cv_out$lambda, cv_out$gamma, name="sim")
       mean(predict(cv_out, test_x)$class != test_y)
@@ -152,10 +150,10 @@ results <- mclapply(sim_config, function(sim_i) {
 
   # Tong, Chen, and Zhao (2012) - Bioinformatics
   Tong_errors <- try({
-      Tong_out <- dlda(x = train_x,
-                       y = train_y,
-                       est_mean = "tong",
-                       prior = prior_probs)
+      Tong_out <- dlda(x=train_x,
+                       y=train_y,
+                       est_mean="tong",
+                       prior=prior_probs)
       mean(predict(Tong_out, test_x)$class != test_y)
   })
 
@@ -164,9 +162,9 @@ results <- mclapply(sim_config, function(sim_i) {
 
   # Pang, Tong, and Zhao (2009) - Bioinformatics
   Pang_errors <- try({
-      Pang_out <- sdlda(x = train_x,
-                        y = train_y,
-                        prior = prior_probs)
+      Pang_out <- sdlda(x=train_x,
+                        y=train_y,
+                        prior=prior_probs)
       mean(predict(Pang_out, test_x)$class != test_y)
   })
 
@@ -174,22 +172,22 @@ results <- mclapply(sim_config, function(sim_i) {
             Pang_errors, i, num_iterations, name="sim")
 
   error_rates <- list(
-    Guo = Guo_errors,
-    HDRDA_Ridge = hdrda_ridge_errors,
-    HDRDA_Convex = hdrda_convex_errors,
-    Pang = Pang_errors,
-    Random_Forest = rf_errors,
-    Tong = Tong_errors,
-    Witten = Witten_errors
+    Guo=Guo_errors,
+    HDRDA_Ridge=hdrda_ridge_errors,
+    HDRDA_Convex=hdrda_convex_errors,
+    Pang=Pang_errors,
+    Random_Forest=rf_errors,
+    Tong=Tong_errors,
+    Witten=Witten_errors
   )
 
-  list(error_rates = error_rates,
+  list(error_rates=error_rates,
        p = p,
        mu=mu,
        rho=rho,
-       contamination_prob = contamination_prob,
-       hdrda_ridge = hdrda_ridge,
-       hdrda_convex = hdrda_convex
+       contamination_prob=contamination_prob,
+       hdrda_ridge=hdrda_ridge,
+       hdrda_convex=hdrda_convex
   )
 }, mc.cores = num_cores)
 
