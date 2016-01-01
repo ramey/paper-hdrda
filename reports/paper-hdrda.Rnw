@@ -65,15 +65,32 @@ proposed classifier in the {\tt sparsediscrim} R package, available on CRAN.
 # http://stackoverflow.com/questions/11062497/how-to-avoid-using-round-in-every-sexpr
 options(digits = 3)
 
-opts_chunk$set(fig.align = 'default', dev = 'png', message = FALSE,
-               warning = FALSE, cache = TRUE, echo = FALSE, autodep = TRUE,
-               fig.width = 12, fig.height = 12, out.width = "\\linewidth")
+opts_chunk$set(fig.align='default', dev='png', message=FALSE, warning=FALSE,
+               cache=TRUE, echo=FALSE, autodep=TRUE, fig.width=12,
+               fig.height=12, out.width="\\linewidth")
 @
 
 <<setup>>=
 setwd("..")
 library(ProjectTemplate)
 load.project()
+
+# Contaminated Normal Sims
+results_contaminated <- lapply(results_block_contaminated[[1]], function(r) {
+  with(r, c(error_rates, p=p, mu=mu, contamination_prob=contamination_prob))
+})
+results_contaminated <- do.call(rbind.data.frame, results_contaminated)
+results_contaminated <- tbl_df(results_contaminated)
+
+results_contaminated <- results_contaminated %>%
+  group_by(p, contamination_prob, mu) %>%
+  summarise_each(funs(mean)) %>%
+  arrange(p, contamination_prob, mu)
+
+results_contaminated <- results_contaminated %>%
+  gather(Classifier, Error, -p, -contamination_prob, -mu) %>%
+  mutate(p=factor(p)) %>%
+  filter(mu == 0.5)
 
 max_se <- 1234567890
 @
@@ -309,7 +326,7 @@ matrices. As $\lambda$ approaches 1, the contours become more similar, resulting
 in identical contours for $\lambda = 1$.
 
 \begin{figure}
-<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', fig.show='hold'>>=
+<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', dpi=200, fig.show='hold'>>=
 rda_contours(lambda = 0)
 rda_contours(lambda = 0.2)
 rda_contours(lambda = 0.4)
@@ -826,7 +843,7 @@ small sample size. Furthermore, although \cite{Guo:2007te} consider $\rho_k =
 0.9$ for all $k$, we considered $\rho_1 = 0.1$, $\rho_2 = 0.5$, and $\rho_3 = 0.9$
 to explore the more realistic assumption of unequal covariance matrices.
 
-\subsubsection{Results}
+\subsubsection{Simulation Results}
 
 As expected, regardless of the values of $p$, $\rho$, or $\bm \mu$, as the
 contaminated probability increases, the average error rate increases.  Also, as
@@ -837,6 +854,19 @@ than HDRDA ridge, HDRDA complex, Guo, or random forests as the contaminated
 probability increased. The correlation coefficient appears to have had little,
 if any, effect on the average error rates for any of the considered classifiers.
 
+\begin{figure}
+<<sim_results, fig.width=8, fig.height=8, dpi=200>>=
+p <- ggplot(results_contaminated, aes(x=contamination_prob, y=Error))
+p <- p + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
+p <- p + facet_wrap(~ p, labeller = "label_both")
+p <- p + xlab("Contamination Probability") + ylab("Error Rate")
+p + theme_bw()
+@
+\caption{Averages of the 1000 error-rate estimates of the competing classifiers
+  for each data set as a function of $d$. Approximate standard errors are no
+  greater than \Sexpr{max_se}.}
+\label{fig:sim-results}
+\end{figure}
 Regardless of the value of $rho$, $p$, or $\bm \mu$, random forests consistently
 yielded the highest average error rate, and the average error rate for random
 forests was much more pronounced when $\bm \mu=0.5$. However, as the
