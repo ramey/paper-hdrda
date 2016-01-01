@@ -764,25 +764,26 @@ equidistant candidate values between 0 and 1, inclusively.
 
 \subsection{Simulation Study}
 
-In this section we compare the competing classifiers using the simulation
-design from \cite{Guo:2007te}. This design is widely used within the
-high-dimensional classification literature including the studies by
-\cite{Ramey:2013ji} and \cite{Witten:2011kc}. The original design comprised two
-$p$-dimensional multivariate normal populations with the common block-diagonal
-covariance matrix
+In this section we compare the competing classifiers using the simulation design
+from \cite{Guo:2007te}. This design is widely used within the high-dimensional
+classification literature including the studies by \cite{Ramey:2013ji} and
+\cite{Witten:2011kc}. First, we consider the block-diagonal covariance
+matrix from from \cite{Guo:2007te}
 \begin{align}
-  \bm\Sigma = \bm\Sigma^{(\rho)} \oplus \bm\Sigma^{(-\rho)} \oplus \ldots \oplus \bm\Sigma^{(\rho)},\label{eq:block-sigma}
+  \bm\Sigma_k = \bm\Sigma^{(\rho_k)} \oplus \bm\Sigma^{(-\rho_k)} \oplus \ldots \oplus \bm\Sigma^{(\rho_k)},\label{eq:block-sigma}
 \end{align}
-where the $(i,j)$th entry of the block matrix $\bm\Sigma^{(\rho)} \in
-\mathbb{R}_{25 \times 25}$ is
+where the $(i,j)$th entry of the block matrix $\bm\Sigma^{(\rho_k)} \in
+\mathbb{R}_{100 \times 100}$ is
 \begin{align*}
-\bm\Sigma_{ij}^{(\rho)} = \{ \rho^{|i - j|} \}_{1 \le i,j \le 25}.
+\bm\Sigma_{ij}^{(\rho_k)} = \{ \rho_k^{|i - j|} \}_{1 \le i,j \le 100}.
 \end{align*}
 The block-diagonal covariance structure in \eqref{eq:block-sigma} resembles
 gene-expression data: within each block of pathways, genes are correlated, and
 the correlation decays as a function of the distance between any two genes. The
-autocorrelation $\rho$ alternates between a positive and a negative value from block
-to block.
+autocorrelation $\rho_k$ alternates between a positive and a negative value from block
+to block. The original design from \cite{Guo:2007te} comprised two $p$-dimensional
+multivariate normal populations with a common block-diagonal covariance
+matrix where $\bm\Sigma_1 = \bm\Sigma_2$.
 
 Although the design is indeed standard, the simulation configuration lacks
 artifacts observed commonly in real data, such as skewness and extreme
@@ -790,41 +791,40 @@ outliers. As a result, we wished to investigate the effect of outliers on the
 high-dimensional classifiers. To do this, we generalized the block-diagonal
 simulation configuration by sampling from a $p$-dimensional multivariate
 contaminated normal distribution.  Denoting the PDF of the $p$-dimensional
-multivariate normal distribution by $N_p(\bm x | \bm \mu, \bm \Sigma)$, we
-write the PDF of the $k$th class as
+multivariate normal distribution by $N_p(\bm x | \bm \mu, \bm \Sigma)$, we write
+the PDF of the $k$th class as
 \begin{align}
-  p(\bm x | \omega_k) = (1 - \epsilon) N_p(\bm x | \bm \mu_k, \bm \Sigma) + \epsilon N_p(\bm x | \bm \mu_k, \omega \bm \Sigma),\label{eq:contaminated-pdf}
+  p(\bm x | \omega_k) = (1 - \epsilon) N_p(\bm x | \bm \mu_k, \bm \Sigma_k) + \epsilon N_p(\bm x | \bm \mu_k, \omega \bm \Sigma_k),\label{eq:contaminated-pdf}
 \end{align}
-where $\epsilon \in [0, 1]$ is the probability that an observation is contaminated (i.e.,
-drawn from a distribution with larger variance) and $\omega > 1$ scales the
-covariance matrix $\bm \Sigma$ to increase the extremity of outliers. For
-$\epsilon = 0$, we have the benchmark block-diagonal simulation design from
-\cite{Guo:2007te}. As $\epsilon$ is increased, the average number of outliers
-is increased. In our simulation, we considered the values of $\epsilon = 0$,
-$0.05$, $0.1$, $0.15$, and $0.2$. We also set $\omega = 100$.
+where $\epsilon \in [0, 1]$ is the probability that an observation is
+contaminated (i.e., drawn from a distribution with larger variance) and $\omega
+> 1$ scales the covariance matrix $\bm \Sigma_k$ to increase the extremity of
+outliers. For $\epsilon = 0$, we have the benchmark block-diagonal simulation
+design from \cite{Guo:2007te}. As $\epsilon$ is increased, the average number of
+outliers is increased. In our simulation, we considered the values of $\epsilon
+= 0$, $0.05$, $\ldots$, $0.50$. We also set $\omega = 100$.
 
-We generated $K=3$ populations from \eqref{eq:contaminated-pdf} using the
-covariance matrix $\bm \Sigma$ given in \eqref{eq:block-sigma}. We set the mean
-vector of class 1 to $\bm \mu_1 = \bm 0_p$. Next, comparable to
-\cite{Guo:2007te}, the first 50 features of $\bm \mu_2$ were 1/2, while the rest
-were set to 0, i.e., $\bm \mu_2 = (\underbrace{1/2, \ldots, 1/2}_{50},
-\underbrace{0, \ldots, 0}_{p - 50})$. For simplicity, we defined $\bm \mu_3 =
--\bm \mu_2$. The three populations differed in their mean vectors in the first
-50 features corresponding to the first two blocks. No difference in the means
-occurred in the remaining blocks.
+We generated $K=3$ populations from \eqref{eq:contaminated-pdf} with $\bm
+\Sigma_k$ given in \eqref{eq:block-sigma}. We set the mean vector of class 1 to
+$\bm \mu_1 = \bm 0_p$. Next, comparable to \cite{Guo:2007te}, the first 100
+features of $\bm \mu_2$ were 1/2, while the rest were set to 0, i.e., $\bm \mu_2
+= (\underbrace{1/2, \ldots, 1/2}_{100}, \underbrace{0, \ldots, 0}_{p -
+  100})$. For simplicity, we defined $\bm \mu_3 = -\bm \mu_2$. The three
+populations differed in their mean vectors in the first 100 features
+corresponding to the first block. No difference in the means occurred in the
+remaining blocks.
 
 From each of the $K=3$ populations, we sampled 25 training observations ($n_k =
-25$ for all $k$) and 1000 test observations. After training each classifier on
+25$ for all $k$) and 10,000 test observations. After training each classifier on
 the training data, we classified the test data sets and computed the proportion
 of mislabeled test observations to estimate the classification error rate for
-each classifier. Repeating this process 250 times, we computed the average of
+each classifier. Repeating this process 500 times, we computed the average of
 the error-rate estimates for each classifier. We allowed the number of features
 to vary from $p = 100$ to $p = 500$ in increments of 100 to examine the
 classification accuracy as the feature dimension increased while maintaining a
-small sample size. Furthermore, although \cite{Guo:2007te} consider $\rho =
-0.9$, we considered $\rho = 0.1$, $0.5$, and $0.9$ to explore the effect of
-autocorrelation on classification accuracy, especially given that the Tong,
-Pang, and Guo classifiers assume independence among features.
+small sample size. Furthermore, although \cite{Guo:2007te} consider $\rho_k =
+0.9$ for all $k$, we considered $\rho_1 = 0.1$, $\rho_2 = 0.5$, and $\rho_3 = 0.9$
+to explore the more realistic assumption of unequal covariance matrices.
 
 \subsubsection{Results}
 
