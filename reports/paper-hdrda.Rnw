@@ -63,7 +63,7 @@ proposed classifier in the {\tt sparsediscrim} R package, available on CRAN.
 # Round digits throughout document including \Sexpr statements.
 # See Yihui's response here:
 # http://stackoverflow.com/questions/11062497/how-to-avoid-using-round-in-every-sexpr
-options(digits = 3)
+options(digits=3)
 
 opts_chunk$set(fig.align='default', dev='png', message=FALSE, warning=FALSE,
                cache=TRUE, echo=FALSE, autodep=TRUE, fig.width=12,
@@ -91,6 +91,14 @@ results_contaminated <- results_contaminated %>%
   gather(Classifier, Error, -p, -contamination_prob, -mu) %>%
   mutate(p=factor(p)) %>%
   filter(mu == 0.5)
+
+# Remove underscore from classifier names
+levels(results_contaminated$Classifier) <- gsub("_", " ",
+                                                levels(results_contaminated$Classifier))
+
+# Maximum Standard Error for Contaminated Sims
+max_sim_se <- with(results_contaminated, max(sqrt(Error * (1 - Error) / 500)))
+max_sim_se <- round(max_sim_se, digits=3)
 
 max_se <- 1234567890
 @
@@ -745,26 +753,27 @@ contain the individual quadratic form of each test observation, $\bm x_t$.
 \label{sec:sims}
 
 In this section, we compare our proposed classifier with four classifiers
-recently proposed for small-sample, high-dimensional data along with the random
-forest from \cite{Breiman:2001fb} using version 3.2.2 of the open-source
-statistical software {\tt R}. Within our study, we included penalized linear
-discriminant analysis from \cite{Witten:2011kc}, implemented in the {\tt
-  penalizedLDA} package. We also considered shrunken centroids regularized
-discriminant analysis from \cite{Guo:2007te} in the {\tt rda} package. Because
-the {\tt rda} package does not perform the authors' ``Min-Min'' rule
-automatically, we applied this rule within our {\tt R} code. We included two
-modifications of diagonal linear discriminant analysis from \cite{Tong:2012hw}
-and \cite{Pang:2009ik}, where the former employs an improved mean estimator and
-the latter utilizes an improved variance estimator. Both classifiers are
-available in the {\tt sparsediscrim} package. Finally, we incorporated the
-random forest as a benchmark based on the findings of
+recently proposed for small-sample, high-dimensional data along with the
+random-forest classifier from \cite{Breiman:2001fb} using version 3.2.2 of the
+open-source statistical software {\tt R}. Within our study, we included
+penalized linear discriminant analysis from \cite{Witten:2011kc}, implemented in
+the {\tt penalizedLDA} package. We also considered shrunken centroids
+regularized discriminant analysis from \cite{Guo:2007te} in the {\tt rda}
+package. Because the {\tt rda} package does not perform the authors' ``Min-Min''
+rule automatically, we applied this rule within our {\tt R} code. We included
+two modifications of diagonal linear discriminant analysis from
+\cite{Tong:2012hw} and \cite{Pang:2009ik}, where the former employs an improved
+mean estimator and the latter utilizes an improved variance estimator. Both
+classifiers are available in the {\tt sparsediscrim} package. Finally, we
+incorporated the random forest as a benchmark based on the findings of
 \cite{FernandezDelgado:2014ul}, who concluded that the random forest is often
 superior to other classifiers in benchmark studies. We used the implementation
 of the random-forest classifier from the {\tt randomForest} package with 250
 trees and 100 maximum nodes. For each classifer we explicitly set prior
 probabilities as equal, if applicable. All other classifier options were set to
-their default settings. Below, we refer to each classifier by the first
-author's surname.
+their default settings. Below, we refer to each classifier by the first author's
+surname. All simulations were conducted on an Amazon Elastic Compute Cloud (EC2)
+instance of type `c4.4xlarge`.
 
 For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examined the
 classification performance of two models. For the first \emph{HDRDA} model, we
@@ -775,17 +784,17 @@ inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the
 values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of
 $\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$
 \citep{Hastie:2008dt}. For the second model, we set $\alpha_k = 1 - \gamma$, $k
-= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s
-parameterization. We estimated both $\lambda$ and $\gamma$ from a grid of 21
-equidistant candidate values between 0 and 1, inclusively.
+= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s parameterization. We
+estimated both $\lambda$ and $\gamma$ from a grid of 21 equidistant candidate
+values between 0 and 1, inclusively.
 
 \subsection{Simulation Study}
 
 In this section we compare the competing classifiers using the simulation design
 from \cite{Guo:2007te}. This design is widely used within the high-dimensional
 classification literature including the studies by \cite{Ramey:2013ji} and
-\cite{Witten:2011kc}. First, we consider the block-diagonal covariance
-matrix from from \cite{Guo:2007te}
+\cite{Witten:2011kc}. First, we consider the block-diagonal covariance matrix
+from from \cite{Guo:2007te}
 \begin{align}
   \bm\Sigma_k = \bm\Sigma^{(\rho_k)} \oplus \bm\Sigma^{(-\rho_k)} \oplus \ldots \oplus \bm\Sigma^{(\rho_k)},\label{eq:block-sigma}
 \end{align}
@@ -797,10 +806,10 @@ where the $(i,j)$th entry of the block matrix $\bm\Sigma^{(\rho_k)} \in
 The block-diagonal covariance structure in \eqref{eq:block-sigma} resembles
 gene-expression data: within each block of pathways, genes are correlated, and
 the correlation decays as a function of the distance between any two genes. The
-autocorrelation $\rho_k$ alternates between a positive and a negative value from block
-to block. The original design from \cite{Guo:2007te} comprised two $p$-dimensional
-multivariate normal populations with a common block-diagonal covariance
-matrix where $\bm\Sigma_1 = \bm\Sigma_2$.
+autocorrelation $\rho_k$ alternates between a positive and a negative value from
+block to block. The original design from \cite{Guo:2007te} comprised two
+$p$-dimensional multivariate normal populations with a common block-diagonal
+covariance matrix where $\bm\Sigma_1 = \bm\Sigma_2$.
 
 Although the design is indeed standard, the simulation configuration lacks
 artifacts observed commonly in real data, such as skewness and extreme
@@ -839,62 +848,85 @@ each classifier. Repeating this process 500 times, we computed the average of
 the error-rate estimates for each classifier. We allowed the number of features
 to vary from $p = 100$ to $p = 500$ in increments of 100 to examine the
 classification accuracy as the feature dimension increased while maintaining a
-small sample size. Furthermore, although \cite{Guo:2007te} consider $\rho_k =
-0.9$ for all $k$, we considered $\rho_1 = 0.1$, $\rho_2 = 0.5$, and $\rho_3 = 0.9$
-to explore the more realistic assumption of unequal covariance matrices.
+small sample size. \cite{Guo:2007te} originally considered $\rho_k = 0.9$ for
+all $k$. To explore the more realistic assumption of unequal covariance
+matrices, we instead put $\rho_1 = 0.1$, $\rho_2 = 0.5$, and $\rho_3 = 0.9$
 
 \subsubsection{Simulation Results}
 
-As expected, regardless of the values of $p$, $\rho$, or $\bm \mu$, as the
-contaminated probability increases, the average error rate increases.  Also, as
-can be expected, the average error rates were typically higher for $\bm \mu=0.5$
-than for $\bm \mu=1$. The difference in the average error rates for the methods
-of Pang, Tong, and Witten all yielded increasingly higher average error rates
-than HDRDA ridge, HDRDA complex, Guo, or random forests as the contaminated
-probability increased. The correlation coefficient appears to have had little,
-if any, effect on the average error rates for any of the considered classifiers.
+In Figure \ref{fig:sim-results}, we observe each classifier's average
+classification error rates for the values of $\epsilon$ and $p$. Unsurprisingly,
+the average error rate increased for each classifier as the contamination
+probability $\epsilon$ increased regardless of the value of $p$. Sensitivity to
+the presence of outliers was most apparent for the for the Pang, Tong, and
+Witten classifiers. For smaller dimensions, the random-forest and HDRDA
+classifiers tended to outperform the remaining classifiers with the random
+forest performing best. As the feature dimension increased with $p \ge 300$,
+both HDRDA classifiers outperformed all other classifiers, suggesting that their
+dimension reduction inherent better captured the classificatory information in
+the small samples even in the presence of outliers.
 
 \begin{figure}
 <<sim_results, fig.width=8, fig.height=8, dpi=200>>=
 p <- ggplot(results_contaminated, aes(x=contamination_prob, y=Error))
 p <- p + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
 p <- p + facet_wrap(~ p, labeller = "label_both")
-p <- p + xlab("Contamination Probability") + ylab("Error Rate")
+p <- p + xlab("Contamination Probability") + ylab("Expected Error Rate")
 p + theme_bw()
 @
-\caption{Averages of the 1000 error-rate estimates of the competing classifiers
-  for each data set as a function of $d$. Approximate standard errors are no
-  greater than \Sexpr{max_se}.}
+\caption{Average classification error rates as a function of the contamination
+  probability $\epsilon$. Approximate standard errors were no greater than
+  \Sexpr{max_sim_se}.}
 \label{fig:sim-results}
 \end{figure}
-Regardless of the value of $rho$, $p$, or $\bm \mu$, random forests consistently
-yielded the highest average error rate, and the average error rate for random
-forests was much more pronounced when $\bm \mu=0.5$. However, as the
-contaminated probability increased, random forests became increasingly
-competitive, and, in some cases, e.g, $\bm \mu=0.5$, $p=100$, and contaminated
-probability greater than 0.05 yielded the lowest average error rate.
 
-Pang and Tong's methods yielded practically the same and consistently the worst
-average error rates when the contaminated probability was greater than 0,
-regardless of the value of $\bm \mu$, $p$, or $\rho$. Witten's method performed
-only slightly better as the contaminated probability increased, however, when
-$\bm \mu = 0.5$, Witten's method became increasingly competitive with Pang and
-Tong for yielding the highest average error rate as $p$ increased.
+The Pang, Tong, and Witten methods yielded practically the same and consistently
+the worst error rates when outliers were present with $\epsilon > 0$, suggesting
+that these classifiers were sensitive to outliers. Notice, for example, that
+when $p=400$, the error rates of the Pang, Tong, and Witten classifiers
+increased dramatically from approximately 19\% when no outliers were present to
+approximately 43\% when $\epsilon=0.05$. The sharp increase in average error
+rates for these three classifiers continued as $\epsilon$ increased
+further. Guo's method always outperformed Pang, Witten, and Tong, but once
+outliers were present, the Guo classifier's average error rate was competitive
+with neither the HDRDA classifiers nor the random forest.
 
-Guo's method always outperformed Pang, Witten, and Tong, but never outperformed
-the HDRDA methods. For the considered parameter configurations, Guo's method
-performed similarly to random forests when the contaminated probability was
-greater than 0 and yielded similar results to HDRDA ridge, HDRDA convex when the
-contaminated probability was equal to 0. However, as the contaminated
-probability increased, Guo's method was often outperformed by HDRDA ridge, HDRDA
-convex, and random forests.
+\begin{figure}
+<<sim_results_by_p, fig.width=8, fig.height=8, dpi=200>>=
+p2 <- results_contaminated %>%
+  mutate(p=as.numeric(as.character(p)),
+         contamination_prob=round(contamination_prob, digits=2)) %>%
+    filter(contamination_prob %in% c(0.0, 0.1, 0.2, 0.3, 0.4, 0.5)) %>%
+    rename(`Contamination Probability`=contamination_prob) %>%
+      ggplot(., aes(x=p, y=Error))
+p2 <- p2 + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
+p2 <- p2 + facet_wrap(~ `Contamination Probability`, labeller="label_both")
+p2 <- p2 + xlab("Number of Features") + ylab("Expected Error Rate")
+p2 + theme_bw()
+@
+\caption{Average classification error rates as a function of the number of
+  features $p$. Approximate standard errors were no greater than
+  \Sexpr{max_sim_se}.}
+\label{fig:sim-results-by-p}
+\end{figure}
 
-HDRDA ridge and HDRDA complex yielded the lowest average error rates, regardless
-of the value of $\bm \mu$, $p$, or $\rho$, with HDRDA ridge typically
-outperforming HDRDA complex when the contaminated probability was greater than
-0. HDRDA ridge only seemed to have competition with random forests when the
-contaminated probability was 0.20. Moreover, neither HDRDA ridge nor HDRDA
-complex seem to be affected by $p$.
+In Figure \ref{fig:sim-results-by-p} we again examine the simulation results as
+a function of the number of features $p$ for a subset of the values of
+$\epsilon$. This set of plots allows us to investigate the effect of feature
+dimensionality on classification performance. When no outliers were present
+(i.e., $\epsilon=0$), the random-forest classifier was outperformed by all other
+classifiers. Furthermore, the HDRDA classifiers were superior in terms of
+average error rate in this setting. As $p$ increased, an elevation in average
+error rate was expected for all classifiers, but the increase was not observed
+to be substantial.
+
+For $\epsilon > 0$, we observed a different behavior in classification
+performance. First, the Pang, Tong, and Witten methods along with the random
+forest increased in average error rate as $p$ increased. Contrarily, the
+performance of the HDRDA and Guo classifiers was hardly affected by $p$.  Also,
+as discussed above, the HDRDA classifiers were superior to all other classifiers
+for larger values of $p$ with only the random forest outperforming them for
+smaller feature dimensions.
 
 \subsection{Application to Gene Expression Data}
 
@@ -960,11 +992,6 @@ specimens are of high quality: 52 prostate tumor samples and 50 non-tumor
 prostate samples.
 
 \subsection{Classification Results}
-
-Despite the claims of \cite{FernandezDelgado:2014ul} that the random forest
-classifier is typically superior, we observed that the classifiers designed for
-high-dimensional data were indeed superior.
-
 
 For the microarray data sets, we computed error-rate estimates for the competing
 classifiers after reducing the dimension of the data sets with feature selection
@@ -1093,6 +1120,10 @@ would improve via such a method, the efficiency of the training and model
 selection would certainly improve. Moreover, if $q_L = 2$ or $3$ was selected,
 the potential for low-dimensional graphical displays of high-dimensional could
 be accomplished.
+
+Despite the claims of \cite{FernandezDelgado:2014ul} that the random forest
+classifier is typically superior, we observed that the classifiers designed for
+high-dimensional data were indeed superior.
 
 \bibliographystyle{plainnat}
 \bibliography{rda}
