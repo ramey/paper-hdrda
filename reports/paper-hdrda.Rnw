@@ -1061,28 +1061,36 @@ rethink applying it in practice.
 \section{Discussion}
 \label{sec:discussion}
 
-We have compared our proposed \emph{HDRDA} classifier to several recently
-proposed classifiers, including the Dudoit, Pang, Tong, and Guo classifiers,
-each of which assumes independence of the features conditional on class
-membership. Despite the rapid computational performance of diagonal classifiers
-and the reduction in the number of parameters to estimate, \cite{Mai:2012bf} and
-\cite{Fan:2012iq} have noted that diagonal classifiers can often yield inferior
-classification performance to other classification methods. We have shown that
-the \emph{HDRDA} classifier often yields superior classification accuracy to the
-diagonal classifiers considered, confirming the assertions of \cite{Mai:2012bf}
-and \cite{Fan:2012iq}. Furthermore, the implementation of
-\eqref{eq:hdrda-decomposed} in the {\tt sparsediscrim} R package was comparable
-to that of the diagonal classifiers in terms of computational runtime. Moreover,
-when preliminary variable selection was applied to the data in our
-classification study, the time to perform model selection with our proposed
-classifier was nearly instantaneous. Hence, our proposed \emph{HDRDA} classifier
-is competitive in terms of classification accuracy for modern small-sample,
-high-dimensional data sets and requires substantially less computing time than
-standard regularized classifiers, such as regularized discriminant analysis
-proposed by \cite{Friedman:1989tm}.
+We have compared our proposed \emph{HDRDA} classifier to the random-forest and
+Witten classifiers as well as the Pang, Tong, and Guo classifiers, each of which
+assumes independence of the features conditional on class membership. Despite
+the rapid computational performance of diagonal classifiers and the reduction in
+the number of parameters to estimate, \cite{Mai:2012bf} and \cite{Fan:2012iq}
+have noted that diagonal classifiers can often yield inferior classification
+performance to other classification methods. We have shown that the \emph{HDRDA}
+classifier often yields superior classification accuracy to the diagonal
+classifiers considered when applied to small-sample, high-dimensional data sets,
+confirming the assertions of \cite{Mai:2012bf} and \cite{Fan:2012iq}.
+Furthermore, we have demonstrated that \emph{HDRDA} classifiers are more robust
+to the presence of outliers than the diagonal classifiers.
 
-Given the \emph{RDA} classifier has been shown to have excellent performance in
-the high-dimensional setting \citep{Webb:2011vu} but is limited by its
+We also considered the popular penalized linear discriminant analysis from
+\cite{Witten:2011kc} because it was specifically designed for high-dimensional
+gene-expression data. We had expected its classification performance to be
+competitive within our classification study and perhaps superior. Contrarily,
+its underperformance in our empirical studies show that it is sensitive to
+outliers and unable to achieve comparable results with other classifiers
+designed for small-sample, high-dimensional data. Also, despite the claims of
+\cite{FernandezDelgado:2014ul} that the random forest classifier is typically
+superior to other classifiers, we observed that the random-forest classifier was
+indeed competitive but was typically outperformed by classifiers developed for
+small-sample, high-dimensional data.
+
+The \emph{HDRDA} implementation of \eqref{eq:hdrda-decomposed} in the {\tt
+  sparsediscrim} R package was comparable to that of the diagonal classifiers in
+terms of computational runtime. Given the \emph{RDA} classifier from
+\cite{Friedman:1989tm} has been shown to have excellent performance in the
+high-dimensional setting \citep{Webb:2011vu} but is limited by its
 computationally intense model selection procedure, our work enables the
 \emph{RDA} classifier to be employed with small-sample, high-dimensional data in
 practice. This is reassuring because the \emph{RDA} classifier remains widely
@@ -1104,9 +1112,6 @@ selection would certainly improve. Moreover, if $q_L = 2$ or $3$ was selected,
 the potential for low-dimensional graphical displays of high-dimensional could
 be accomplished.
 
-Despite the claims of \cite{FernandezDelgado:2014ul} that the random forest
-classifier is typically superior, we observed that the classifiers designed for
-high-dimensional data were indeed superior.
 
 \bibliographystyle{plainnat}
 \bibliography{rda}
