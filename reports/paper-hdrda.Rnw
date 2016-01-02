@@ -74,7 +74,9 @@ opts_chunk$set(fig.align='default', dev='png', message=FALSE, warning=FALSE,
 setwd("..")
 library(ProjectTemplate)
 load.project()
+@
 
+<<munge_contaminated_sims>>=
 # Contaminated Normal Sims
 results_contaminated <- lapply(results_block_contaminated[[1]], function(r) {
   with(r, c(error_rates, p=p, mu=mu, contamination_prob=contamination_prob))
@@ -85,7 +87,8 @@ results_contaminated <- tbl_df(results_contaminated)
 results_contaminated <- results_contaminated %>%
   group_by(p, contamination_prob, mu) %>%
   summarise_each(funs(mean)) %>%
-  arrange(p, contamination_prob, mu)
+  arrange(p, contamination_prob, mu) %>%
+  ungroup
 
 results_contaminated <- results_contaminated %>%
   gather(Classifier, Error, -p, -contamination_prob, -mu) %>%
@@ -99,8 +102,36 @@ levels(results_contaminated$Classifier) <- gsub("_", " ",
 # Maximum Standard Error for Contaminated Sims
 max_sim_se <- with(results_contaminated, max(sqrt(Error * (1 - Error) / 500)))
 max_sim_se <- round(max_sim_se, digits=3)
+@
 
-max_se <- 1234567890
+<<munge_microarray_results>>=
+# Microarray Classification Results
+results_microarray <- lapply(results[[1]], function(r) {
+  with(r, c(error_rates, `data_set`=data_set))
+})
+results_microarray <- do.call(rbind.data.frame, results_microarray)
+results_microarray <- tbl_df(results_microarray)
+
+avg_error_microarray <- results_microarray %>%
+    group_by(data_set) %>%
+    summarise_each(funs(mean)) %>%
+    gather(Classifier, Avg_Error, -data_set)
+
+sd_error_microarray <- results_microarray %>%
+  group_by(data_set) %>%
+  summarise_each(funs(sd)) %>%
+  gather(Classifier, SD_Error, -data_set)
+
+# Microarray classification results are presented in a table
+# Rows = classifier, columns = data set
+# Cells = Error (SD) rounded to 3 digits
+results_microarray <- inner_join(avg_error_microarray, sd_error_microarray,
+                                 by=c('data_set', 'Classifier')) %>%
+  mutate(Table_Cells=sprintf('%.3f (%.3f)', Avg_Error, SD_Error),
+         data_set=stringr::str_to_title(data_set),
+         Classifier=gsub("_", " ", Classifier)) %>%
+  select(-Avg_Error, -SD_Error) %>%
+  spread(data_set, Table_Cells)
 @
 
 
@@ -859,19 +890,19 @@ classification error rates for the values of $\epsilon$ and $p$. Unsurprisingly,
 the average error rate increased for each classifier as the contamination
 probability $\epsilon$ increased regardless of the value of $p$. Sensitivity to
 the presence of outliers was most apparent for the for the Pang, Tong, and
-Witten classifiers. For smaller dimensions, the random-forest and HDRDA
+Witten classifiers. For smaller dimensions, the random-forest and \emph{HDRDA}
 classifiers tended to outperform the remaining classifiers with the random
 forest performing best. As the feature dimension increased with $p \ge 300$,
-both HDRDA classifiers outperformed all other classifiers, suggesting that their
-dimension reduction inherent better captured the classificatory information in
-the small samples even in the presence of outliers.
+both \emph{HDRDA} classifiers outperformed all other classifiers, suggesting
+that their dimension reduction inherent better captured the classificatory
+information in the small samples even in the presence of outliers.
 
 \begin{figure}
 <<sim_results, fig.width=8, fig.height=8, dpi=200>>=
 p <- ggplot(results_contaminated, aes(x=contamination_prob, y=Error))
 p <- p + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
 p <- p + facet_wrap(~ p, labeller = "label_both")
-p <- p + xlab("Contamination Probability") + ylab("Expected Error Rate")
+p <- p + xlab("Contamination Probability") + ylab("Average Error Rate")
 p + theme_bw()
 @
 \caption{Average classification error rates as a function of the contamination
@@ -889,7 +920,7 @@ approximately 43\% when $\epsilon=0.05$. The sharp increase in average error
 rates for these three classifiers continued as $\epsilon$ increased
 further. Guo's method always outperformed Pang, Witten, and Tong, but once
 outliers were present, the Guo classifier's average error rate was competitive
-with neither the HDRDA classifiers nor the random forest.
+with neither the \emph{HDRDA} classifiers nor the random forest.
 
 \begin{figure}
 <<sim_results_by_p, fig.width=8, fig.height=8, dpi=200>>=
@@ -901,7 +932,7 @@ p2 <- results_contaminated %>%
       ggplot(., aes(x=p, y=Error))
 p2 <- p2 + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
 p2 <- p2 + facet_wrap(~ `Contamination Probability`, labeller="label_both")
-p2 <- p2 + xlab("Number of Features") + ylab("Expected Error Rate")
+p2 <- p2 + xlab("Number of Features") + ylab("Average Error Rate")
 p2 + theme_bw()
 @
 \caption{Average classification error rates as a function of the number of
@@ -915,7 +946,7 @@ a function of the number of features $p$ for a subset of the values of
 $\epsilon$. This set of plots allows us to investigate the effect of feature
 dimensionality on classification performance. When no outliers were present
 (i.e., $\epsilon=0$), the random-forest classifier was outperformed by all other
-classifiers. Furthermore, the HDRDA classifiers were superior in terms of
+classifiers. Furthermore, the \emph{HDRDA} classifiers were superior in terms of
 average error rate in this setting. As $p$ increased, an elevation in average
 error rate was expected for all classifiers, but the increase was not observed
 to be substantial.
@@ -923,10 +954,10 @@ to be substantial.
 For $\epsilon > 0$, we observed a different behavior in classification
 performance. First, the Pang, Tong, and Witten methods along with the random
 forest increased in average error rate as $p$ increased. Contrarily, the
-performance of the HDRDA and Guo classifiers was hardly affected by $p$.  Also,
-as discussed above, the HDRDA classifiers were superior to all other classifiers
-for larger values of $p$ with only the random forest outperforming them for
-smaller feature dimensions.
+performance of the \emph{HDRDA} and Guo classifiers was hardly affected by $p$.
+Also, as discussed above, the \emph{HDRDA} classifiers were superior to all
+other classifiers for larger values of $p$ with only the random forest
+outperforming them for smaller feature dimensions.
 
 \subsection{Application to Gene Expression Data}
 
@@ -979,7 +1010,7 @@ desired to determine a patient's curability. The authors measured 6,817 gene
 expression levels from 58 DLBCL patient samples with customized cDNA
 (lymphochip) microarrays to investigate the curability of patients treated with
 cyclophosphamide, adriamycin, vincristine, and prednisone (CHOP)-based
-chemotherapy.  Among the 58 DLBCL patient samples, 32 are from cured patients
+chemotherapy. Among the 58 DLBCL patient samples, 32 are from cured patients
 while 26 are from patients with fatal or refractory disease.
 
 \subsubsection{\cite{Singh:2002fh} Data Set}
@@ -993,87 +1024,39 @@ prostate samples.
 
 \subsection{Classification Results}
 
-For the microarray data sets, we computed error-rate estimates for the competing
-classifiers after reducing the dimension of the data sets with feature selection
-to $d = 100, 200, \ldots, 1000$, similar to the values of $d$ considered by
-\cite{Xu:2009fl}. To compare misclassification rates between different values of
-$d$, we applied each value of $d$ considered to the same random allocation of
-training and test data. Hence, for a given random partition, the set of features
-selected for a smaller value of $d$ is a proper subset of the features selected
-for a larger value of $d$. We report the average of the error-rate estimates for
-each value of $d$ in Figure \ref{fig:error-rates}. Approximate standard errors
-were no greater than \Sexpr{max_se}.
+Similar to \cite{Witten:2011kc}, we report the average test error rates obtained
+over 250 random training-test partitions in Table \ref{tab:microarray-results}.
+Standard deviations of the test error rates are given in the parentheses. The
+\emph{HDRDA} and Guo classifiers were superior in classification performance for
+the majority of the simulations with the popular Guo classifier being the best
+for the Burczysnki data set. Both \emph{HDRDA} methods yielded comparable
+results.
 
-The \emph{HDRDA} classifier was superior in classification performance for the
-majority of the simulations. For the Burczysnki, Shipp, and Singh data sets, our
-classifier outperformed its competitors for all values of $d$ examined. For the
-Nakayama data set, the \emph{HDRDA} classifier \eqref{eq:hdrda-decomposed} was
-slightly outperformed by the Dudoit, Pang, and Tong classifiers for small values
-of $d$ but attained classification rates superior to its competitors for larger
-values of $d$. Furthermore, Figure \ref{fig:error-rates} emphasizes two
-strengths of our classifier: reliability of the classifier for relatively small
-$d$ and stability of the classifier for large $d$. In contrast to the other
-classifiers, the \emph{HDRDA} classifier exhibited less variability in its
-misclassification estimates for small values of $d$ and yielded superior
-classification accuracy as $d$ increased and was hardly effected by the
-inclusion of more variables in the data sets. We attribute the apparent
-stability of the error-rate estimates of our classifier for large values of $d$
-to its novel dimension-reduction technique.
+<<classification_results, results='asis'>>=
+table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 250 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
 
-The average error-rate estimates for the Dudoit, Pang, Tong, and Witten
-classifiers were comparable for all values of $d$ examined. Furthermore, the
-error-rate estimates of the Dudoit, Pang, and Tong classifiers were
-approximately equal throughout our study, and the Witten classifier yielded
-approximately equal error-rate estimates for the Burczysnki, Shipp, and Singh
-data sets. Furthermore, the error-rate estimates for the Dudoit and Tong
-classifiers were nearly identical, which suggests that the improved mean
-estimator employed by \cite{Tong:2012hw} provided little improvement to the
-classification performance of diagonal linear discriminant analysis.
-
-The classification performance of the the Dudoit, Pang, Tong, and Witten
-classifiers for the Shipp and Singh data sets revealed the inability of these
-methods to handle larger values of $d$. After closer examination of the
-classification studies performed in the authors' original papers, we noticed
-that classification accuracy estimates were reported only for small values of
-$d$, thereby ignoring the inclusion of a larger number of variables. Hence, we
-advise practioners to consider filtering a large number of features before
-employing these methods.
-
-The popular Guo classifier is most competitive over large values of $d$ for the
-Shipp and Singh data sets. However, for the Burczynski and Nakayama data sets,
-the implementation of the Guo method in the {\tt rda} package often classified
-every test observation into a single class, thus yielding larger error rates
-than its competitors. Furthermore, the Guo classifier exhibited unreliable
-classification performance for smaller values of $d$ and required a larger
-subset of the features to perform competitively in our study.
-\begin{figure}
-<<error_rates, fig.width=8, fig.height=8, out.width='.65\\linewidth'>>=
-print(NULL)
+xtable_out <- xtable(results_microarray,
+                     caption=table_caption,
+                     label='tab:microarray-results')
+print(xtable_out, include.rownames=FALSE)
 @
-\caption{Averages of the 1000 error-rate estimates of the competing classifiers
-  for each data set as a function of $d$. Approximate standard errors are no
-  greater than \Sexpr{max_se}.}
-\label{fig:error-rates}
-\end{figure}
-Next, we examine the optimal estimates of the tuning parameters for the
-\emph{HDRDA} classifier. For brevity, we provide graphical summaries of the
-optimal estimates of $\lambda$ and $\gamma$ in \ref{suppB}. For each of the four
-data sets, the distribution of the optimal values of $\lambda$ selected through
-cross-validation often had a notable bathtub shape, resembling a Beta
-distribution with both shape parameters less than unity. Specifically, the
-optimal values of $\lambda$ were typically near 0 or near 1, corresponding to
-quadratic and linear discriminant analysis, respectively. For instance, with
-smaller values of $d$ applied to the Shipp data set, the range of optimal values
-of $\lambda$ was typically no larger than 0.05, indicating there were a large
-number of training data sets for which we can safely assume the covariance
-matrices are unequal. As $d$ increased, the majority of the optimal values of
-$\lambda$ were selected as unity, thereby an increased number of variables
-resulted in the \emph{HDRDA} classifier preferring the more parsimonious
-assumption of equal covariance matrices. In this instance we can see the
-flexibility of our proposed classifier to employ the more realistic assumption
-of unequal class covariance matrices, but if optimal, the \emph{HDRDA}
-classifier \eqref{eq:hdrda-decomposed} can utilize the more parsimonious
-assumption of equal covariance matrices.
+
+The average error-rate estimates for the Pang, Tong, and Witten classifiers were
+comparable across all data sets. Furthermore, the average error rates for the
+Pang and Tong classifiers were approximately equal throughout our study,
+suggesting that the mean and variance estimators used in lieu of the MLEs
+provided little improvement to classification accuracies. The random-forest
+classifier was competitive only on the Singh data set. This result challenges
+the claim of \cite{FernandezDelgado:2014ul} that the random forest is
+typically superior. More studies should be performed to validate this statement
+in the small-sample, high-dimensional setting.
+
+Finally, the average test error rates for the Witten classifier were the largest
+across all data sets. Given that the standard deviations were relatively large,
+we hesitate to generalize claims regarding the Witten classifier being the
+uniformly worst performer. However, the variability in its classification
+accuracy across multiple random partitions of each data set were large enough to
+rethink applying it in practice.
 
 \section{Discussion}
 \label{sec:discussion}
