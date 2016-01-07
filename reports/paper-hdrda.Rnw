@@ -1,8 +1,6 @@
 \documentclass{article}
 
-\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm}
-\usepackage{natbib, setspace}
-\usepackage{algorithm2e}
+\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib, setspace, algorithm2e}
 
 \bibpunct{(}{)}{;}{a}{,}{,}
 
@@ -48,14 +46,15 @@ identity matrix. The RDA classifier's two tuning parameters are typically
 estimated via a computationally burdensome cross-validation procedure from a
 grid of candidate values. We reformulate the RDA classifier in the small-sample,
 high-dimensional setting and then show that the classification decision rule is
-equivalent to one in a subspace having a much lower dimension. As a result, the
-dimension reduction involved yields a substantial reduction in computation
-during model selection. Our parameterization also offers interpretability
-previously lacking with the RDA classifier. We demonstrate with three artificial
-and four real high-dimensional data sets that our proposed classifier is often
-superior to several recently proposed sparse and regularized classifiers in
-terms of classification accuracy. Finally, we provide an implementation of our
-proposed classifier in the {\tt sparsediscrim} R package, available on CRAN.
+equivalent to a classifier in a subspace having a much lower dimension. As a
+result, the dimension reduction involved yields a substantial reduction in
+computation during model selection. Our parameterization also offers
+interpretability previously lacking with the RDA classifier. We demonstrate with
+three artificial and four real high-dimensional data sets that our proposed
+classifier is often superior to several recently proposed sparse and regularized
+classifiers in terms of classification accuracy. Finally, we provide an
+implementation of our proposed classifier in the {\tt sparsediscrim} R package,
+available on CRAN.
 
 \end{abstract}
 
@@ -141,13 +140,13 @@ As machine-learning algorithms are increasingly utilized to automate data-driven
 decisions, researchers continue to develop a wealth of \emph{classifiers}
 employed in a variety of disciplines, such as medical research, facial
 recognition, remote sensing, and chemical analysis
-\citep{Ching:2012fu,Li:2012ev,Zhang:2010va}. Despite the advances in
+\citep*{Ching:2012fu,Li:2012ev,Zhang:2010va}. Despite the advances in
 classification to facilitate technological advancements, well-established
 classifiers often degrade in accuracy with modern, high-dimensional data sets
 when the number of features $p$ exceeds the total sample size $N$, due to the
 \emph{curse of dimensionality} \citep{Bellman:1961tn}. For instance, linear
-discriminant analysis (LDA) and quadratic discriminant analysis (QDA) are
-popular because of their simplicity, speed of computation, and
+discriminant analysis (\emph{LDA}) and quadratic discriminant analysis
+(\emph{QDA}) are popular because of their simplicity, speed of computation, and
 interpretability. However, both methods are incalculable when $p > N$ because
 the class sample covariance matrices are singular \citep*{Bouveyron:2007gx}.
 
@@ -164,16 +163,16 @@ covariance matrices to ensure positive definiteness. Alternatively, dimension
 reduction typically transforms the original data in the high-dimensional space
 to a subspace having a much smaller dimension such that redundant and noisy
 information is removed
-\citep{Fan:2012iq,Ye:2009gd,Bouveyron:2007gx,Ye:2006vx,Ye:2005hd,Antoniadis:2003bk}. Finally,
-\cite{Mai:2012bf}, \cite{Fan:2012iq}, \cite{Merchante:2012vk},
-\cite{Clemmensen:2011kr}, \cite{Huang:2010ju}, and \cite{Dudoit:2002ev} have
+\citep*{Fan:2012iq,Ye:2009gd,Bouveyron:2007gx,Ye:2006vx,Ye:2005hd,Antoniadis:2003bk}.
+Finally, \cite*{Mai:2012bf}, \cite{Fan:2012iq}, \cite*{Merchante:2012vk},
+\cite*{Clemmensen:2011kr}, \cite*{Huang:2010ju}, and \cite*{Dudoit:2002ev} have
 proposed restrictions on the population covariance matrices to reduce the number
 of parameters that must be estimated. For instance, \cite{Dudoit:2002ev} have
 assumed the features within each class are independent so that the population
 covariance matrices are diagonal, resulting in positive-definite sample
 covariance matrices. For excellent overviews of the regularization problem in
 discriminant analysis and other techniques, see \cite{Murphy:2012uq} and
-\cite{Mkhadri:1997gy}.
+\cite*{Mkhadri:1997gy}.
 
 Here, we present a new classification method intended for the $p > N$ case that
 builds on the classic regularized discriminant analysis (\emph{RDA}) proposed by
@@ -183,7 +182,7 @@ individual sample covariance matrices from the \emph{QDA} classifier with the
 pooled sample covariance matrix from the \emph{LDA} classifier. We then shrink
 the resulting covariance-matrix estimator towards a scaled identity matrix to
 ensure positive definiteness. By reparameterizing the \emph{RDA} classifier
-similar to \cite{Hastie:2008dt} and \cite{Halbe:2007ea}, we first show the
+similar to \cite*{Hastie:2008dt} and \cite{Halbe:2007ea}, we first show that the
 pooling parameter in the \emph{HDRDA} classifier determines the contribution of
 each training observation to the estimation of each class covariance matrix,
 enabling interpretability that has been previously lacking with the \emph{RDA}
@@ -196,24 +195,24 @@ null space of the pooled sample covariance matrix are redundant and can be
 discarded from the \emph{HDRDA} decision rule without loss of classificatory
 information. Moreover, because the \emph{HDRDA} decision rule is invariant to
 adjustments to the zero eigenvalues, the decision rule in the original feature
-space is equivalent to a decision rule in a much lower dimension, such that the
-matrix inverses and determinants of relatively small matrices can be rapidly
-computed. Furthermore, we show that a large number of shrinkage methods that are
-special cases of the \emph{HDRDA} classifier have no effect on the zero
-eigenvalues of the covariance-matrix estimators. Such methods include work from
+space is equivalent to a decision rule in a lower dimension, such that matrix
+inverses and determinants of relatively small matrices can be rapidly computed.
+Furthermore, we show that several shrinkage methods that are special cases of
+the \emph{HDRDA} classifier have no effect on the zero eigenvalues of the
+covariance-matrix estimators. Such methods include work from
 \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods studied by
 \cite{Ramey:2013ji} and \citet*{Xu:2009fl}.
 
 We provide an efficient algorithm that expedites the model-selection process for
 the \emph{HDRDA} classifier when $p \gg N$. We then study the classification
 performance of the \emph{HDRDA} classifier on four real high-dimensional data
-sets along with a simulation experiment that generalizes that initially
+sets along with a simulation design that generalizes the experiments initially
 conducted by \cite{Guo:2007te}. We demonstrate that the \emph{HDRDA} classifier
 often attains superior classification accuracy to several recent classifiers
-designed for small-sample, high-dimensional data from \cite{Tong:2012hw},
-\cite{Witten:2011kc}, \cite{Pang:2009ik}, and \cite{Guo:2007te}. We also include
-as a benchmark the random forest from \cite{Breiman:2001fb} because
-\cite{FernandezDelgado:2014ul} has concluded that the random forest is often
+designed for small-sample, high-dimensional data from \cite*{Tong:2012hw},
+\cite{Witten:2011kc}, \cite*{Pang:2009ik}, and \cite{Guo:2007te}. We also
+include as a benchmark the random forest from \cite{Breiman:2001fb} because
+\cite*{FernandezDelgado:2014ul} has concluded that the random forest is often
 superior to other classifiers in benchmark studies.
 
 The remainder of this document is organized as follows. In Section
@@ -239,14 +238,12 @@ let $\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm
 \mathbb{R}_{m \times 1}$ as a vector of ones. Let $\bm A \oplus \bm B$ denote
 the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in
 \mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Let $\bm A^{T}$,
-$\bm A^+$, and $\mathcal{N}(\bm A) = \{\bm z \in \mathbb{R}_{p \times 1} : \bm A
-\bm z = \bm 0_{m \times 1}\}$ denote the transpose, the Moore-Penrose
+$\bm A^+$, and $\mathcal{N}(\bm A)$ denote the transpose, the Moore-Penrose
 pseudoinverse, and the null space of $\bm A \in \mathbb{R}_{m \times p}$,
 respectively. Denote by $\mathbb{R}_{p \times p}^{>}$ the cone of real $p \times
 p$ positive-definite matrices. Similarly, let $\mathbb{R}_{p \times p}^{\ge}$
 denote the cone of real $p \times p$ positive-semidefinite matrices. Let
-$V^{\perp} = \{\bm y \in \mathbb{R}_{p \times 1} : \bm y^{T} \bm v = 0$ for all
-$\bm v \in V \}$ denote the orthogonal complement of a vector space $V \subset
+$V^{\perp}$ denote the orthogonal complement of a vector space $V \subset
 \mathbb{R}_{p \times 1}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$
 and $0$ otherwise.
 
@@ -257,21 +254,19 @@ In discriminant analysis we wish to assign an unlabeled vector $\bm x \in
 classifier from $N$ training observations. Let $\bm x_i = (x_{i1}, \ldots,
 x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots,
 N)$ with true, unique membership $y_i \in \{\omega_1, \ldots, \omega_K\}$. We
-assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution
-$p(\bm x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x |
-\omega_k)$ is the probability density function (PDF) of the $k$th class and
-$p(\omega_k)$ is the prior probability of class membership of the $k$th
-class. We further assume that each of $p(\omega_k)$ is equal, $k = 1, \ldots,
-K$.
+assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm
+x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$
+is the probability density function (PDF) of the $k$th class and $p(\omega_k)$
+is the prior probability of class membership of the $k$th class. We further
+assume $p(\omega_k) = p(\omega_l)$, $1 \le k, l \le K$, $k \ne l$.
 
-Quadratic discriminant analysis is the optimal Bayesian decision rule with
-respect to a $0-1$ loss function when $p(\bm x | \omega_k)$ is the probability
-density function of the multivariate normal distribution with known mean vectors
-$\bm \mu_k \in \mathbb{R}_{p \times 1}$ and known covariance matrices $\bm
-\Sigma_k \in \mathbb{R}_{p \times p}^{>}$, $k = 1, 2, \ldots, K$. Because $\bm
-\mu_k$ and $\bm \Sigma_k$ are typically unknown, we assign an unlabeled
-observation $\bm x$ to class $\omega_k$ with the sample quadratic discriminant
-analysis classifier
+The \emph{QDA} classifier is the optimal Bayesian decision rule with respect to
+a $0-1$ loss function when $p(\bm x | \omega_k)$ is the PDF of the multivariate
+normal distribution with known mean vectors $\bm \mu_k \in \mathbb{R}_{p \times 1}$
+and known covariance matrices $\bm \Sigma_k \in \mathbb{R}_{p \times p}^{>}$,
+$k = 1, 2, \ldots, K$. Because $\bm \mu_k$ and $\bm \Sigma_k$ are typically
+unknown, we assign an unlabeled observation $\bm x$ to class $\omega_k$ with the
+sample \emph{QDA} classifier
 \begin{align}
 	D_{QDA}(\bm x) = \argmin_{k} (\bm x - \xbar_k)^{T}\widehat{\bm
     \Sigma}_k^{-1}(\bm x - \xbar_k) + \log |\widehat{\bm \Sigma}_k|, \label{eq:qda}
@@ -284,9 +279,9 @@ sample covariance matrix $\widehat{\bm \Sigma}$ is substituted for $\widehat{
 \begin{align}
 	\widehat{\bm \Sigma} = N^{-1} \sum_{k=1}^K n_k \widehat{\bm \Sigma}_k \label{eq:pooled-cov}
 \end{align}
-is the MLE for $\bm \Sigma$. In this case \eqref{eq:qda} reduces to the sample
-linear discriminant analysis classifier, and the log-determinant is omitted
-because it is constant across the $K$ classes.
+is the MLE for $\bm \Sigma$. Here, \eqref{eq:qda} reduces to the sample
+\emph{LDA} classifier. We omit the log-determinant because it is constant across
+the $K$ classes.
 
 The smallest eigenvalues of $\widehat{\bm \Sigma}_k$ and the directions
 associated with their eigenvectors can highly influence \eqref{eq:qda}. In fact,
@@ -299,7 +294,7 @@ available to discriminate among the $K$ classes, if $p > n_k$, \eqref{eq:qda} is
 incalculable because $\widehat{\bm \Sigma}_k^{-1}$ does not exist.
 
 Several regularization methods, such as the methods considered by
-\cite{Xu:2009fl}, \citet*{Guo:2007te}, and \cite{Mkhadri:1995jp} have been
+\cite{Xu:2009fl}, \cite{Guo:2007te}, and \cite{Mkhadri:1995jp} have been
 proposed in the literature to adjust the eigenvalues of $\widehat{\bm \Sigma}_k$
 so that \eqref{eq:qda} is calculable and has reduced variability in the standard
 bias-variance tradeoff. A common form of the covariance-matrix regularization
@@ -324,7 +319,7 @@ its clear interpretation as a linear combination of the crossproducts of the
 training observations centered by their respective class sample means. We define
 the convex combination
 \begin{align}
-  \widehat{\bm \Sigma}_k(\lambda) = (1 - \lambda) \widehat{\bm \Sigma}_k + \lambda
+  \widehat{\bm \Sigma}_k(\lambda) \coloneqq (1 - \lambda) \widehat{\bm \Sigma}_k + \lambda
   \widehat{\bm \Sigma}, \quad k = 1, \ldots, K,\label{eq:sig-lambda-alternative}
 \end{align}
 where $\lambda \in [0, 1]$ is the \emph{pooling} parameter. By rewriting
@@ -383,7 +378,7 @@ proposed to increase eigenvalues (approximately) equal to 0. To further improve
 the estimation of $\bm \Sigma_k$ and to stabilize the estimator's inverse, we
 define the eigenvalue adjustment of \eqref{eq:sig-lambda-alternative} as
 \begin{align}
-	\tilde{\bm \Sigma}_k = \alpha_k \widehat{\bm \Sigma}_k(\lambda) + \gamma \bm I_p,\label{eq:hdrda-cov}
+	\tilde{\bm \Sigma}_k \coloneqq \alpha_k \widehat{\bm \Sigma}_k(\lambda) + \gamma \bm I_p,\label{eq:hdrda-cov}
 \end{align}
 where $\alpha_k \ge 0$ and $\gamma \ge 0$ is an eigenvalue-shrinkage
 constant. Thus, the \emph{pooling} parameter $\lambda$ controls the amount
@@ -434,11 +429,11 @@ estimate $\bm \Sigma_k$ with
 where $\lambda \in [0, 1]$, $n_k(\lambda) = (1 - \lambda) n_k + \lambda N$, $
 \bm S_k = n_k \widehat{\bm \Sigma}_k$, $\bm S = \sum_{k=1}^K \bm S_k$, and $ \bm
 S_k(\lambda) = (1 - \lambda) \bm S_k + \lambda \bm S$. If $\lambda = 0$,
-\eqref{eq:sig-lambda} is equal to $\widehat{\bm \Sigma}_k$ used in
-\eqref{eq:qda}. Alternatively, if $\lambda = 1$, \eqref{eq:sig-lambda} reduces
-to \eqref{eq:pooled-cov}. To further improve the estimation of $\bm \Sigma_k$
-and to stabilize the inverse of \eqref{eq:sig-lambda}, \cite{Friedman:1989tm}
-has proposed the biased covariance-matrix estimator
+\eqref{eq:sig-lambda} is equal to $\widehat{\bm \Sigma}_k$ in \eqref{eq:qda}.
+Alternatively, if $\lambda = 1$, then \eqref{eq:sig-lambda} reduces to
+\eqref{eq:pooled-cov}. To further improve the estimation of $\bm \Sigma_k$ and
+to stabilize the inverse of \eqref{eq:sig-lambda}, \cite{Friedman:1989tm} has
+proposed the biased covariance-matrix estimator
 \begin{align}
           \widehat{\bm \Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm
             \Sigma}_k(\lambda) + \gamma \frac{\tr\{\widehat{\bm
@@ -470,7 +465,7 @@ component involves determinants and inverses of high-dimensional matrices, and
 by ignoring these calculations, a substantial reduction in computational costs
 is achieved. Furthermore, a byproduct is that adjustments to the associated
 eigenvalues have no effect on \eqref{eq:hdrda}. Lastly, we utilize the singular
-value decomposition to calculate efficiently the eigenvalue decomposition of
+value decomposition to efficiently calculate the eigenvalue decomposition of
 $\widehat{\bm \Sigma}$, further reducing the computational costs of the
 \emph{HDRDA} classifier.
 
@@ -556,8 +551,8 @@ that \eqref{eq:hdrda} is invariant to adjustments to the eigenvalues of $\tilde{
 
 \begin{lemma}\label{lemma:RDA-constant-term}
 Let $\bm U_2$ be defined as above. Then, for all $\bm x \in \mathbb{R}_{p \times
-  1}$, $\bm U_2^{T} (\bm x - \xbar_k) = \bm U_2^{T} (\bm x - \xbar_{k'})$ $(1 \le k,
-k' \le K)$.
+  1}$, $\bm U_2^{T} (\bm x - \xbar_k) = \bm U_2^{T} (\bm x - \xbar_{k'})$, $1
+\le k, k' \le K$, where $k \ne k'$.
 \end{lemma}
 \begin{proof}
 Let $\bm x \in \mathbb{R}_{p \times 1}$, and suppose that $1 \le k, k' \le K$.
@@ -628,22 +623,25 @@ and
 First, we write $\bm W_k = n_k^{-1} \alpha_k (1 - \lambda) \bm U_1^{T} \bm
 X_k^{T} \bm X_k \bm U_1 + \bm \Gamma_k$. To calculate $|\bm W_k|$, we apply
 Theorem 18.1.1 from \cite{Harville:2008wja}, which states that $|\bm A + \bm B
-\bm T \bm C| = |\bm A| |\bm T| |\bm T^{-1} + \bm C \bm A^{-1} \bm B|$. Thus,
-setting $\bm A = \bm \Gamma_k$, $\bm B = \alpha_k (1 - \lambda) \bm U_1^{T} \bm
-X_k^{T}$, $\bm T = \bm I_{n_k}$, and $\bm C = \bm X_k \bm U_1$, we have $|\bm
-W_k| = |\bm \Gamma_k| |\bm Q_k|$. Similarly, \eqref{eq:W_k_inv} follows from the
-well-known Sherman-Woodbury formula \citep[Theorem 18.2.8]{Harville:2008wja} by
-noting that $(\bm A + \bm B \bm T \bm C)^{-1} = \bm A^{-1} - \bm A^{-1} \bm B
-(\bm T^{-1} + \bm C \bm A^{-1} \bm B)^{-1} \bm C \bm A^{-1}$.
+\bm T \bm C| = |\bm A| |\bm T| |\bm T^{-1} + \bm C \bm A^{-1} \bm B|$, where
+$\bm A \in \mathbb{R}_{a \times a}^{>}$, $\bm B \in \mathbb{R}_{a \times b}$,
+$\bm T \in \mathbb{R}_{b \times b}^{>}$, and $\bm C \in \mathbb{R}_{b \times
+  a}$. Thus, setting $\bm A = \bm \Gamma_k$, $\bm B = \alpha_k (1 - \lambda) \bm
+U_1^{T} \bm X_k^{T}$, $\bm T = \bm I_{n_k}$, and $\bm C = \bm X_k \bm U_1$, we
+have $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$. Similarly, \eqref{eq:W_k_inv}
+follows from the well-known Sherman-Woodbury formula \citep[Theorem
+  18.2.8]{Harville:2008wja} by noting that $(\bm A + \bm B \bm T \bm C)^{-1} =
+\bm A^{-1} - \bm A^{-1} \bm B (\bm T^{-1} + \bm C \bm A^{-1} \bm B)^{-1} \bm C
+\bm A^{-1}$.
 \end{proof}
 
 The application of the Sherman-Woodbury formula requires that $\bm \Gamma_k$ be
 nonsingular. This assumption is not met when $(\lambda, \gamma) = (0, 0)$
-because $\bm \Gamma_k = \bm 0_q$. In this case we instead use the formulation in
-\eqref{eq:hdrda-decomposed}. Also, notice that if $\alpha_k$ is constant across
-the $K$ classes, then $\bm \Gamma_k$ in \eqref{eq:Gamma_k} is independent of
-$k$. Consequently, $|\bm \Gamma_k|$ is constant across the $K$ classes and need
-not be calculated in \eqref{eq:hdrda-decomposed}.
+because $\bm \Gamma_k = \bm 0_q$. Here, we use the formulation in
+\eqref{eq:hdrda-decomposed} instead. Also, notice that if $\alpha_k$ is constant
+across the $K$ classes, then $\bm \Gamma_k$ in \eqref{eq:Gamma_k} is independent
+of $k$. Consequently, $|\bm \Gamma_k|$ is constant across the $K$ classes and
+need not be calculated in \eqref{eq:hdrda-decomposed}.
 
 \subsection{Model Selection}
 
@@ -727,12 +725,11 @@ the $V$ folds.
 
 A primary contributing factor to the efficiency of Algorithm
 \ref{alg:hdrda_model_selection} is our usage of the compact singular value
-decomposition (SVD) (sometimes called the reduced or fast SVD). Rather than
-computing the eigenvalue decomposition of $\widehat{\bm \Sigma}$ to obtain $\bm
-U_1$, we instead obtain $\bm U_1$ by computing the eigendecomposition of a much
-smaller $N \times N$ matrix when $p \gg N$
-\cite[Chapter~18.3.5]{Hastie:2008dt}. Applying the SVD, we decompose $\bm X_c =
-\bm M \bm \Delta \bm U^{T}$, where $\bm M \in \mathbb{R}_{N \times p}$ is
+decomposition (SVD). Rather than computing the eigenvalue decomposition of
+$\widehat{\bm \Sigma}$ to obtain $\bm U_1$, we instead obtain $\bm U_1$ by
+computing the eigendecomposition of a much smaller $N \times N$ matrix when $p
+\gg N$ \cite[Chapter~18.3.5]{Hastie:2008dt}. Applying the SVD, we decompose $\bm
+X_c = \bm M \bm \Delta \bm U^{T}$, where $\bm M \in \mathbb{R}_{N \times p}$ is
 orthogonal, $\bm \Delta \in \mathbb{R}_{p \times p}^{\ge}$ is a diagonal matrix
 consisting of the singular values of $\bm X_c$, and $\bm U \in \mathbb{R}_{p
   \times p}$ is orthogonal. Recalling that $\widehat{\bm \Sigma} = N^{-1} \bm
@@ -745,11 +742,11 @@ X_c^{T} = \bm M \bm D \bm M^{T}$. Next, we compute $\bm U = \bm X_c^{T} \bm M
 \bm D^{+/2}$, where $\bm D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then
 determine $q$, the number of numerically nonzero eigenvalues present in $\bm D$,
 by calculating the number of eigenvalues that exceeds some tolerance value, say,
-$1 \times 10^{-6}$. After calculating $q$, we extract $\bm U_1$ by retaining
-only the first $q$ columns of $\bm U$.
+$1 \times 10^{-6}$. We then extract $\bm U_1$ as the first $q$ columns of $\bm
+U$.
 
 As a result of the compact SVD, we need calculate $\bm X_c \bm U_1$ only once
-per cross-validation fold, requiring $O(p q N) \approx (p N^2)$ calculations.
+per cross-validation fold, requiring $O(p q N) \approx O(p N^2)$ calculations.
 Hence, the computational costs of expensive calculations, such as matrix
 inverses and determinants, are greatly reduced because they are performed in the
 $q$-dimensional subspace. Similarly, we reduce the dimension of the test data
@@ -804,7 +801,7 @@ trees and 100 maximum nodes. For each classifer we explicitly set prior
 probabilities as equal, if applicable. All other classifier options were set to
 their default settings. Below, we refer to each classifier by the first author's
 surname. All simulations were conducted on an Amazon Elastic Compute Cloud (EC2)
-instance of type `c4.4xlarge`.
+{\tt c4.4xlarge} instance.
 
 For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examined the
 classification performance of two models. For the first \emph{HDRDA} model, we
@@ -837,29 +834,28 @@ where the $(i,j)$th entry of the block matrix $\bm\Sigma^{(\rho_k)} \in
 The block-diagonal covariance structure in \eqref{eq:block-sigma} resembles
 gene-expression data: within each block of pathways, genes are correlated, and
 the correlation decays as a function of the distance between any two genes. The
-autocorrelation $\rho_k$ alternates between a positive and a negative value from
-block to block. The original design from \cite{Guo:2007te} comprised two
-$p$-dimensional multivariate normal populations with a common block-diagonal
-covariance matrix where $\bm\Sigma_1 = \bm\Sigma_2$.
+original design from \cite{Guo:2007te} comprised two $p$-dimensional
+multivariate normal populations with a common block-diagonal covariance matrix
+where $\bm\Sigma_1 = \bm\Sigma_2$.
 
 Although the design is indeed standard, the simulation configuration lacks
 artifacts observed commonly in real data, such as skewness and extreme
 outliers. As a result, we wished to investigate the effect of outliers on the
-high-dimensional classifiers. To do this, we generalized the block-diagonal
-simulation configuration by sampling from a $p$-dimensional multivariate
-contaminated normal distribution.  Denoting the PDF of the $p$-dimensional
-multivariate normal distribution by $N_p(\bm x | \bm \mu, \bm \Sigma)$, we write
-the PDF of the $k$th class as
+high-dimensional classifiers. To accomplish this goal, we generalized the
+block-diagonal simulation configuration by sampling from a $p$-dimensional
+multivariate contaminated normal distribution.  Denoting the PDF of the
+$p$-dimensional multivariate normal distribution by $N_p(\bm x | \bm \mu, \bm
+\Sigma)$, we write the PDF of the $k$th class as
 \begin{align}
-  p(\bm x | \omega_k) = (1 - \epsilon) N_p(\bm x | \bm \mu_k, \bm \Sigma_k) + \epsilon N_p(\bm x | \bm \mu_k, \omega \bm \Sigma_k),\label{eq:contaminated-pdf}
+  p(\bm x | \omega_k) = (1 - \epsilon) N_p(\bm x | \bm \mu_k, \bm \Sigma_k) + \epsilon N_p(\bm x | \bm \mu_k, \eta \bm \Sigma_k),\label{eq:contaminated-pdf}
 \end{align}
 where $\epsilon \in [0, 1]$ is the probability that an observation is
-contaminated (i.e., drawn from a distribution with larger variance) and $\omega
-> 1$ scales the covariance matrix $\bm \Sigma_k$ to increase the extremity of
+contaminated (i.e., drawn from a distribution with larger variance) and $\eta >
+1$ scales the covariance matrix $\bm \Sigma_k$ to increase the extremity of
 outliers. For $\epsilon = 0$, we have the benchmark block-diagonal simulation
 design from \cite{Guo:2007te}. As $\epsilon$ is increased, the average number of
-outliers is increased. In our simulation, we considered the values of $\epsilon
-= 0$, $0.05$, $\ldots$, $0.50$. We also set $\omega = 100$.
+outliers is increased. In our simulation, we set $\eta = 100$ and considered the
+values of $\epsilon = 0$, $0.05$, $\ldots$, $0.50$.
 
 We generated $K=3$ populations from \eqref{eq:contaminated-pdf} with $\bm
 \Sigma_k$ given in \eqref{eq:block-sigma}. We set the mean vector of class 1 to
@@ -894,7 +890,7 @@ Witten classifiers. For smaller dimensions, the random-forest and \emph{HDRDA}
 classifiers tended to outperform the remaining classifiers with the random
 forest performing best. As the feature dimension increased with $p \ge 300$,
 both \emph{HDRDA} classifiers outperformed all other classifiers, suggesting
-that their dimension reduction inherent better captured the classificatory
+that their inherent dimension reduction better captured the classificatory
 information in the small samples even in the presence of outliers.
 
 \begin{figure}
@@ -1022,15 +1018,15 @@ sequence tags. They have reported that 102 of the radical prostatectomy
 specimens are of high quality: 52 prostate tumor samples and 50 non-tumor
 prostate samples.
 
-\subsection{Classification Results}
+\subsubsection{Classification Results}
 
 Similar to \cite{Witten:2011kc}, we report the average test error rates obtained
-over 250 random training-test partitions in Table \ref{tab:microarray-results}.
-Standard deviations of the test error rates are given in the parentheses. The
+over 250 random training-test partitions in Table \ref{tab:microarray-results}
+along with standard deviations of the test error rates in parentheses. The
 \emph{HDRDA} and Guo classifiers were superior in classification performance for
-the majority of the simulations with the popular Guo classifier being the best
-for the Burczysnki data set. Both \emph{HDRDA} methods yielded comparable
-results.
+the majority of the simulations with the popular Guo classifier providing
+superior classification performance for the Burczysnki data set. Both
+\emph{HDRDA} methods yielded comparable results.
 
 <<classification_results, results='asis'>>=
 table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 250 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
@@ -1093,17 +1089,17 @@ terms of computational runtime. Given the \emph{RDA} classifier from
 high-dimensional setting \citep{Webb:2011vu} but is limited by its
 computationally intense model selection procedure, our work enables the
 \emph{RDA} classifier to be employed with small-sample, high-dimensional data in
-practice. This is reassuring because the \emph{RDA} classifier remains widely
-popular in the literature. In fact, variants of the RDA classifier have been
-applied to microarray data \citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te},
-facial recognition
+practice. This results is reassuring because the \emph{RDA} classifier remains
+widely popular in the literature. In fact, variants of the RDA classifier have
+been applied to microarray data
+\citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te}, facial recognition
 \citep{Ching:2012fu,Zhang:2010va,Dai:2007vd,Lu:2005hq,Pima:2004vw,Lu:2003we},
 handwritten digit recognition \citep{Bouveyron:2007gx}, remote sensing
 \citep{Tadjudin:1999fk}, seismic detection \citep{Anderson:2002kg}, and chemical
-spectra \citep{Wu:1996us,Aeberhard:1993fp}.
+spectra \citep*{Wu:1996us,Aeberhard:1993fp}.
 
 The dimension reduction that we have employed in this paper has reduced the
-dimension to the rank$(\widehat{\bm \Sigma})$, $q$. An interesting extension of
+dimension to rank$(\widehat{\bm \Sigma}) = q$. An interesting extension of
 our work would reduce the dimension $q$ further to a lower dimension $q_L < q$
 using some criterion proposed, perhaps similar to that employed in principal
 components analysis. While it is not clear whether classification performance
