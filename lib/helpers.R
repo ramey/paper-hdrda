@@ -179,8 +179,18 @@ load_microarray <- function(dataset) {
 
     su$x <- su$x[, features_kept]
     data_out <- su
-
-  } else {
+  } else if (dataset == 'chiaretti') {
+    # As in Xu et al. (2009), we restricted the data set to the n1 = 74
+    # observations without cytogenetic abnormalities and the n2 = 37
+    # observations with a detected BCR/ABL gene.
+    data('chiaretti', package = 'datamicroarray')
+    classes <- with(chiaretti, levels(y)[table(y) >= 37])
+    idx <- which(chiaretti$y %in% classes)
+    chiaretti$x <- chiaretti$x[idx, ]
+    chiaretti$y <- factor(chiaretti$y[idx])
+    data_out <- chiaretti
+  }
+  else {
     data(list = dataset, package = "datamicroarray")
     data_out <- get(dataset)
   }
