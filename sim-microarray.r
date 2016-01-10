@@ -7,7 +7,8 @@ num_cores <- 8
 train_pct <- 2/3
 num_iterations <- 250
 
-data_sets <- c("burczynski", "christensen", "khan", "nakayama", "sorlie", "su", "sun", "yeoh")
+data_sets <- c('alon', 'chiaretti', 'chin', 'chowdary', 'gordon', 'gravier',
+               'pomeroy', 'subramanian', 'tian', 'west')
 sim_config <- rep(data_sets, each=num_iterations)
 
 flog.logger("sim", INFO, appender=appender.file('sim-microarray.log'))
