@@ -7,8 +7,7 @@ num_cores <- 16
 train_pct <- 2/3
 num_iterations <- 100
 
-data_sets <- c('alon', 'burczynski', 'chiaretti', 'chin', 'chowdary', 'gravier',
-               'nakayama', 'shipp', 'singh', 'tian')
+data_sets <- c('chiaretti', 'chowdary', 'nakayama', 'shipp', 'singh', 'tian')
 
 sim_config <- rep(data_sets, each=num_iterations)
 
