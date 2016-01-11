@@ -1049,9 +1049,12 @@ Similar to \cite{Witten:2011kc}, we report the average test error rates obtained
 over 100 random training-test partitions in Table \ref{tab:microarray-results}
 along with standard deviations of the test error rates in parentheses. The
 \emph{HDRDA} and Guo classifiers were superior in classification performance for
-the majority of the simulations with the popular Guo classifier providing
-superior classification performance for the Burczysnki data set. Both
-\emph{HDRDA} methods yielded comparable results.
+the majority of the simulations. The \emph{HDRDA} classifiers had the best
+classification accuracy on the Chowdary and Shipp data sets. Although the random
+forest's accuracy slightly exceeded the \emph{HDRDA} classifiers on the Tian
+data set, our proposed methods outperformed the other classifiers considered.
+Additionally, the \emph{HDRDA} classifiers had comparable performance on five of
+the six data sets.
 
 <<classification_results, results='asis'>>=
 table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
@@ -1064,20 +1067,29 @@ print(xtable_out, include.rownames=FALSE)
 
 The average error-rate estimates for the Pang, Tong, and Witten classifiers were
 comparable across all data sets. Furthermore, the average error rates for the
-Pang and Tong classifiers were approximately equal throughout our study,
-suggesting that the mean and variance estimators used in lieu of the MLEs
-provided little improvement to classification accuracies. The random-forest
-classifier was competitive only on the Singh data set. This result challenges
-the claim of \cite{FernandezDelgado:2014ul} that the random forest is
-typically superior. More studies should be performed to validate this statement
-in the small-sample, high-dimensional setting.
+Pang and Tong classifiers were approximately equal for all data sets except for
+the Chiaretti dataset. This result suggests that the mean and variance
+estimators used in lieu of the MLEs provided little improvement to
+classification accuracies. However, we investigated the Pang classifier's poor
+performance on the Chiaretti data set and determined that its variance estimator
+exhibited numerical instability. The classifier's denominator was approximately
+zero for both classes and lead to the poor classification performance.
 
-Finally, the average test error rates for the Witten classifier were the largest
-across all data sets. Given that the standard deviations were relatively large,
-we hesitate to generalize claims regarding the Witten classifier being the
-uniformly worst performer. However, the variability in its classification
-accuracy across multiple random partitions of each data set were large enough to
-rethink applying it in practice.
+The random-forest classifier was competitive when applied to the Chowdary and
+Singh data sets and yielded the smallest error rate of the considered
+classifiers on the Tian data set. The fact that the \emph{HDRDA} and Guo
+classifiers typically outperformed the random-forest classifier challenges the
+claim of \cite{FernandezDelgado:2014ul} that the random forest is typically
+superior. Further studies should be performed to validate this statement in the
+small-sample, high-dimensional setting.
+
+Finally, the Pang, Tong, and Witten classifiers consistently yielded the largest
+error rates across all data sets. Given that the standard deviations were
+relatively large, we hesitate to generalize claims regarding the ranking of
+these three classifiers in terms of error rate. However, the classifiers' error
+rates and their variability across multiple random partitions of each data set
+were large enough to rethink applying them in practice.
+
 
 \section{Discussion}
 \label{sec:discussion}
