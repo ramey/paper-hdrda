@@ -959,24 +959,38 @@ outperforming them for smaller feature dimensions.
 
 We compared the \emph{HDRDA} classifer to the five competing classifiers on four
 benchmark gene-expression microarray data sets. We evaluated the classification
-performance of each classifier by randomly partitioning the data set under
+accuracy of each classifier by randomly partitioning the data set under
 consideration such that $2/3$ of the observations were allocated as training
 data and the remaining $1/3$ of the observations were allocated as a test data
-set. After training each classifier on the training data, we classified the test
-data sets and computed the proportion of mislabeled test observations to
-estimate the classification error rate for each classifier. Repeating this
-process 250 times, we computed the average of the error-rate estimates for each
-classifier. Here, we provide a concise description of each high-dimensional
-data set examined in our classification study.
+set. To expedite the computational runtime, we reduced the training data to the
+top 1000 variables by employing the variable-selection method proposed by
+\cite{Dudoit:2002ev}. We then reduced the test data set to the same 1000
+variables. After training each classifier on the training data, we classified
+the test data sets and computed the proportion of mislabeled test observations
+to estimate the classification error rate for each classifier. Repeating this
+process 100 times, we computed the average of the error-rate estimates for each
+classifier. Here, we provide a concise description of each high-dimensional data
+set examined in our classification study.
 
-\subsubsection{\cite{Burczynski:2006ik} Data Set}
+\subsubsection{\cite{Chiaretti:2004gq} Data Set}
 
-\cite{Burczynski:2006ik} acquired peripheral blood mononuclear cells (PBMC)
-through hybridization to microarrays from 127 individuals resulting in 22,283
-sequences. Of the 127 individuals, 42 were healthy, 59 had Crohn's disease (CD),
-and 26 had ulcerative colitis (UC). The goal of \cite{Burczynski:2006ik} was to
-improve accuracy in the discrimination of Inflammatory Bowel Disease (IBD) using
-the PBMC-based gene expression signature of a patient.
+\cite{Chiaretti:2004gq} measured the gene-expression profiles for 128
+individuals with acute lymphoblastic leukaemia (ALL) using Affymetrix human
+95Av2 arrays. Following \cite{Xu:2009fl}, we restricted the data set to $K = 2$
+classes such that $n_1 = 74$ observations were without cytogenetic abnormalities
+and $n_2 = 37$ observations have a detected BCR/ABL gene. The robust multichip
+average normalization method was applied to all 12,625 gene expression levels.
+
+\subsubsection{\cite{Chowdary:2006kf} Data Set}
+
+\cite{Chowdary:2006kf} investigated 52 matched pairs of tissues from colon and
+breast tumors using Affymetrix U133A arrays and ribonucleic-acid (RNA)
+amplification. Each tissue pair was gathered from the same patient and
+consisted of a snap-frozen tissue and a tissue suspended in a RNAlater
+preservative. Overall, 31 breast-cancer and 21 colon-cancer pairs were gathered,
+resulting in $K = 2$ classes with $n_1 = 62$ and $n_2 = 42$. A purpose of the
+study was to determine whether the disease state could be identified using
+22,283 gene-expression profiles.
 
 \subsubsection{\cite{Nakayama:2007fl} Data Set}
 
@@ -1018,10 +1032,21 @@ sequence tags. They have reported that 102 of the radical prostatectomy
 specimens are of high quality: 52 prostate tumor samples and 50 non-tumor
 prostate samples.
 
+\subsubsection{\cite{Tian:2003ht} Data Set}
+
+\cite{Tian:2003ht} investigated the purified plasma cells from the bone marrow
+of control patients along with patients with newly diagnosed multiple
+myeloma. Expression profiles for 12,2625 genes were obtained via Affymetrix
+U95Av2 microarrays. The plasma cells were subjected to biochemical and
+immunohistochemical analyses to identify molecular determinants of osteolytic
+lesions. For 36 multiple-myloma patients, focal bone lesions could not be
+detected by magnetic resonance imaging (MRI), whereas MRI was used to detect
+such lesions in 137 patients.
+
 \subsubsection{Classification Results}
 
 Similar to \cite{Witten:2011kc}, we report the average test error rates obtained
-over 250 random training-test partitions in Table \ref{tab:microarray-results}
+over 100 random training-test partitions in Table \ref{tab:microarray-results}
 along with standard deviations of the test error rates in parentheses. The
 \emph{HDRDA} and Guo classifiers were superior in classification performance for
 the majority of the simulations with the popular Guo classifier providing
@@ -1029,7 +1054,7 @@ superior classification performance for the Burczysnki data set. Both
 \emph{HDRDA} methods yielded comparable results.
 
 <<classification_results, results='asis'>>=
-table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 250 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
+table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
 
 xtable_out <- xtable(results_microarray,
                      caption=table_caption,
