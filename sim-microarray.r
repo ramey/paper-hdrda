@@ -2,13 +2,14 @@ library(ProjectTemplate)
 load.project()
 
 set.seed(42)
-num_cores <- 8
+num_cores <- 16
 
 train_pct <- 2/3
-num_iterations <- 250
+num_iterations <- 100
 
-data_sets <- c('alon', 'chiaretti', 'chin', 'chowdary', 'gordon', 'gravier',
-               'pomeroy', 'subramanian', 'tian', 'west')
+data_sets <- c('alon', 'burczynski', 'chiaretti', 'chin', 'chowdary', 'gravier',
+               'nakayama', 'shipp', 'singh', 'tian')
+
 sim_config <- rep(data_sets, each=num_iterations)
 
 flog.logger("sim", INFO, appender=appender.file('sim-microarray.log'))
@@ -26,6 +27,11 @@ results <- mclapply(seq_along(sim_config), function(i) {
   train_y <- data$y[rand_split$training]
   test_x <- as.matrix(data$x[rand_split$test, ])
   test_y <- data$y[rand_split$test]
+
+  # Apply Dudoit's variable selection with 1000 variables to reduce runtime.
+  top_features <- dudoit(train_x, train_y, num_variables=1000)
+  train_x <- train_x[, top_features]
+  test_x <- test_x[, top_features]
 
   flog.info("Training Data: (Observations, Dimension): (%s, %s) -- Data Set: %s -- Sim Config: %s of %s",
             nrow(train_x), ncol(train_x), data_set, i, length(sim_config), name="sim")
