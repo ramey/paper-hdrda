@@ -38,23 +38,23 @@
 
 \begin{abstract}
 
-\citeauthor{Friedman:1989tm} proposed the popular regularized discriminant
-analysis (RDA) classifier that utilizes a biased covariance-matrix estimator to
-partially pool the sample covariance matrices from linear and quadratic
-disriminant analysis before shrinking the resulting estimator towards a scaled
+\cite{Friedman:1989tm} proposed the popular regularized discriminant analysis
+(RDA) classifier that utilizes a biased covariance-matrix estimator that
+partially pools the sample covariance matrices from linear and quadratic
+disriminant analysis and shrinks the resulting estimator towards a scaled
 identity matrix. The RDA classifier's two tuning parameters are typically
-estimated via a computationally burdensome cross-validation procedure from a
-grid of candidate values. We reformulate the RDA classifier in the small-sample,
+estimated via a computationally burdensome cross-validation procedure using a
+grid search. We formulate a new RDA classifier for the small-sample,
 high-dimensional setting and then show that the classification decision rule is
 equivalent to a classifier in a subspace having a much lower dimension. As a
-result, the dimension reduction involved yields a substantial reduction in
-computation during model selection. Our parameterization also offers
-interpretability previously lacking with the RDA classifier. We demonstrate with
-three artificial and four real high-dimensional data sets that our proposed
-classifier is often superior to several recently proposed sparse and regularized
-classifiers in terms of classification accuracy. Finally, we provide an
-implementation of our proposed classifier in the {\tt sparsediscrim} R package,
-available on CRAN.
+result, the utilization of the dimension-reduction step yields a substantial
+reduction in computation during model selection. Also, our parameterization
+offers interpretability previously lacking with the RDA classifier. We
+demonstrate that our proposed classifier is often superior to several recently
+proposed sparse and regularized classifiers in terms of classification accuracy
+with three artificial and six real high-dimensional data sets. Finally, we
+provide an implementation of our proposed classifier in the {\tt sparsediscrim}
+R package, which is available on CRAN.
 
 \end{abstract}
 
@@ -142,10 +142,10 @@ employed in a variety of disciplines, such as medical research, facial
 recognition, remote sensing, and chemical analysis
 \citep*{Ching:2012fu,Li:2012ev,Zhang:2010va}. Despite the advances in
 classification to facilitate technological advancements, well-established
-classifiers often degrade in accuracy with modern, high-dimensional data sets
-when the number of features $p$ exceeds the total sample size $N$, due to the
-\emph{curse of dimensionality} \citep{Bellman:1961tn}. For instance, linear
-discriminant analysis (\emph{LDA}) and quadratic discriminant analysis
+classifiers often degrade in accuracy when applied to modern, high-dimensional
+data sets if the number of features $p$ exceeds the total sample size $N$, due
+to the \emph{curse of dimensionality} \citep{Bellman:1961tn}. For instance,
+linear discriminant analysis (\emph{LDA}) and quadratic discriminant analysis
 (\emph{QDA}) are popular because of their simplicity, speed of computation, and
 interpretability. However, both methods are incalculable when $p > N$ because
 the class sample covariance matrices are singular \citep*{Bouveyron:2007gx}.
@@ -174,53 +174,56 @@ covariance matrices. For excellent overviews of the regularization problem in
 discriminant analysis and other techniques, see \cite{Murphy:2012uq} and
 \cite*{Mkhadri:1997gy}.
 
-Here, we present a new classification method intended for the $p > N$ case that
-builds on the classic regularized discriminant analysis (\emph{RDA}) proposed by
-\cite{Friedman:1989tm}. Our proposed high-dimensional \emph{RDA} (\emph{HDRDA})
-classifier employs a biased covariance matrix estimator that partially pools the
-individual sample covariance matrices from the \emph{QDA} classifier with the
-pooled sample covariance matrix from the \emph{LDA} classifier. We then shrink
-the resulting covariance-matrix estimator towards a scaled identity matrix to
-ensure positive definiteness. By reparameterizing the \emph{RDA} classifier
-similar to \cite*{Hastie:2008dt} and \cite{Halbe:2007ea}, we first show that the
-pooling parameter in the \emph{HDRDA} classifier determines the contribution of
-each training observation to the estimation of each class covariance matrix,
-enabling interpretability that has been previously lacking with the \emph{RDA}
-classifier \citep{Bensmail:1996fw}.
+Here, we present the high-dimensional \emph{RDA} (\emph{HDRDA}) classifier,
+which is intended for the $p > N$ case and builds on the classic \emph{RDA}
+classifier proposed by \cite{Friedman:1989tm}. In this paper, we study the
+classification performance of the \emph{HDRDA} classifier on six real
+high-dimensional data sets along with a simulation design that generalizes the
+experiments initially conducted by \cite{Guo:2007te}. We demonstrate that the
+\emph{HDRDA} classifier often attains superior classification accuracy to
+several recent classifiers designed for small-sample, high-dimensional data from
+\cite*{Tong:2012hw}, \cite{Witten:2011kc}, \cite*{Pang:2009ik}, and
+\cite{Guo:2007te}. We also include as a benchmark the random forest from
+\cite{Breiman:2001fb} because \cite*{FernandezDelgado:2014ul} have concluded
+that the random forest is often superior to other classifiers in benchmark
+studies. We show that our proposed classifier is competitive and often
+outperforms the random forest in terms of classification accuracy in the
+small-sample, high-dimensional setting.
 
-Next, we achieve a substantial reduction in dimension to reduce greatly the
-computation during model selection by applying a reasoning similar to
-\cite{Ye:2006tq}. We establish that the matrix operations corresponding to the
-null space of the pooled sample covariance matrix are redundant and can be
-discarded from the \emph{HDRDA} decision rule without loss of classificatory
-information. Moreover, because the \emph{HDRDA} decision rule is invariant to
-adjustments to the zero eigenvalues, the decision rule in the original feature
-space is equivalent to a decision rule in a lower dimension, such that matrix
-inverses and determinants of relatively small matrices can be rapidly computed.
-Furthermore, we show that several shrinkage methods that are special cases of
-the \emph{HDRDA} classifier have no effect on the zero eigenvalues of the
-covariance-matrix estimators. Such methods include work from
+Our proposed \emph{HDRDA} classifier employs a biased covariance-matrix
+estimator that partially pools the individual sample covariance matrices from
+the \emph{QDA} classifier with the pooled sample covariance matrix from the
+\emph{LDA} classifier. We then shrink the resulting covariance-matrix estimator
+towards a scaled identity matrix to ensure positive definiteness. By
+reparameterizing the \emph{RDA} classifier similar to \cite*{Hastie:2008dt} and
+\cite{Halbe:2007ea}, we show that the pooling parameter in the \emph{HDRDA}
+classifier determines the contribution of each training observation to the
+estimation of each class covariance matrix, enabling interpretability that has
+been previously lacking with the \emph{RDA} classifier \citep{Bensmail:1996fw}.
+
+Next, we achieve a substantial reduction in dimension that greatly reduces the
+computational effort during model selection when $p \gg N$ by applying reasoning
+similar to \cite{Ye:2006tq}. We establish that the matrix operations
+corresponding to the null space of the pooled sample covariance matrix are
+redundant and can be discarded from the \emph{HDRDA} decision rule without loss
+of classificatory information. Moreover, because the \emph{HDRDA} decision rule
+is invariant to adjustments to the zero eigenvalues, the decision rule in the
+original feature space is equivalent to a decision rule in a lower dimension,
+such that matrix inverses and determinants of relatively small matrices can be
+rapidly computed. Also, we provide an efficient algorithm along with pseudocode
+to estimate the \emph{HDRDA} classifier's tuning parameters in a grid search via
+cross-validation. Finally, we show that several shrinkage methods that are
+special cases of the \emph{HDRDA} classifier have no effect on the zero
+eigenvalues of the covariance-matrix estimators. Such methods include work from
 \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods studied by
 \cite{Ramey:2013ji} and \citet*{Xu:2009fl}.
 
-We provide an efficient algorithm that expedites the model-selection process for
-the \emph{HDRDA} classifier when $p \gg N$. We then study the classification
-performance of the \emph{HDRDA} classifier on four real high-dimensional data
-sets along with a simulation design that generalizes the experiments initially
-conducted by \cite{Guo:2007te}. We demonstrate that the \emph{HDRDA} classifier
-often attains superior classification accuracy to several recent classifiers
-designed for small-sample, high-dimensional data from \cite*{Tong:2012hw},
-\cite{Witten:2011kc}, \cite*{Pang:2009ik}, and \cite{Guo:2007te}. We also
-include as a benchmark the random forest from \cite{Breiman:2001fb} because
-\cite*{FernandezDelgado:2014ul} has concluded that the random forest is often
-superior to other classifiers in benchmark studies.
-
-The remainder of this document is organized as follows. In Section
-\ref{sec:preliminaries} we present the discrimination problem and the necessary
+The remainder of this paper is organized as follows. In Section
+\ref{sec:preliminaries} we present the discrimination problem and necessary
 notation to describe our contributions. In Section \ref{sec:rda} we present the
 \emph{HDRDA} classifier along with its interpretation, properties, and
-computationally efficient model-selection procedure. Section \ref{sec:sims}
-describes our simulation studies of artificial and real data sets and also
+computationally efficient model-selection procedure. In Section \ref{sec:sims},
+we describe our simulation studies of artificial and real data sets and also
 describes the experimental results. We conclude with a brief discussion in
 Section \ref{sec:discussion}.
 
@@ -284,21 +287,22 @@ is the MLE for $\bm \Sigma$. Here, \eqref{eq:qda} reduces to the sample
 the $K$ classes.
 
 The smallest eigenvalues of $\widehat{\bm \Sigma}_k$ and the directions
-associated with their eigenvectors can highly influence \eqref{eq:qda}. In fact,
-the eigenvalues of $\widehat{ \bm \Sigma}_k$ are well-known to be biased if $p
-\ge n_k$ such that the smallest eigenvalues are underestimated
-\citep{Seber:2004uh}. Moreover, if $p > n_k$, then rank$(\widehat{\bm \Sigma}_k)
-\le n_k$, which implies that at least $p - n_k$ eigenvalues of $\widehat{\bm
-  \Sigma}_k$ are zero. Furthermore, although more feature information is
-available to discriminate among the $K$ classes, if $p > n_k$, \eqref{eq:qda} is
-incalculable because $\widehat{\bm \Sigma}_k^{-1}$ does not exist.
+associated with their eigenvectors can highly influence the classifier in
+\eqref{eq:qda}. In fact, the eigenvalues of $\widehat{ \bm \Sigma}_k$ are
+well-known to be biased if $p \ge n_k$ such that the smallest eigenvalues are
+underestimated \citep{Seber:2004uh}. Moreover, if $p > n_k$, then
+rank$(\widehat{\bm \Sigma}_k) \le n_k$, which implies that at least $p - n_k$
+eigenvalues of $\widehat{\bm \Sigma}_k$ are zero. Furthermore, although more
+feature information is available to discriminate among the $K$ classes, if $p >
+n_k$, \eqref{eq:qda} is incalculable because $\widehat{\bm \Sigma}_k^{-1}$ does
+not exist.
 
 Several regularization methods, such as the methods considered by
 \cite{Xu:2009fl}, \cite{Guo:2007te}, and \cite{Mkhadri:1995jp} have been
 proposed in the literature to adjust the eigenvalues of $\widehat{\bm \Sigma}_k$
-so that \eqref{eq:qda} is calculable and has reduced variability in the standard
-bias-variance tradeoff. A common form of the covariance-matrix regularization
-applies a shrinkage factor $\gamma > 0$, so that
+so that \eqref{eq:qda} is calculable and provide reduced variability for
+$\widehat{\bm \Sigma}_k^{-1}$. A common form of the covariance-matrix regularization applies
+  a shrinkage factor $\gamma > 0$, so that
 \begin{align}
 	\widehat{\bm \Sigma}_k(\gamma) = \widehat{\bm \Sigma}_k + \gamma \bm I_p, \label{eq:ridge-estimator}
 \end{align}
@@ -323,8 +327,8 @@ the convex combination
   \widehat{\bm \Sigma}, \quad k = 1, \ldots, K,\label{eq:sig-lambda-alternative}
 \end{align}
 where $\lambda \in [0, 1]$ is the \emph{pooling} parameter. By rewriting
-\eqref{eq:sig-lambda-alternative} in terms of the observations $ \bm x_i$ $(i =
-1, \ldots, N)$, each centered by its class sample mean, we attain a clear
+\eqref{eq:sig-lambda-alternative} in terms of the observations $\bm x_i$, $i =
+1, \ldots, N$, each centered by its class sample mean, we attain a clear
 interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is,
 \begin{align}
 	\widehat{\bm \Sigma}_k(\lambda)
@@ -335,29 +339,29 @@ interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is,
 	&= \sum_{i=1}^N c_{ik}(\lambda) \bm x_i \bm x_i^{T},\label{eq:sig-lambda-alternative2}
 \end{align}
 where $c_{ik}(\lambda) = \lambda N^{-1} + (1 - \lambda)n_k^{-1}I(y_i = k)$.
-From \eqref{eq:sig-lambda-alternative2}, $\lambda$ weights the contribution of
-each of the $N$ observations in estimating $\bm \Sigma_k$ from all $K$ classes
-rather than $n_k$ observations from a single class. As a result, we can
-interpret \eqref{eq:sig-lambda-alternative2} as a covariance-matrix estimator
-that borrows from $\widehat{\bm \Sigma}$ in \eqref{eq:pooled-cov} to estimate $
-\bm \Sigma_k$.
+From \eqref{eq:sig-lambda-alternative2}, we see that $\lambda$ weights the
+contribution of each of the $N$ observations in estimating $\bm \Sigma_k$ from
+all $K$ classes rather than using only the $n_k$ observations from a single
+class. As a result, we can interpret \eqref{eq:sig-lambda-alternative2} as a
+covariance-matrix estimator that borrows from $\widehat{\bm \Sigma}$ in
+\eqref{eq:pooled-cov} to estimate $ \bm \Sigma_k$.
 
-Below, we will show that the pooling operation is advantageous in increasing the
-rank of each $\widehat{\bm \Sigma}_k(\lambda)$ from rank$(\widehat{\bm
-  \Sigma}_k)$ to rank$(\widehat{\bm \Sigma})$ for $0 < \lambda \le 1$. Notice
-that if $\lambda = 0$, then the observations from the remaining $K - 1$ classes
-do not contribute to the estimation of $\bm \Sigma_k$, corresponding to
-$\widehat{\bm \Sigma}_k$. Furthermore, if $\lambda = 1$, the weights
-$c_{ik}(\lambda)$ in \eqref{eq:sig-lambda-alternative2} reduce to $1/N$,
+In Figure \ref{fig:hdrda-contours} we plot the contours of five multivariate
+normal populations for $\lambda = 0$ with unequal covariance matrices. As
+$\lambda$ approaches 1, the contours become more similar, resulting in identical
+contours for $\lambda = 1$. Below, we show that the pooling operation is
+advantageous in increasing the rank of each $\widehat{\bm \Sigma}_k(\lambda)$
+from rank$(\widehat{\bm \Sigma}_k)$ to rank$(\widehat{\bm \Sigma})$ for $0 <
+\lambda \le 1$. Notice that if $\lambda = 0$, then the observations from the
+remaining $K - 1$ classes do not contribute to the estimation of $\bm \Sigma_k$,
+corresponding to $\widehat{\bm \Sigma}_k$. Furthermore, if $\lambda = 1$, the
+weights $c_{ik}(\lambda)$ in \eqref{eq:sig-lambda-alternative2} reduce to $1/N$,
 corresponding to $\widehat{\bm \Sigma}$. For brevity, when $\lambda = 1$, we
 define $\bm X = [\sqrt{c_{1k}(1)} \bm x_1^{T}, \ldots, \sqrt{c_{Nk}(1)} \bm
-  x_N^{T}]^{T}$ such that $\widehat{\bm \Sigma} = N^{-1} \bm X^{T} \bm X$. Similarly,
-for $\lambda = 0$, we define $\bm X_k = [\sqrt{c_{1k}(0)} \bm x_1^{T}, \ldots,
-  \sqrt{c_{Nk}(0)} \bm x_N^{T}]^{T}$ such that $\widehat{\bm \Sigma}_k = n_k^{-1} \bm
-X_k^{T} \bm X_k$. In Figure \ref{fig:hdrda-contours} we plot the contours of
-five multivariate normal populations for $\lambda = 0$ with unequal covariance
-matrices. As $\lambda$ approaches 1, the contours become more similar, resulting
-in identical contours for $\lambda = 1$.
+  x_N^{T}]^{T}$ such that $\widehat{\bm \Sigma} = N^{-1} \bm X^{T} \bm
+X$. Similarly, for $\lambda = 0$, we define $\bm X_k = [\sqrt{c_{1k}(0)} \bm
+  x_1^{T}, \ldots, \sqrt{c_{Nk}(0)} \bm x_N^{T}]^{T}$ such that $\widehat{\bm
+  \Sigma}_k = n_k^{-1} \bm X_k^{T} \bm X_k$.
 
 \begin{figure}
 <<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', dpi=200, fig.show='hold'>>=
@@ -381,15 +385,16 @@ define the eigenvalue adjustment of \eqref{eq:sig-lambda-alternative} as
 	\tilde{\bm \Sigma}_k \coloneqq \alpha_k \widehat{\bm \Sigma}_k(\lambda) + \gamma \bm I_p,\label{eq:hdrda-cov}
 \end{align}
 where $\alpha_k \ge 0$ and $\gamma \ge 0$ is an eigenvalue-shrinkage
-constant. Thus, the \emph{pooling} parameter $\lambda$ controls the amount
-borrowed from $\widehat{\bm \Sigma}$ to estimate $\bm \Sigma_k$, and the
-\emph{shrinkage} parameter $\gamma$ determines the degree of eigenvalue
-shrinkage. The choice of $\alpha_k$ allows for a flexible formulation of
-covariance-matrix estimators. For instance, if $\alpha_k = 1$, $k = 1, \ldots,
-K$, then \eqref{eq:hdrda-cov} resembles \eqref{eq:ridge-estimator}. Similarly,
-if $\alpha_k = 1 - \gamma$, then \eqref{eq:hdrda-cov} has a form similar to the
-\emph{RDA} classifier from \cite{Friedman:1989tm}. Substituting
-\eqref{eq:hdrda-cov} into \eqref{eq:qda}, we define the \emph{HDRDA} classifier
+constant. Thus, the \emph{pooling} parameter $\lambda$ controls the amount of
+estimation information borrowed from $\widehat{\bm \Sigma}$ to estimate $\bm
+\Sigma_k$, and the \emph{shrinkage} parameter $\gamma$ determines the degree of
+eigenvalue shrinkage. The choice of $\alpha_k$ allows for a flexible formulation
+of covariance-matrix estimators. For instance, if $\alpha_k = 1$, $k = 1,
+\ldots, K$, then \eqref{eq:hdrda-cov} resembles \eqref{eq:ridge-estimator}.
+Similarly, if $\alpha_k = 1 - \gamma$, then \eqref{eq:hdrda-cov} has a form
+comparable to the \emph{RDA} classifier from \cite{Friedman:1989tm}.
+Substituting \eqref{eq:hdrda-cov} into \eqref{eq:qda}, we define the
+\emph{HDRDA} classifier
 \begin{align}
 	D_{HDRDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)^{T}\tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k|. \label{eq:hdrda}
 \end{align}
@@ -399,22 +404,22 @@ For $\gamma > 0$, $\tilde{\bm \Sigma}_k$ is nonsingular such that $\tilde{\bm
 equal to the product of the positive eigenvalues of $\tilde{\bm
   \Sigma}_k$. Following \cite{Friedman:1989tm}, we select $\lambda$ and $\gamma$
 from a grid of candidate models via cross-validation. We provide an
-implementation of \eqref{eq:hdrda} in the {\tt hdrda} function in the {\tt
-  sparsediscrim} R package, available on CRAN.
+implementation of \eqref{eq:hdrda} in the {\tt hdrda} function contained in the
+{\tt sparsediscrim} R package, which is available on CRAN.
 
 The choice of $\alpha_k$ in \eqref{eq:hdrda-cov} is one of convenience and
 allows the flexibility of various covariance-matrix estimators proposed in the
 literature. In practice, we generally are not interested in estimating
 $\alpha_k$ as it would incorporate $K$ additional tuning parameters to estimate
 via cross-validation, which is counterproductive to our goal of improving the
-\emph{RDA} classifier's efficiency. By setting $\alpha_k$ to an appropriate
-constant, the \emph{HDRDA} covariance-matrix estimator includes or resembles a
-large family of estimators. Notice that if $\alpha_k = 1$ and $\lambda = 1$,
-\eqref{eq:hdrda-cov} is equivalent to the standard ridge-like covariance-matrix
-estimator in \eqref{eq:ridge-estimator}, and various estimators proposed in the
-literature can be obtained by selecting $\gamma$ accordingly. For instance, with
-$\gamma = \tr\{ \widehat{\bm \Sigma} \} / \min(N, p)$, we obtain the estimator
-from \cite{Srivastava:2007ww}.
+\emph{RDA} classifier's computational efficiency. By setting $\alpha_k$ to an
+appropriate constant, the \emph{HDRDA} covariance-matrix estimator includes or
+resembles a large family of estimators. Notice that if $\alpha_k = 1$ and
+$\lambda = 1$, \eqref{eq:hdrda-cov} is equivalent to the standard ridge-like
+covariance-matrix estimator in \eqref{eq:ridge-estimator}, and various
+estimators proposed in the literature can be obtained by selecting $\gamma$
+accordingly. For instance, with $\gamma = \tr\{ \widehat{\bm \Sigma} \} /
+\min(N, p)$, we obtain the estimator from \cite{Srivastava:2007ww}.
 
 Perhaps the most well-known of the ridge-like estimators is from
 \cite{Friedman:1989tm}, who proposed regularized discriminant analysis (RDA) by
@@ -432,7 +437,7 @@ S_k(\lambda) = (1 - \lambda) \bm S_k + \lambda \bm S$. If $\lambda = 0$,
 \eqref{eq:sig-lambda} is equal to $\widehat{\bm \Sigma}_k$ in \eqref{eq:qda}.
 Alternatively, if $\lambda = 1$, then \eqref{eq:sig-lambda} reduces to
 \eqref{eq:pooled-cov}. To further improve the estimation of $\bm \Sigma_k$ and
-to stabilize the inverse of \eqref{eq:sig-lambda}, \cite{Friedman:1989tm} has
+to stabilize the inverse of \eqref{eq:sig-lambda}, \cite{Friedman:1989tm}
 proposed the biased covariance-matrix estimator
 \begin{align}
           \widehat{\bm \Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm
@@ -444,10 +449,10 @@ shrinkage of \eqref{eq:sig-rda} towards $\bm I_p$ and is weighted by the average
 of the eigenvalues of \eqref{eq:sig-lambda}. Finally, the RDA classifier is
 established by substituting \eqref{eq:sig-rda} into \eqref{eq:qda}.
 
-Our proposed \emph{HDRDA} classifier resembles \eqref{eq:sig-rda} but improves
-the interpretation of the pooling parameter $\lambda$ as discussed
-above. Moreover, as we discuss below, our formulation of \emph{HDRDA} classifier
-lends itself to rapid estimation in high-dimensional classification.
+Our proposed \emph{HDRDA} classifier resembles \eqref{eq:sig-rda} but yields an
+interpretation of the pooling parameter $\lambda$ as discussed above. Moreover,
+as we discuss below, our formulation of \emph{HDRDA} classifier lends itself to
+rapid estimation in high-dimensional classification.
 
 \section{Properties of the HDRDA Classifier}
 \label{sec:hdrda-properties}
@@ -597,7 +602,7 @@ $\bm U_2^{T} (\bm x - \xbar_k)$ is constant for $k = 1, \ldots, K$.
 \end{proof}
 
 As we can see, we are able to avoid the time-consuming inverses and determinants
-of $p \times p$ covariance matrices in \eqref{eq:hdrda} and instead calculating
+of $p \times p$ covariance matrices in \eqref{eq:hdrda} and instead calculate
 these same operations on $\bm W_k \in \mathbb{R}_{q \times q}$ in
 \eqref{eq:hdrda-decomposed}. The substantial computational improvements arise
 because our proposed classifier in \eqref{eq:hdrda} is invariant to the term
@@ -758,8 +763,8 @@ Q_k$ requires $O(n_k q^2)$ operations. Because $\bm Q_k \in \mathbb{R}_{n_k
   \times n_k}$, both its determinant and inverse require $O(n_k^3)$
 operations. Consequently, $\bm W_k^{-1}$ requires $O(n_k q^2)$ operations. Also,
 the inverse of the diagonal matrix $\bm \Gamma_k^{-1} \in \mathbb{R}_{q \times
-  q}$ requires $O(q)$ operations. Finally, $| \bm W_k |$ requires $O(n_k^3)$
-operations.
+  q}$ requires $O(q)$ operations. Finally, we remark that $| \bm W_k |$ requires
+$O(n_k^3)$ operations.
 
 The expressions given in Proposition \ref{proposition:hdrda-W_k} also expedite
 the selection of $\lambda$ and $\gamma$ via cross-validation because the most
@@ -812,9 +817,9 @@ inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the
 values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of
 $\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$
 \citep{Hastie:2008dt}. For the second model, we set $\alpha_k = 1 - \gamma$, $k
-= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s parameterization. We
-estimated both $\lambda$ and $\gamma$ from a grid of 21 equidistant candidate
-values between 0 and 1, inclusively.
+= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s parameterization,
+and we estimated both $\lambda$ and $\gamma$ from a grid of 21 equidistant
+candidate values between 0 and 1, inclusively.
 
 \subsection{Simulation Study}
 
@@ -854,7 +859,7 @@ contaminated (i.e., drawn from a distribution with larger variance) and $\eta >
 1$ scales the covariance matrix $\bm \Sigma_k$ to increase the extremity of
 outliers. For $\epsilon = 0$, we have the benchmark block-diagonal simulation
 design from \cite{Guo:2007te}. As $\epsilon$ is increased, the average number of
-outliers is increased. In our simulation, we set $\eta = 100$ and considered the
+outliers is increased. In our simulation, we let $\eta = 100$ and considered the
 values of $\epsilon = 0$, $0.05$, $\ldots$, $0.50$.
 
 We generated $K=3$ populations from \eqref{eq:contaminated-pdf} with $\bm
@@ -876,8 +881,8 @@ the error-rate estimates for each classifier. We allowed the number of features
 to vary from $p = 100$ to $p = 500$ in increments of 100 to examine the
 classification accuracy as the feature dimension increased while maintaining a
 small sample size. \cite{Guo:2007te} originally considered $\rho_k = 0.9$ for
-all $k$. To explore the more realistic assumption of unequal covariance
-matrices, we instead put $\rho_1 = 0.1$, $\rho_2 = 0.5$, and $\rho_3 = 0.9$
+all $k$. Alternatively, to explore the more realistic assumption of unequal
+covariance matrices, we put $\rho_1 = 0.1$, $\rho_2 = 0.5$, and $\rho_3 = 0.9$
 
 \subsubsection{Simulation Results}
 
@@ -913,10 +918,10 @@ that these classifiers were sensitive to outliers. Notice, for example, that
 when $p=400$, the error rates of the Pang, Tong, and Witten classifiers
 increased dramatically from approximately 19\% when no outliers were present to
 approximately 43\% when $\epsilon=0.05$. The sharp increase in average error
-rates for these three classifiers continued as $\epsilon$ increased
-further. Guo's method always outperformed Pang, Witten, and Tong, but once
-outliers were present, the Guo classifier's average error rate was competitive
-with neither the \emph{HDRDA} classifiers nor the random forest.
+rates for these three classifiers continued as $\epsilon$ increased. Guo's
+method always outperformed Pang, Witten, and Tong, but once outliers were
+present, the Guo classifier's average error rate was competitive with neither
+the \emph{HDRDA} classifiers nor the random forest.
 
 \begin{figure}
 <<sim_results_by_p, fig.width=8, fig.height=8, dpi=200>>=
@@ -957,7 +962,7 @@ outperforming them for smaller feature dimensions.
 
 \subsection{Application to Gene Expression Data}
 
-We compared the \emph{HDRDA} classifer to the five competing classifiers on four
+We compared the \emph{HDRDA} classifer to the five competing classifiers on six
 benchmark gene-expression microarray data sets. We evaluated the classification
 accuracy of each classifier by randomly partitioning the data set under
 consideration such that $2/3$ of the observations were allocated as training
@@ -1009,7 +1014,7 @@ our analysis to the five tumor types having at least 15 observations.
 
 \subsubsection{\cite{Shipp:2002ka} Data Set}
 
-Approximately 30-40\% of adult non-Hodgkin lymphomas are diffuse large B-cell
+Approximately 30\%-40\% of adult non-Hodgkin lymphomas are diffuse large B-cell
 lymphomas (DLBCLs) \cite{Shipp:2002ka}.  However, only a small proportion of
 DLBCL patients are cured with modern chemotherapeutic regimens.  Several models
 have been proposed, such as the International Prognostic Index (IPI), to
@@ -1052,9 +1057,9 @@ along with standard deviations of the test error rates in parentheses. The
 the majority of the simulations. The \emph{HDRDA} classifiers had the best
 classification accuracy on the Chowdary and Shipp data sets. Although the random
 forest's accuracy slightly exceeded the \emph{HDRDA} classifiers on the Tian
-data set, our proposed methods outperformed the other classifiers considered.
-Additionally, the \emph{HDRDA} classifiers had comparable performance on five of
-the six data sets.
+data set, our proposed classifiers outperformed the other competing classifiers
+considered here. Moreover, the \emph{HDRDA} classifiers had comparable
+performance on five of the six data sets.
 
 <<classification_results, results='asis'>>=
 table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
