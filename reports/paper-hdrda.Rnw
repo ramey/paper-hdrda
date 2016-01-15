@@ -256,12 +256,14 @@ In discriminant analysis we wish to assign an unlabeled vector $\bm x \in
 \mathbb{R}_{p \times 1}$ to one of $K$ unique, known classes by constructing a
 classifier from $N$ training observations. Let $\bm x_i = (x_{i1}, \ldots,
 x_{ip}) \in \mathbb{R}_{p \times 1}$ be the $i$th observation $(i = 1, \ldots,
-N)$ with true, unique membership $y_i \in \{\omega_1, \ldots, \omega_K\}$. We
-assume that $(\bm x_i, y_i)$ is a realization from a mixture distribution $p(\bm
-x) = \sum_{k=1}^K p(\bm x | \omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$
-is the probability density function (PDF) of the $k$th class and $p(\omega_k)$
-is the prior probability of class membership of the $k$th class. We further
-assume $p(\omega_k) = p(\omega_l)$, $1 \le k, l \le K$, $k \ne l$.
+N)$ with true, unique membership $y_i \in \{\omega_1, \ldots, \omega_K\}$.
+Denote by $n_k$ the number of training observations realized from class $k$,
+such that $\sum_{k=1}^K n_k = N$. We assume that $(\bm x_i, y_i)$ is a
+realization from a mixture distribution $p(\bm x) = \sum_{k=1}^K p(\bm x |
+\omega_k) p(\omega_k)$, where $p(\bm x | \omega_k)$ is the probability density
+function (PDF) of the $k$th class and $p(\omega_k)$ is the prior probability of
+class membership of the $k$th class. We further assume $p(\omega_k) =
+p(\omega_l)$, $1 \le k, l \le K$, $k \ne l$.
 
 The \emph{QDA} classifier is the optimal Bayesian decision rule with respect to
 a $0-1$ loss function when $p(\bm x | \omega_k)$ is the PDF of the multivariate
