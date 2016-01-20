@@ -365,19 +365,7 @@ X$. Similarly, for $\lambda = 0$, we define $\bm X_k = [\sqrt{c_{1k}(0)} \bm
   x_1^{T}, \ldots, \sqrt{c_{Nk}(0)} \bm x_N^{T}]^{T}$ such that $\widehat{\bm
   \Sigma}_k = n_k^{-1} \bm X_k^{T} \bm X_k$.
 
-\begin{figure}
-<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', dpi=200, fig.show='hold'>>=
-rda_contours(lambda = 0)
-rda_contours(lambda = 0.2)
-rda_contours(lambda = 0.4)
-rda_contours(lambda = 0.6)
-rda_contours(lambda = 0.8)
-rda_contours(lambda = 1)
-@
-\caption{Contours of five multivariate normal populations as a function of the
-  pooling parameter $\lambda$.}
-\label{fig:hdrda-contours}
-\end{figure}
+\[ \left[\text{Insert Figure \ref{fig:hdrda-contours} approximately here }\right] \]
 
 As we have discussed above, several eigenvalue adjustment methods have been
 proposed to increase eigenvalues (approximately) equal to 0. To further improve
@@ -900,19 +888,7 @@ both \emph{HDRDA} classifiers outperformed all other classifiers, suggesting
 that their inherent dimension reduction better captured the classificatory
 information in the small training samples, even in the presence of outliers.
 
-\begin{figure}
-<<sim_results, fig.width=8, fig.height=8, dpi=200>>=
-p <- ggplot(results_contaminated, aes(x=contamination_prob, y=Error))
-p <- p + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
-p <- p + facet_wrap(~ p, labeller = "label_both")
-p <- p + xlab("Contamination Probability") + ylab("Average Error Rate")
-p + theme_bw()
-@
-\caption{Average classification error rates as a function of the contamination
-  probability $\epsilon$. Approximate standard errors were no greater than
-  \Sexpr{max_sim_se}.}
-\label{fig:sim-results}
-\end{figure}
+\[ \left[\text{Insert Figure \ref{fig:sim-results} approximately here }\right] \]
 
 The Pang, Tong, and Witten methods yielded practically the same and consistently
 the worst error rates when outliers were present with $\epsilon > 0$, suggesting
@@ -925,24 +901,7 @@ method always outperformed Pang, Witten, and Tong, but once outliers were
 present, the Guo classifier's average error rate was not competitive with
 the \emph{HDRDA} classifiers or the random-forest classifier.
 
-\begin{figure}
-<<sim_results_by_p, fig.width=8, fig.height=8, dpi=200>>=
-p2 <- results_contaminated %>%
-  mutate(p=as.numeric(as.character(p)),
-         contamination_prob=round(contamination_prob, digits=2)) %>%
-    filter(contamination_prob %in% c(0.0, 0.1, 0.2, 0.3, 0.4, 0.5)) %>%
-    rename(`Contamination Probability`=contamination_prob) %>%
-      ggplot(., aes(x=p, y=Error))
-p2 <- p2 + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
-p2 <- p2 + facet_wrap(~ `Contamination Probability`, labeller="label_both")
-p2 <- p2 + xlab("Number of Features") + ylab("Average Error Rate")
-p2 + theme_bw()
-@
-\caption{Average classification error rates as a function of the number of
-  features $p$. Approximate standard errors were no greater than
-  \Sexpr{max_sim_se}.}
-\label{fig:sim-results-by-p}
-\end{figure}
+\[ \left[\text{Insert Figure \ref{fig:sim-results-by-p} approximately here }\right] \]
 
 In Figure \ref{fig:sim-results-by-p} we again examine the simulation results as
 a function of the number of features $p$ for a subset of the values of
@@ -956,12 +915,11 @@ to be substantial.
 
 For $\epsilon > 0$, we observed a different behavior in classification
 performance. First, the Pang, Tong, and Witten methods, along with the
-random-forest method increased in average error rate as $p$
-increased. Contrarily, the performance of the \emph{HDRDA} and Guo classifiers
-was hardly affected by $p$.  Also, as discussed above, the \emph{HDRDA}
-classifiers were superior to all other classifiers for large values of $p$ with
-only the random-forest classifier outperforming them in smaller
-feature-dimension cases.
+random-forest method increased in average error rate as $p$ increased.
+Contrarily, the performance of the \emph{HDRDA} and Guo classifiers was hardly
+affected by $p$. Also, as discussed above, the \emph{HDRDA} classifiers were
+superior to all other classifiers for large values of $p$ with only the
+random-forest classifier outperforming them in smaller feature-dimension cases.
 
 \subsection{Application to Gene Expression Data}
 
@@ -1064,14 +1022,7 @@ data set, our proposed classifiers outperformed the other competing classifiers
 considered here. Moreover, the \emph{HDRDA} classifiers had comparable
 performance on five of the six data sets.
 
-<<classification_results, results='asis'>>=
-table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
-
-xtable_out <- xtable(results_microarray,
-                     caption=table_caption,
-                     label='tab:microarray-results')
-print(xtable_out, include.rownames=FALSE)
-@
+\[ \left[\text{Insert Table \ref{tab:microarray-results} approximately here }\right] \]
 
 The average error-rate estimates for the Pang, Tong, and Witten classifiers were
 comparable across all six data sets. Furthermore, the average error rates for the
@@ -1156,5 +1107,69 @@ could be accomplished.
 
 \bibliographystyle{plainnat}
 \bibliography{rda}
+
+\clearpage
+
+\begin{figure}
+<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', dpi=200, fig.show='hold'>>=
+rda_contours(lambda = 0)
+rda_contours(lambda = 0.2)
+rda_contours(lambda = 0.4)
+rda_contours(lambda = 0.6)
+rda_contours(lambda = 0.8)
+rda_contours(lambda = 1)
+@
+\caption{Contours of five multivariate normal populations as a function of the
+  pooling parameter $\lambda$.}
+\label{fig:hdrda-contours}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+<<sim_results, fig.width=8, fig.height=8, dpi=200>>=
+p <- ggplot(results_contaminated, aes(x=contamination_prob, y=Error))
+p <- p + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
+p <- p + facet_wrap(~ p, labeller = "label_both")
+p <- p + xlab("Contamination Probability") + ylab("Average Error Rate")
+p + theme_bw()
+@
+\caption{Average classification error rates as a function of the contamination
+  probability $\epsilon$. Approximate standard errors were no greater than
+  \Sexpr{max_sim_se}.}
+\label{fig:sim-results}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+<<sim_results_by_p, fig.width=8, fig.height=8, dpi=200>>=
+p2 <- results_contaminated %>%
+  mutate(p=as.numeric(as.character(p)),
+         contamination_prob=round(contamination_prob, digits=2)) %>%
+    filter(contamination_prob %in% c(0.0, 0.1, 0.2, 0.3, 0.4, 0.5)) %>%
+    rename(`Contamination Probability`=contamination_prob) %>%
+      ggplot(., aes(x=p, y=Error))
+p2 <- p2 + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
+p2 <- p2 + facet_wrap(~ `Contamination Probability`, labeller="label_both")
+p2 <- p2 + xlab("Number of Features") + ylab("Average Error Rate")
+p2 + theme_bw()
+@
+\caption{Average classification error rates as a function of the number of
+  features $p$. Approximate standard errors were no greater than
+  \Sexpr{max_sim_se}.}
+\label{fig:sim-results-by-p}
+\end{figure}
+
+\clearpage
+
+<<classification_results, results='asis'>>=
+table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
+
+xtable_out <- xtable(results_microarray,
+                     caption=table_caption,
+                     label='tab:microarray-results')
+print(xtable_out, include.rownames=FALSE)
+@
 
 \end{document}
