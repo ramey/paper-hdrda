@@ -124,11 +124,20 @@ sd_error_microarray <- results_microarray %>%
 # Microarray classification results are presented in a table
 # Rows = classifier, columns = data set
 # Cells = Error (SD) rounded to 3 digits
+# The classifier with the minimum average error rate is in bold for each data set.
+
+bold_latex <- function(x) {
+  paste0('\\textbf{', x, '}')
+}
+
 results_microarray <- inner_join(avg_error_microarray, sd_error_microarray,
                                  by=c('data_set', 'Classifier')) %>%
-  mutate(Table_Cells=sprintf('%.3f (%.3f)', Avg_Error, SD_Error),
+  mutate(Table_Cells=sprintf('%.3f', Avg_Error),
          data_set=stringr::str_to_title(data_set),
          Classifier=gsub("_", " ", Classifier)) %>%
+  group_by(data_set) %>%
+  mutate(Table_Cells=ifelse(Avg_Error == min(Avg_Error), bold_latex(Table_Cells), Table_Cells),
+         Table_Cells=sprintf('%s (%.3f)', Table_Cells, SD_Error)) %>%
   select(-Avg_Error, -SD_Error) %>%
   spread(data_set, Table_Cells)
 @
@@ -1164,12 +1173,12 @@ p2 + theme_bw()
 \clearpage
 
 <<classification_results, results='asis'>>=
-table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses.'
+table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses. The classifier with the minimum average error rate for each data set is in bold.'
 
 xtable_out <- xtable(results_microarray,
                      caption=table_caption,
                      label='tab:microarray-results')
-print(xtable_out, include.rownames=FALSE)
+print(xtable_out, include.rownames=FALSE, sanitize.text.function = function(x) { x })
 @
 
 \end{document}
