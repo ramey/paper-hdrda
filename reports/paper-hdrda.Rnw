@@ -44,12 +44,12 @@ partially pools the sample covariance matrices from linear and quadratic
 disriminant analysis and shrinks the resulting estimator towards a scaled
 identity matrix. The RDA classifier's two tuning parameters are typically
 estimated via a computationally burdensome cross-validation procedure using a
-grid search. We formulate a new RDA classifier for the small-sample,
+grid search. We formulate a new RDA-based classifier for the small-sample,
 high-dimensional setting and then show that the classification decision rule is
 equivalent to a classifier in a subspace having a much lower dimension. As a
 result, the utilization of the dimension-reduction step yields a substantial
 reduction in computation during model selection. Also, our parameterization
-offers interpretability previously lacking with the RDA classifier. We
+offers interpretability that was previously lacking with the RDA classifier. We
 demonstrate that our proposed classifier is often superior to several recently
 proposed sparse and regularized classifiers in terms of classification accuracy
 with three artificial and six real high-dimensional data sets. Finally, we
@@ -898,7 +898,7 @@ classifiers tended to outperform the remaining classifiers with the random
 forest performing best. As the feature dimension increased with $p \ge 300$,
 both \emph{HDRDA} classifiers outperformed all other classifiers, suggesting
 that their inherent dimension reduction better captured the classificatory
-information in the small samples even in the presence of outliers.
+information in the small training samples, even in the presence of outliers.
 
 \begin{figure}
 <<sim_results, fig.width=8, fig.height=8, dpi=200>>=
@@ -922,8 +922,8 @@ increased dramatically from approximately 19\% when no outliers were present to
 approximately 43\% when $\epsilon=0.05$. The sharp increase in average error
 rates for these three classifiers continued as $\epsilon$ increased. Guo's
 method always outperformed Pang, Witten, and Tong, but once outliers were
-present, the Guo classifier's average error rate was competitive with neither
-the \emph{HDRDA} classifiers nor the random forest.
+present, the Guo classifier's average error rate was not competitive with
+the \emph{HDRDA} classifiers or the random-forest classifier.
 
 \begin{figure}
 <<sim_results_by_p, fig.width=8, fig.height=8, dpi=200>>=
@@ -955,12 +955,13 @@ error rate was expected for all classifiers, but the increase was not observed
 to be substantial.
 
 For $\epsilon > 0$, we observed a different behavior in classification
-performance. First, the Pang, Tong, and Witten methods along with the random
-forest increased in average error rate as $p$ increased. Contrarily, the
-performance of the \emph{HDRDA} and Guo classifiers was hardly affected by $p$.
-Also, as discussed above, the \emph{HDRDA} classifiers were superior to all
-other classifiers for larger values of $p$ with only the random forest
-outperforming them for smaller feature dimensions.
+performance. First, the Pang, Tong, and Witten methods, along with the
+random-forest method increased in average error rate as $p$
+increased. Contrarily, the performance of the \emph{HDRDA} and Guo classifiers
+was hardly affected by $p$.  Also, as discussed above, the \emph{HDRDA}
+classifiers were superior to all other classifiers for large values of $p$ with
+only the random-forest classifier outperforming them in smaller
+feature-dimension cases.
 
 \subsection{Application to Gene Expression Data}
 
@@ -976,7 +977,7 @@ variables. After training each classifier on the training data, we classified
 the test data sets and computed the proportion of mislabeled test observations
 to estimate the classification error rate for each classifier. Repeating this
 process 100 times, we computed the average of the error-rate estimates for each
-classifier. Here, we provide a concise description of each high-dimensional data
+classifier. We next provide a concise description of each high-dimensional data
 set examined in our classification study.
 
 \subsubsection{\cite{Chiaretti:2004gq} Data Set}
@@ -1073,7 +1074,7 @@ print(xtable_out, include.rownames=FALSE)
 @
 
 The average error-rate estimates for the Pang, Tong, and Witten classifiers were
-comparable across all data sets. Furthermore, the average error rates for the
+comparable across all six data sets. Furthermore, the average error rates for the
 Pang and Tong classifiers were approximately equal for all data sets except for
 the Chiaretti dataset. This result suggests that the mean and variance
 estimators used in lieu of the MLEs provided little improvement to
@@ -1091,12 +1092,12 @@ superior. Further studies should be performed to validate this statement in the
 small-sample, high-dimensional setting.
 
 Finally, the Pang, Tong, and Witten classifiers consistently yielded the largest
-error rates across all data sets. Given that the standard deviations were
-relatively large, we hesitate to generalize claims regarding the ranking of
-these three classifiers in terms of error rate. However, the classifiers' error
-rates and their variability across multiple random partitions of each data set
-were large enough to rethink applying them in practice.
-
+average error rates across the six data sets. Given that the standard deviations
+were relatively large, we hesitate to generalize claims regarding the ranking of
+these three classifiers in terms of the average error rate. However, the
+classifiers' error rates and their variability across multiple random partitions
+of each data set were large enough that we might question their benefit when
+applied to real data.
 
 \section{Discussion}
 \label{sec:discussion}
