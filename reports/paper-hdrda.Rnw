@@ -1133,7 +1133,7 @@ terms of computational runtime. Given the \emph{RDA} classifier from
 high-dimensional setting \citep{Webb:2011vu} but is limited by its
 computationally intense model selection procedure, our work enables the
 \emph{RDA} classifier to be employed with small-sample, high-dimensional data in
-practice. This results is reassuring because the \emph{RDA} classifier remains
+practice. This result is reassuring because the \emph{RDA} classifier remains
 widely popular in the literature. In fact, variants of the RDA classifier have
 been applied to microarray data
 \citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te}, facial recognition
@@ -1143,14 +1143,14 @@ handwritten digit recognition \citep{Bouveyron:2007gx}, remote sensing
 spectra \citep*{Wu:1996us,Aeberhard:1993fp}.
 
 The dimension reduction that we have employed in this paper has reduced the
-dimension to rank$(\widehat{\bm \Sigma}) = q$. An interesting extension of
-our work would reduce the dimension $q$ further to a lower dimension $q_L < q$
-using some criterion proposed, perhaps similar to that employed in principal
+dimension to rank$(\widehat{\bm \Sigma}) = q$. An interesting extension of our
+work would reduce the dimension $q$ further to a lower dimension $q_L < q$ using
+some criterion proposed, perhaps similar to that employed in principal
 components analysis. While it is not clear whether classification performance
 would improve via such a method, the efficiency of the training and model
 selection would certainly improve. Moreover, if $q_L = 2$ or $3$ was selected,
-the potential for low-dimensional graphical displays of high-dimensional could
-be accomplished.
+the potential for low-dimensional graphical displays of high-dimensional data
+could be accomplished.
 
 
 \bibliographystyle{plainnat}
