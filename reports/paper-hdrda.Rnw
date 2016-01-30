@@ -855,8 +855,7 @@ The block-diagonal covariance structure in \eqref{eq:block-sigma} resembles
 gene-expression data: within each block of pathways, genes are correlated, and
 the correlation decays as a function of the distance between any two genes. The
 original design from \cite{Guo:2007te} comprised two $p$-dimensional
-multivariate normal populations with a common block-diagonal covariance matrix
-where $\bm\Sigma_1 = \bm\Sigma_2$.
+multivariate normal populations with a common block-diagonal covariance matrix.
 
 Although the design is indeed standard, the simulation configuration lacks
 artifacts observed commonly in real data, such as skewness and extreme
