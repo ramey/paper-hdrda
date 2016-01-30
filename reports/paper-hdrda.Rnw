@@ -1,6 +1,6 @@
 \documentclass{article}
 
-\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib, setspace, algorithm2e}
+\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib, setspace, algorithm2e, authblk}
 
 \bibpunct{(}{)}{;}{a}{,}{,}
 
@@ -30,7 +30,18 @@
 
 \title{High-Dimensional Regularized Discriminant Analysis}
 
-\author{John A. Ramey, Caleb K. Stein, Phil D. Young, and Dean M. Young}
+%\author{John A. Ramey, Caleb K. Stein, Phil D. Young, and Dean M. Young}
+
+\author[a]{John A. Ramey}
+\author[b]{Caleb K. Stein}
+\author[c]{Phil D. Young}
+\author[d]{Dean M. Young}
+\affil[a]{uStudio, Inc.}
+\affil[b]{Myeloma Institute, University of Arkansas for Medical Sciences}
+\affil[c]{Department of Management and Information Systems, Baylor University}
+\affil[d]{Department of Statistical Science, Baylor University}
+
+\renewcommand\Authands{ and }
 
 \maketitle
 
