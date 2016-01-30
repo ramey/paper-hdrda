@@ -241,7 +241,7 @@ from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods studied by
 \cite{Ramey:2013ji} and \citet*{Xu:2009fl}.
 
 The remainder of this paper is organized as follows. In Section
-\ref{sec:preliminaries} we present the discrimination problem and necessary
+\ref{sec:preliminaries} we present the classification problem and necessary
 notation to describe our contributions. In Section \ref{sec:rda} we present the
 \emph{HDRDA} classifier along with its interpretation, properties, and
 computationally efficient model-selection procedure. In Section \ref{sec:sims}
