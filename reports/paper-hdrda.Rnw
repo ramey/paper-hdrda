@@ -1117,6 +1117,8 @@ would certainly improve. Moreover, if $q_L = 2$ or $3$ was selected, the
 potential for low-dimensional graphical displays of high-dimensional data could
 be accomplished.
 
+We thank Mrs. Joy Young for her numerous recommendations that enhanced the
+quality of our writing.
 
 \bibliographystyle{plainnat}
 \bibliography{rda}
