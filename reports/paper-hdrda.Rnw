@@ -1,6 +1,7 @@
 \documentclass{article}
 
-\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib, setspace, algorithm2e, authblk}
+\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib, setspace}
+\usepackage{algorithm2e, authblk, url}
 
 \bibpunct{(}{)}{;}{a}{,}{,}
 
@@ -819,7 +820,8 @@ trees and 100 maximum nodes. For each classifer we explicitly set prior
 probabilities as equal, if applicable. All other classifier options were set to
 their default settings. Below, we refer to each classifier by the first author's
 surname. All simulations were conducted on an Amazon Elastic Compute Cloud (EC2)
-{\tt c4.4xlarge} instance.
+{\tt c4.4xlarge} instance. Our analyses can be reproduced using the code
+available in the \url{https://github.com/ramhiser/paper-hdrda} repository.
 
 For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examined the
 classification performance of two models. For the first \emph{HDRDA} model, we
