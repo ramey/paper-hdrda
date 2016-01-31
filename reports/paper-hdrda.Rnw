@@ -1,7 +1,7 @@
-\documentclass{article}
+\documentclass[review]{elsarticle}
 
-\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib, setspace}
-\usepackage{algorithm2e, authblk, url}
+\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib}
+\usepackage{algorithm2e, url, lineno}
 
 \bibpunct{(}{)}{;}{a}{,}{,}
 
@@ -14,7 +14,6 @@
 \newtheorem{proposition}{Proposition}
 \newtheorem{thm}{Theorem}
 
-\pagestyle{plain}
 %----------------Page dimensions ----------------
 \oddsidemargin 0.0in
 \evensidemargin 0.0in
@@ -29,24 +28,18 @@
 
 \begin{document}
 
+\begin{frontmatter}
+
 \title{High-Dimensional Regularized Discriminant Analysis}
 
-%\author{John A. Ramey, Caleb K. Stein, Phil D. Young, and Dean M. Young}
-
-\author[a]{John A. Ramey}
-\author[b]{Caleb K. Stein}
-\author[c]{Phil D. Young}
-\author[d]{Dean M. Young}
-\affil[a]{uStudio, Inc.}
-\affil[b]{Myeloma Institute, University of Arkansas for Medical Sciences}
-\affil[c]{Department of Management and Information Systems, Baylor University}
-\affil[d]{Department of Statistical Science, Baylor University}
-
-\renewcommand\Authands{ and }
-
-\maketitle
-
-\doublespacing
+\author[jar]{John A. Ramey\cortext[cor1]{Corresponding author}}
+\author[cks]{Caleb K. Stein}
+\author[pdy]{Phil D. Young}
+\author[dmy]{Dean M. Young}
+\address[jar]{uStudio, Inc.}
+\address[cks]{Myeloma Institute, University of Arkansas for Medical Sciences}
+\address[pdy]{Department of Management and Information Systems, Baylor University}
+\address[dmy]{Department of Statistical Science, Baylor University}
 
 \begin{abstract}
 
@@ -69,6 +62,10 @@ provide an implementation of our proposed classifier in the {\tt sparsediscrim}
 R package, which is available on CRAN.
 
 \end{abstract}
+
+\end{frontmatter}
+
+\linenumbers
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
 # Round digits throughout document including \Sexpr statements.
