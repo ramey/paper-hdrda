@@ -1158,7 +1158,7 @@ be accomplished.
 We thank Mrs. Joy Young for her numerous recommendations that enhanced the
 quality of our writing.
 
-\bibliographystyle{plainnat}
+\bibliographystyle{elsarticle-num}
 \bibliography{rda}
 
 \clearpage
