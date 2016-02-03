@@ -31,7 +31,7 @@
 
 \title{High-Dimensional Regularized Discriminant Analysis}
 
-%\author{John A. Ramey, Caleb K. Stein, Phil D. Young, and Dean M. Young}
+% AMS' MSC Classes: 62H30, 65F15, 65F20, 65F22
 
 \author[a]{John A. Ramey}
 \author[b]{Caleb K. Stein}
@@ -46,14 +46,12 @@
 
 \maketitle
 
-\doublespacing
-
 \begin{abstract}
 
 \citeauthor{Friedman:1989tm} proposed the popular regularized discriminant
 analysis (RDA) classifier that utilizes a biased covariance-matrix estimator
 that partially pools the sample covariance matrices from linear and quadratic
-disriminant analysis and shrinks the resulting estimator towards a scaled
+discriminant analysis and shrinks the resulting estimator towards a scaled
 identity matrix. The RDA classifier's two tuning parameters are typically
 estimated via a computationally burdensome cross-validation procedure that uses
 a grid search. We formulate a new RDA-based classifier for the small-sample,
