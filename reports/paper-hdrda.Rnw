@@ -1,4 +1,4 @@
-\documentclass[review]{elsarticle}
+\documentclass[review,authoryear]{elsarticle}
 
 \usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib}
 \usepackage{algorithm2e, url, lineno}
@@ -46,7 +46,7 @@
 \citeauthor{Friedman:1989tm} proposed the popular regularized discriminant
 analysis (RDA) classifier that utilizes a biased covariance-matrix estimator
 that partially pools the sample covariance matrices from linear and quadratic
-disriminant analysis and shrinks the resulting estimator towards a scaled
+discriminant analysis and shrinks the resulting estimator towards a scaled
 identity matrix. The RDA classifier's two tuning parameters are typically
 estimated via a computationally burdensome cross-validation procedure that uses
 a grid search. We formulate a new RDA-based classifier for the small-sample,
@@ -1158,7 +1158,7 @@ be accomplished.
 We thank Mrs. Joy Young for her numerous recommendations that enhanced the
 quality of our writing.
 
-\bibliographystyle{elsarticle-num}
+\bibliographystyle{elsarticle-harv}
 \bibliography{rda}
 
 \clearpage

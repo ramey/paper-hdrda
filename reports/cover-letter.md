@@ -34,8 +34,12 @@ been bundled them in the _datamicroarray_ R package located at
 interest to a broad readership including those interested in efficient sparse
 and regularized classifiers for high-dimensional classification.
 
+A preprint of our paper is
+[available on arXiv](http://arxiv.org/abs/1602.01182).  However, the paper is
+not under review at any other journal.
+
 Due to a potential conflict of interest, we respectfully request that the
-following six individuals not be asked to review the paper:
+following seven individuals not be asked to review the paper:
 
 1. Professor Daniella Witten, University of Washington, USA
 2. Professor Robert Tibshirani, Stanford University, USA
