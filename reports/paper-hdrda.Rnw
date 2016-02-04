@@ -64,7 +64,7 @@ R package, which is available on CRAN.
 \end{abstract}
 
 \begin{keyword}
-Regularized discriminant analysis\sep high-dimensional classification\sep covariance-matrix regularization
+Regularized discriminant analysis\sep High-dimensional classification\sep Covariance-matrix regularization\sep Singular value decomposition\sep Multivariate analysis\sep Dimension reduction
 \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
 \end{keyword}
 
