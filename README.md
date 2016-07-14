@@ -1,6 +1,6 @@
 # High-Dimensional Regularized Discriminant Analysis
 
-This repository includes the paper and simulation code.
+This repository includes the paper and simulation code. Our paper is [available on arXiv.org](http://arxiv.org/abs/1602.01182).
 
 ## Installation
 
