@@ -262,17 +262,14 @@ discriminant analysis, we require the following notation. Let $\mathbb{R}_{a
 field $\mathbb{R}$. Denote by $\bm I_m$ the $m \times m$ identity matrix, and
 let $\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm
 0_m$ is understood to denote $\bm 0_{m \times m}$. Define $\bm 1_m \in
-\mathbb{R}_{m \times 1}$ as a vector of ones. Let $\bm A \oplus \bm B$ denote
-the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in
-\mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Let $\bm A^{T}$,
-$\bm A^+$, and $\mathcal{N}(\bm A)$ denote the transpose, the Moore-Penrose
-pseudoinverse, and the null space of $\bm A \in \mathbb{R}_{m \times p}$,
-respectively. Denote by $\mathbb{R}_{p \times p}^{>}$ the cone of real $p \times
-p$ positive-definite matrices. Similarly, let $\mathbb{R}_{p \times p}^{\ge}$
-denote the cone of real $p \times p$ positive-semidefinite matrices. Let
-$V^{\perp}$ denote the orthogonal complement of a vector space $V \subset
-\mathbb{R}_{p \times 1}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$
-and $0$ otherwise.
+\mathbb{R}_{m \times 1}$ as a vector of ones. Let $\bm A^{T}$, $\bm A^+$, and
+$\mathcal{N}(\bm A)$ denote the transpose, the Moore-Penrose pseudoinverse, and
+the null space of $\bm A \in \mathbb{R}_{m \times p}$, respectively. Denote by
+$\mathbb{R}_{p \times p}^{>}$ the cone of real $p \times p$ positive-definite
+matrices. Similarly, let $\mathbb{R}_{p \times p}^{\ge}$ denote the cone of real
+$p \times p$ positive-semidefinite matrices. Let $V^{\perp}$ denote the
+orthogonal complement of a vector space $V \subset \mathbb{R}_{p \times 1}$. For
+$c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$ and $0$ otherwise.
 
 \subsection{Discriminant Analysis}
 
@@ -535,16 +532,22 @@ we have that $\mathcal{N}\{\widehat{\bm \Sigma}_k(\lambda)\} \subset
 
 In Lemma \ref{lemma:rda-tilde-Sigma_k} below, we derive an alternative
 expression for $\tilde{\bm \Sigma}_k$ in terms of the matrix of eigenvectors of
-$\widehat{\bm \Sigma}$. Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be the
-eigendecomposition of $\widehat{\bm \Sigma}$ such that $\bm D \in \mathbb{R}_{p
-  \times p}^{\ge}$ is the diagonal matrix of eigenvalues of $\widehat{\bm \Sigma}$
-with $\bm D = \bm D_q \oplus \bm 0_{p-q}$, $\bm D_q \in \mathbb{R}_{q \times
-  q}^{>}$ is the diagonal matrix consisting of the positive eigenvalues of
-$\widehat{\bm \Sigma}$, the columns of $\bm U \in \mathbb{R}_{p \times p}$ are
-the corresponding orthonormal eigenvectors of $\widehat{\bm \Sigma}$, and
-rank$(\widehat{\bm \Sigma}) = q$. Then, we partition $\bm U = (\bm U_1,
-\bm U_2)$ such that $\bm U_1 \in \mathbb{R}_{p \times q}$ and $\bm U_2 \in
-\mathbb{R}_{p \times (p - q)}$.
+$\widehat{\bm \Sigma}$. Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be
+the eigendecomposition of $\widehat{\bm \Sigma}$ such that $\bm D \in
+\mathbb{R}_{p \times p}^{\ge}$ is the diagonal matrix of eigenvalues of
+$\widehat{\bm \Sigma}$ with
+\begin{align*}
+  \bm D = \begin{bmatrix}
+    \bm D_q & \bm 0 \\
+    \bm{0} & \bm 0_{p-q}
+    \end{bmatrix},
+\end{align*}
+$\bm D_q \in \mathbb{R}_{q \times q}^{>}$ is the diagonal matrix consisting of
+the positive eigenvalues of $\widehat{\bm \Sigma}$, the columns of $\bm U \in
+\mathbb{R}_{p \times p}$ are the corresponding orthonormal eigenvectors of
+$\widehat{\bm \Sigma}$, and rank$(\widehat{\bm \Sigma}) = q$. Then, we partition
+$\bm U = (\bm U_1, \bm U_2)$ such that $\bm U_1 \in \mathbb{R}_{p \times q}$ and
+$\bm U_2 \in \mathbb{R}_{p \times (p - q)}$.
 
 \begin{lemma}\label{lemma:rda-tilde-Sigma_k}
 Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be the eigendecomposition of
@@ -552,8 +555,12 @@ $\widehat{\bm \Sigma}$ as above, and suppose that rank$(\widehat{\bm \Sigma}) =
 q \le p$. Then, we have
 \begin{linenomath*}
 \begin{align}
-	\tilde{\bm \Sigma}_k &= \bm U(\bm W_k \oplus \gamma \bm I_{p-q})\bm U^{T}, \quad
-  k = 1, \ldots, K,\label{eq:rda-matrix}
+	\tilde{\bm \Sigma}_k &= \bm U
+    \begin{bmatrix}
+      \bm W_k & \bm 0 \\
+      \bm 0 & \gamma \bm I_{p-q}
+    \end{bmatrix}
+    \bm U^{T}, \quad k = 1, \ldots, K,\label{eq:rda-matrix}
 \intertext{where}
 \bm W_k &= \alpha_k \{(1 - \lambda) \bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 + \lambda \bm D_q\} + \gamma \bm I_{q}.\label{eq:Wk}
 \end{align}
@@ -562,10 +569,15 @@ q \le p$. Then, we have
 \begin{proof}
 From Lemma \ref{lemma:null-spaces}, the columns of $\bm U_2$ span the null space
 of $\widehat{\bm \Sigma}_k$, which implies that $\widehat{\bm \Sigma}_k \bm U_2
-= \bm 0_{p \times (p - q)}$. Hence, $\bm U^{T} \widehat{\bm \Sigma}_k \bm U =
-\bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 \oplus \bm 0_{p-q}$, $k = 1, \ldots,
-K$. Thus, $\bm U^{T} \tilde{\bm \Sigma}_k \bm U = \alpha_k \{(1 - \lambda) \bm
-U^{T} \widehat{\bm \Sigma}_k \bm U + \lambda \bm D\} + \gamma \bm I_p$, and
+= \bm 0_{p \times (p - q)}$. Hence,
+\begin{align*}
+  \bm U^{T} \widehat{\bm \Sigma}_k \bm U = \begin{bmatrix}
+    \bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 & \bm 0 \\
+    \bm 0 & \bm 0_{p-q}
+  \end{bmatrix}, \quad k = 1, \ldots, K.
+\end{align*}
+Thus, $\bm U^{T} \tilde{\bm \Sigma}_k \bm U = \alpha_k \{(1 - \lambda) \bm U^{T}
+\widehat{\bm \Sigma}_k \bm U + \lambda \bm D\} + \gamma \bm I_p$, and
 \eqref{eq:rda-matrix} holds because $\bm U$ is orthogonal.
 \end{proof}
 
@@ -622,10 +634,16 @@ the decision rule in \eqref{eq:hdrda} is equivalent to
 \end{linenomath*}
 \end{thm}
 \begin{proof}
-From \eqref{eq:rda-matrix}, we have that $\tilde{\bm \Sigma}_k^{+} = \bm U(
-\bm W_k^{-1} \oplus \gamma^{+} \bm I_{p-q} )\bm U^{T}$ and $|\tilde{\bm \Sigma}_k| =
-\gamma^{p-q}| \bm W_k |$, $k = 1, \ldots, K$. Therefore, for all $\bm x \in
-\mathbb{R}_{p \times 1}$, we have that
+From \eqref{eq:rda-matrix}, we have that
+\begin{align*}
+  \tilde{\bm \Sigma}_k^{+} = \bm U \begin{bmatrix}
+    \bm W_k^{-1} & \bm 0 \\
+    \bm 0 & \gamma^{+} \bm I_{p-q}
+  \end{bmatrix}
+  \bm U^{T}
+\end{align*}
+and $|\tilde{\bm \Sigma}_k| = \gamma^{p-q}| \bm W_k |$, $k = 1, \ldots,
+K$. Therefore, for all $\bm x \in \mathbb{R}_{p \times 1}$, we have that
 \begin{linenomath*}
 \begin{align*}
 	(\bm x - \xbar_k)^{T} \tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k| &= (\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k)\\
@@ -783,11 +801,17 @@ X_c^{T} \bm X_c$, we have the eigendecomposition $\widehat{\bm \Sigma} = \bm U
 of $\widehat{\bm \Sigma}$. Now, we can obtain $\bm M$ and $\bm D$ efficiently
 from the eigenvalue decomposition of the $N \times N$ matrix $\bm X_c \bm
 X_c^{T} = \bm M \bm D \bm M^{T}$. Next, we compute $\bm U = \bm X_c^{T} \bm M
-\bm D^{+/2}$, where $\bm D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then
-determine $q$, the number of numerically nonzero eigenvalues present in $\bm D$,
-by calculating the number of eigenvalues that exceeds some tolerance value, say,
-$1 \times 10^{-6}$. We then extract $\bm U_1$ as the first $q$ columns of $\bm
-U$.
+\bm D^{+/2}$, where
+\begin{align*}
+  \bm D^{+/2} = \begin{bmatrix}
+    \bm D_q^{-1/2} & \bm 0 \\
+    \bm 0 & \bm 0_{N-q}
+  \end{bmatrix}.
+\end{align*}
+We then determine $q$, the number of numerically nonzero eigenvalues present in
+$\bm D$, by calculating the number of eigenvalues that exceeds some tolerance
+value, say, $1 \times 10^{-6}$. We then extract $\bm U_1$ as the first $q$
+columns of $\bm U$.
 
 As a result of the compact SVD, we need calculate $\bm X_c \bm U_1$ only once
 per cross-validation fold, requiring $O(p q N) \approx O(p N^2)$ calculations.
@@ -870,7 +894,14 @@ classification literature, including the studies by \cite{Ramey:2013ji} and
 from \cite{Guo:2007te},
 \begin{linenomath*}
 \begin{align}
-  \bm\Sigma_k = \bm\Sigma^{(\rho_k)} \oplus \bm\Sigma^{(-\rho_k)} \oplus \ldots \oplus \bm\Sigma^{(\rho_k)},\label{eq:block-sigma}
+  \bm\Sigma_k = \begin{bmatrix}
+    \bm\Sigma^{(\rho_k)} & \bm 0_{100} & \bm 0_{100} & \cdots & \cdots & \cdots \\
+    \bm 0_{100} & \bm\Sigma^{(-\rho_k)} & \bm 0_{100} & \bm 0_{100} & \cdots & \vdots \\
+    \bm 0_{100} & \bm 0_{100} & \bm\Sigma^{(\rho_k)} & \bm 0_{100} & \cdots & \vdots \\
+    \vdots & \bm 0_{100} & \bm 0_{100} & \bm\Sigma^{(-\rho_k)} & \bm 0_{100} & \vdots \\
+    \vdots & \vdots & \vdots & \bm 0_{100} & \ddots & \vdots \\
+    \cdots & \cdots & \cdots & \cdots & \cdots & \cdots \\
+  \end{bmatrix},\label{eq:block-sigma}
 \end{align}
 \end{linenomath*}
 where the $(i,j)$th entry of the block matrix $\bm\Sigma^{(\rho_k)} \in
