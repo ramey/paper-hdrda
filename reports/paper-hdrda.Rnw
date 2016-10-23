@@ -43,23 +43,26 @@
 
 \begin{abstract}
 
-\citeauthor{Friedman:1989tm} proposed the popular regularized discriminant
-analysis (RDA) classifier that utilizes a biased covariance-matrix estimator
-that partially pools the sample covariance matrices from linear and quadratic
-discriminant analysis and shrinks the resulting estimator towards a scaled
-identity matrix. The RDA classifier's two tuning parameters are typically
-estimated via a computationally burdensome cross-validation procedure that uses
-a grid search. We formulate a new RDA-based classifier for the small-sample,
-high-dimensional setting and then show that the classification decision rule is
-equivalent to a classifier in a subspace having a much lower dimension. As a
-result, the utilization of the dimension-reduction step yields a substantial
-reduction in computation during model selection. Also, our parameterization
-offers interpretability that was previously lacking with the RDA classifier. We
-demonstrate that our proposed classifier is often superior to several recently
-proposed sparse and regularized classifiers in terms of classification accuracy
-with three artificial and six real high-dimensional data sets. Finally, we
-provide an implementation of our proposed classifier in the {\tt sparsediscrim}
-R package, which is available on CRAN.
+We develop a new and computationally efficient implementation of
+\citeauthor{Friedman:1989tm}'s popular regularized discriminant analysis (RDA)
+classifier in the small-sample, high-dimensional setting. Our proposed
+high-dimensional RDA (HDRDA) classifier modifies \citeauthor{Friedman:1989tm}'s
+original formulation to achieve interpretability previously lacking. We are able
+to interpret the biased covariance matrix estimator employed in the HDRDA
+classifier as one that is estimated from all training observations regardless of
+class, solidifying the ``borrowing'' operation \citeauthor{Friedman:1989tm}'s
+RDA is claimed to have. Moreover, our formulation also differs from
+\citeauthor{Friedman:1989tm}'s in that we show our classifier is equivalent to
+one in a reduced feature space with dimension approximately equal to the
+training sample size. As a result, the matrix operations used in the HDRDA
+classifier are computationally linear in the number of features, making HDRDA
+well-suited for high-dimensional classification in practice. Timing comparisons
+between our HDRDA implementation in the {\tt sparsediscrim} R package and the
+standard RDA formulation in the {\tt klaR} R package demonstrate that as the
+number of features increases, the computational runtime of HDRDA is drastically
+smaller than RDA. We also demonstrate that HDRDA is often superior to several
+sparse and regularized classifiers in terms of classification accuracy with
+three artificial and six real high-dimensional data sets.
 
 \end{abstract}
 
