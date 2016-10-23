@@ -159,91 +159,89 @@ results_microarray <- inner_join(avg_error_microarray, sd_error_microarray,
   spread(data_set, Table_Cells)
 @
 
-
 \section{Introduction}
 
-As machine-learning algorithms are increasingly utilized to automate data-driven
-decisions, researchers continue to develop a wealth of \emph{classifiers}
-employed in a variety of disciplines, such as medical research, facial
-recognition, remote sensing, and chemical analysis
-\citep*{Ching:2012fu,Li:2012ev,Zhang:2010va}. Despite the advances in
-classification to facilitate technological advancements, well-established
-classifiers often degrade in accuracy when applied to modern, high-dimensional
-data sets if the number of features $p$ exceeds the total sample size $N$, due
-to the \emph{curse of dimensionality} \citep{Bellman:1961tn}. For instance,
-linear discriminant analysis (\emph{LDA}) and quadratic discriminant analysis
-(\emph{QDA}) are popular because of their simplicity, speed of computation, and
-interpretability. However, both methods are incalculable when $p > N$ because
-the class sample covariance matrices are singular \citep*{Bouveyron:2007gx}.
-
-As a result, researchers have emphasized three standard approaches to modifying
-the \emph{LDA} and \emph{QDA} classifiers for application to high-dimensional
-data: 1) covariance-matrix regularization, 2) dimension reduction, and 3)
-parameter restrictions. Covariance-matrix regularization methods are often based
-on the well-known ridge-regression approach of \cite{Hoerl:1970cd}.
-Additionally, \cite{Ching:2012fu}, \cite{Zhang:2010va}, \cite{Ye:2009gd},
-\cite{Ji:2008wp}, \cite*{Guo:2007te}, \cite*{Srivastava:2007ud},
-\cite{Ye:2006vx}, and \cite{Ye:2005uu} have proposed regularization methods to
-improve the estimation of the class covariance matrices by adjusting the
-eigenvalues of the sample covariance matrices to ensure positive
-definiteness. Alternatively, dimension reduction typically transforms the
-original data in the high-dimensional space to a subspace having a much smaller
-dimension such that redundant and noisy information is removed
-\citep*{Fan:2012iq,Ye:2009gd,Bouveyron:2007gx,Ye:2006vx,Ye:2005hd,Antoniadis:2003bk}.
-Finally, \cite*{Mai:2012bf}, \cite{Fan:2012iq}, \cite*{Merchante:2012vk},
-\cite*{Clemmensen:2011kr}, \cite*{Huang:2010ju}, and \cite*{Dudoit:2002ev} have
-proposed restrictions on the population covariance matrices to reduce the number
-of parameters that must be estimated. For instance, \cite{Dudoit:2002ev} have
-assumed that the features within each class are independent so that the
-population covariance matrices are diagonal, resulting in positive-definite
-sample covariance matrices. For excellent overviews of the regularization
-problem in discriminant analysis and other techniques, see \cite{Murphy:2012uq}
-and \cite*{Mkhadri:1997gy}.
+In this paper, we consider the classification of small-sample, high-dimensional
+data, where the number of features $p$ exceeds the training sample size $N$. In
+this setting, well-established classifiers such as linear discriminant analysis
+(\emph{LDA}) and quadratic discriminant analysis (\emph{QDA}) become
+incalculable because the class and pooled covariance matrix estimators are
+singular \citep*{Murphy:2012uq, Bouveyron:2007gx, Mkhadri:1997gy}. To improve
+the estimation of the class covariance matrices estimated in the \emph{QDA}
+classifier and to ensure the covariance matrix estimators are nonsingular,
+\cite{Friedman:1989tm} proposed the regularized discriminant analysis
+(\emph{RDA}) classifier by incorporating a weighted average of the pooled sample
+covariance matrix and the class sample covariance matrix. To further improve the
+estimation of the class covariance matrix and to stabilize its inverse,
+\cite{Friedman:1989tm} also included a regularization component by shrinking the
+covariance matrix estimator towards the identity matrix, which yields a
+nonsingular estimator following the well-known ridge-regression approach of
+\cite{Hoerl:1970cd}. Despite its popularity, the ``borrowing'' operation
+employed in the \emph{RDA} classifier lacks interpretability
+\citep{Bensmail:1996fw}, and the \emph{RDA} classifier is computationally
+inefficient in that its matrix operations are cubic in the number of
+features.\footnote{TODO: Add a couple of references saying RDA is slooooow.} As
+a result, the \emph{RDA} classifier is impraticial for modern high-dimensional
+data sets because its matrix operations are cubic in the number of features, and
+the estimation of the \emph{RDA} classifier's two tuning parameters is
+computationally burdensome.
 
 Here, we present the high-dimensional \emph{RDA} (\emph{HDRDA}) classifier,
 which is intended for the $p > N$ case and builds on the classic \emph{RDA}
-classifier proposed by \cite{Friedman:1989tm}. In this paper, we study the
-classification performance of the \emph{HDRDA} classifier on six real
-high-dimensional data sets along with a simulation design that generalizes the
-experiments initially conducted by \cite{Guo:2007te}. We demonstrate that the
-\emph{HDRDA} classifier often attains superior classification accuracy to
-several recent classifiers designed for small-sample, high-dimensional data from
-\cite*{Tong:2012hw}, \cite{Witten:2011kc}, \cite*{Pang:2009ik}, and
-\cite{Guo:2007te}. We also include as a benchmark the random forest from
-\cite{Breiman:2001fb} because \cite*{FernandezDelgado:2014ul} have concluded
-that the random forest is often superior to other classifiers in benchmark
-studies. We show that our proposed classifier is competitive and often
+classifier proposed by \cite{Friedman:1989tm}. We reparameterize the \emph{RDA}
+classifier similar to that of \cite*{Hastie:2008dt} and \cite{Halbe:2007ea} and
+employ a biased covariance-matrix estimator that partially pools the individual
+sample covariance matrices from the \emph{QDA} classifier with the pooled sample
+covariance matrix from the \emph{LDA} classifier. We then shrink the resulting
+covariance-matrix estimator towards a scaled identity matrix to ensure positive
+definiteness. We show that the pooling parameter in the \emph{HDRDA} classifier
+determines the contribution of each training observation to the estimation of
+each class covariance matrix, enabling interpretability that has been previously
+lacking with the \emph{RDA} classifier \citep{Bensmail:1996fw}. Our
+parameterization differs from \cite*{Hastie:2008dt} and \cite{Halbe:2007ea} in
+that our formulation allows the flexibility of various covariance-matrix
+estimators proposed in the literature, including a variety of ridge-like
+estimators such as the one proposed by \cite{Srivastava:2007ww}.
+
+Next, we establish that the matrix operations corresponding to the null space of
+the pooled sample covariance matrix are redundant and can be discarded from the
+\emph{HDRDA} decision rule without loss of classificatory information by
+applying reasoning similar to that of \cite{Ye:2006tq}. As a result, we achieve
+a substantial reduction in dimension such that the matrix operations used in the
+\emph{HDRDA} classifier are computationally linear in the number of features.
+Furthermore, we demonstrate that the \emph{HDRDA} decision rule is invariant to
+adjustments to the approximately $p - N$ zero eigenvalues, so that the decision
+rule in the original feature space is equivalent to a decision rule in a lower
+dimension, such that matrix inverses and determinants of relatively small
+matrices can be rapidly computed. Finally, we show that several shrinkage
+methods that are special cases of the \emph{HDRDA} classifier have no effect on
+the approximately $p - N$ zero eigenvalues of the covariance-matrix estimators
+when $p > N$. Such techniques include work from \cite{Srivastava:2007ww},
+\cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
+\citet*{Xu:2009fl}.
+
+We provide an efficient algorithm along with pseudocode to estimate the
+\emph{HDRDA} classifier's tuning parameters in a grid search via
+cross-validation. Timing comparisons between our \emph{HDRDA} implementation in
+the {\tt sparsediscrim} R package available on CRAN and the standard \emph{RDA}
+formulation in the {\tt klaR} R package demonstrate that as the number of
+features increases, the computational runtime of the \emph{HDRDA} classifier is
+drastically smaller than \emph{RDA}. In fact, when $p = 1000$ and $N = 100$, the
+\emph{HDRDA} classifier is \textbf{XXX} times faster on average than the
+\emph{RDA} classifier.
+
+Finally, we study the classification performance of the \emph{HDRDA} classifier
+on six real high-dimensional data sets along with a simulation design that
+generalizes the experiments initially conducted by \cite{Guo:2007te}. We
+demonstrate that the \emph{HDRDA} classifier often attains superior
+classification accuracy to several recent classifiers designed for small-sample,
+high-dimensional data from \cite*{Tong:2012hw}, \cite{Witten:2011kc},
+\cite*{Pang:2009ik}, and \cite{Guo:2007te}. We also include as a benchmark the
+random forest from \cite{Breiman:2001fb} because \cite*{FernandezDelgado:2014ul}
+have concluded that the random forest is often superior to other classifiers in
+benchmark studies. We show that our proposed classifier is competitive and often
 outperforms the random forest in terms of classification accuracy in the
 small-sample, high-dimensional setting.
-
-Our proposed \emph{HDRDA} classifier employs a biased covariance-matrix
-estimator that partially pools the individual sample covariance matrices from
-the \emph{QDA} classifier with the pooled sample covariance matrix from the
-\emph{LDA} classifier. We then shrink the resulting covariance-matrix estimator
-towards a scaled identity matrix to ensure positive definiteness. By
-reparameterizing the \emph{RDA} classifier similar to that of
-\cite*{Hastie:2008dt} and \cite{Halbe:2007ea}, we show that the pooling
-parameter in the \emph{HDRDA} classifier determines the contribution of each
-training observation to the estimation of each class covariance matrix, enabling
-interpretability that has been previously lacking with the \emph{RDA} classifier
-\citep{Bensmail:1996fw}.
-
-Next, we achieve a substantial reduction in dimension that greatly reduces the
-computational effort during model selection when $p \gg N$ by applying reasoning
-similar to that of \cite{Ye:2006tq}. We establish that the matrix operations
-corresponding to the null space of the pooled sample covariance matrix are
-redundant and can be discarded from the \emph{HDRDA} decision rule without loss
-of classificatory information. Moreover, because the \emph{HDRDA} decision rule
-is invariant to adjustments to the zero eigenvalues, the decision rule in the
-original feature space is equivalent to a decision rule in a lower dimension,
-such that matrix inverses and determinants of relatively small matrices can be
-rapidly computed. Also, we provide an efficient algorithm along with pseudocode
-to estimate the \emph{HDRDA} classifier's tuning parameters in a grid search via
-cross-validation. Finally, we show that several shrinkage methods that are
-special cases of the \emph{HDRDA} classifier have no effect on the zero
-eigenvalues of the covariance-matrix estimators. Such techniques include work
-from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods studied by
-\cite{Ramey:2013ji} and \citet*{Xu:2009fl}.
 
 The remainder of this paper is organized as follows. In Section
 \ref{sec:preliminaries} we present the classification problem and necessary
