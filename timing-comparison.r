@@ -20,17 +20,18 @@ feature_dims <- c(
 )
 
 # klaR's Implementation of Friedman (1989)
-rda_model_selection <- function(x, y, num_tuning=5) {
+# Uses a grid model selection
+rda_grid <- function(x, y, num_tuning=5) {
   tuning_grid <- expand.grid(lambda=seq(0, 1, length=num_tuning),
                              gamma=seq(0, 1, length=num_tuning))
    rda_errors <- vector(mode="list", length=nrow(tuning_grid))
    for (i in seq_len(nrow(tuning_grid))) {
      rda_errors[[i]] <- try({
-       rda_out <- rda(x=x,
-                      grouping=y,
-                      lambda=tuning_grid$lambda[i],
-                      gamma=tuning_grid$gamma[i],
-                      estimate.error=FALSE)
+       rda_out <- klaR::rda(x=x,
+                            grouping=y,
+                            lambda=tuning_grid$lambda[i],
+                            gamma=tuning_grid$gamma[i],
+                            estimate.error=FALSE)
        rda_out$error.rate['crossval']
      })
    }
@@ -39,8 +40,17 @@ rda_model_selection <- function(x, y, num_tuning=5) {
    tuning_grid[which.min(unlist(rda_errors)), ]
 }
 
+# klaR's Implementation of Friedman (1989)
+# Uses a Nelder-Mead model selection
+rda_nelder_mead <- function(x, y) {
+  rda_out <- klaR::rda(x=x,
+                       grouping=y,
+                       estimate.error=FALSE)
+  rda_out$regularization
+}
+
 # HDRDA
-hdrda_model_selection <- function(x, y, num_tuning=5) {
+hdrda_grid <- function(x, y, num_tuning=5) {
   hdrda_cv(x=x,
            y=y,
            num_lambda=num_tuning,
@@ -59,8 +69,9 @@ timing_results <- lapply(feature_dims, function(p) {
   data <- simdata_normal(n=n, mean=means, cov=cov_mat)
 
   mb_results <- microbenchmark(
-    rda_model_selection(x=data$x, y=data$y, num_tuning=grid_size),
-    hdrda_model_selection(x=data$x, y=data$y, num_tuning=grid_size),
+    rda_grid(x=data$x, y=data$y, num_tuning=grid_size),
+    rda_nelder_mead(x=data$x, y=data$y),
+    hdrda_grid(x=data$x, y=data$y, num_tuning=grid_size),
     times=num_reps)
   cat("Timing results for p =", p, "\n")
   print(mb_results)
