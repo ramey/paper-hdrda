@@ -5,7 +5,7 @@ library(microbenchmark)
 load.project()
 
 # Number of timing-comparison replications to perform
-num_reps <- 50
+num_reps <- 5
 
 # Grid Size (m x m)
 grid_size <- 5
@@ -13,11 +13,12 @@ grid_size <- 5
 # Simulation Parameters
 K <- 4
 n <- rep.int(x=25, times=K)
-feature_dims <- c(
-  25, 50, 75,
-  seq(100, 1000, by=100),
-  seq(1500, 3000, by=500)
-)
+#feature_dims <- c(
+#  25, 50, 75,
+#  seq(100, 1000, by=100),
+# seq(1500, 3000, by=500)
+#)
+feature_dims <- c(25, 50)
 
 # klaR's Implementation of Friedman (1989)
 # Uses a grid model selection
