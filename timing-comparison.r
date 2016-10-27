@@ -5,7 +5,7 @@ library(microbenchmark)
 load.project()
 
 # Number of timing-comparison replications to perform
-num_reps <- 50
+num_reps <- 100
 
 # Grid Size (m x m)
 grid_size <- 5
@@ -14,9 +14,8 @@ grid_size <- 5
 K <- 4
 n <- rep.int(x=25, times=K)
 feature_dims <- c(
-  25, 50, 75,
   seq(100, 1000, by=100),
-  seq(1500, 3000, by=500)
+  seq(1500, 5000, by=500)
 )
 
 # klaR's Implementation of Friedman (1989)
@@ -40,15 +39,6 @@ rda_grid <- function(x, y, num_tuning=5) {
    tuning_grid[which.min(unlist(rda_errors)), ]
 }
 
-# klaR's Implementation of Friedman (1989)
-# Uses a Nelder-Mead model selection
-rda_nelder_mead <- function(x, y) {
-  rda_out <- klaR::rda(x=x,
-                       grouping=y,
-                       estimate.error=FALSE)
-  rda_out$regularization
-}
-
 # HDRDA
 hdrda_grid <- function(x, y, num_tuning=5) {
   hdrda_cv(x=x,
@@ -70,7 +60,6 @@ timing_results <- lapply(feature_dims, function(p) {
 
   mb_results <- microbenchmark(
     rda_grid(x=data$x, y=data$y, num_tuning=grid_size),
-    rda_nelder_mead(x=data$x, y=data$y),
     hdrda_grid(x=data$x, y=data$y, num_tuning=grid_size),
     times=num_reps)
   cat("Timing results for p =", p, "\n")
