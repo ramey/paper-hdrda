@@ -36,7 +36,7 @@
 \author[cks]{Caleb K. Stein}
 \author[pdy]{Phil D. Young}
 \author[dmy]{Dean M. Young}
-\address[jar]{uStudio, Inc.}
+\address[jar]{uStudio Labs}
 \address[cks]{Myeloma Institute, University of Arkansas for Medical Sciences}
 \address[pdy]{Department of Management and Information Systems, Baylor University}
 \address[dmy]{Department of Statistical Science, Baylor University}
@@ -430,7 +430,7 @@ For $\gamma > 0$, $\tilde{\bm \Sigma}_k$ is nonsingular such that $\tilde{\bm
 \eqref{eq:hdrda}. If $\gamma = 0$, we explicitly set $|\tilde{\bm \Sigma}_k|$
 equal to the product of the positive eigenvalues of $\tilde{\bm
   \Sigma}_k$. Following \cite{Friedman:1989tm}, we select $\lambda$ and $\gamma$
-from a grid of candidate models via cross-validation. We provide an
+from a grid of candidate models via cross-validation \citep{Hastie:2008dt}. We provide an
 implementation of \eqref{eq:hdrda} in the {\tt hdrda} function contained in the
 {\tt sparsediscrim} R package, which is available on CRAN.
 
@@ -846,12 +846,49 @@ X_{test} - \xbar_k \bm 1_k')' \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm X_{test} -
 \xbar_k \bm 1_k')$. The diagonal elements of the resulting matrix contain the
 individual quadratic form of each test observation, $\bm x_t$.
 
+\section{Timing Comparisons between RDA and HDRDA}
+\label{sec:timing-comparisons}
+
+In this section, we demonstrate that the computational performance of the
+training and model selection employed in the \emph{HDRDA} classifier is
+substantially faster than that of the \emph{RDA} classifier on small-sample,
+high-dimensional data sets. The relative difference in runtime between the two
+classifiers drastically increases as the number of features increases. To
+compare the two classifiers, we generate 25 observations from each of $K=4$
+multivariate normal populations with mean vectors $\bm \mu_1 = -3 \cdot \bm
+1_p$, $\bm \mu_2 = -\bm 1_p$, $\bm \mu_3 = \bm 1_p$, and $\bm \mu_4 = 3 \cdot
+\bm 1_p$. We set the covariance matrix of each population to the $p \times p$
+identity matrix. For each data set generated, we estimate the $\lambda$ and
+$\gamma$ parameters for both classifiers using a grid of 21 equidistant
+candidate values between 0 and 1, inclusively. We set $\alpha_k = 1 - \gamma$,
+$k = 1, \ldots, K$, in the \emph{HDRDA} classifier to resemble
+\citeauthor{Friedman:1989tm}'s \emph{RDA} parameterization. At each pair of
+$\lambda$ and $\gamma$, we compute the $V$-fold cross-validation error rate with
+$V = 10$ \citep{Hastie:2008dt}. The optimal model is the pair of $\lambda$ and
+$\gamma$ that minimizes the $V$-fold cross-validation error rate.
+
+Here, our goal is to compare the computational runtime of the model selection
+for both classifiers. We compare the runtime of both classifiers by increasing
+the number of features from $p = 500$ to $p = 5000$ in increments of 500. We
+generate 100 data sets for each value of $p$ and compute the training and model
+selection runtime of both classifiers. Our timing comparisons are based on our
+\emph{HDRDA} implementation in the {\tt sparsediscrim} R package with the
+standard \emph{RDA} implementation in the {\tt klaR} R package. All timing
+comparisons were conducted on an Amazon Elastic Compute Cloud (EC2) {\tt
+  c4.4xlarge} instance using version 3.3.1 of the open-source statistical
+software {\tt R}. Our analyses can be reproduced using the code available in the
+\url{https://github.com/ramhiser/paper-hdrda} repository.
+
+\subsection{Timing Comparison Results}
+
+TODO
+
 \section{Classification Study}
 \label{sec:sims}
 
 In this section, we compare our proposed classifier with four classifiers
 recently proposed for small-sample, high-dimensional data along with the
-random-forest classifier from \cite{Breiman:2001fb} using version 3.2.2 of the
+random-forest classifier from \cite{Breiman:2001fb} using version 3.3.1 of the
 open-source statistical software {\tt R}. Within our study, we included
 penalized linear discriminant analysis from \cite{Witten:2011kc}, implemented in
 the {\tt penalizedLDA} package. We also considered shrunken centroids
@@ -869,9 +906,9 @@ of the random-forest classifier from the {\tt randomForest} package with 250
 trees and 100 maximum nodes. For each classifer we explicitly set prior
 probabilities as equal, if applicable. All other classifier options were set to
 their default settings. Below, we refer to each classifier by the first author's
-surname. All simulations were conducted on an Amazon Elastic Compute Cloud (EC2)
-{\tt c4.4xlarge} instance. Our analyses can be reproduced using the code
-available in the \url{https://github.com/ramhiser/paper-hdrda} repository.
+surname. All simulations were conducted on an Amazon EC2 {\tt c4.4xlarge}
+instance. Our analyses can be reproduced using the code available in the
+\url{https://github.com/ramhiser/paper-hdrda} repository.
 
 For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examined the
 classification performance of two models. For the first \emph{HDRDA} model, we
@@ -880,11 +917,22 @@ set $\alpha_k = 1$, $k = 1, \ldots, K$, so that the covariance-matrix estimator
 $\lambda$ from a grid of 21 equidistant candidate values between 0 and 1,
 inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the
 values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of
-$\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$
-\citep{Hastie:2008dt}. For the second model, we set $\alpha_k = 1 - \gamma$, $k
-= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s parameterization,
-and we estimated both $\lambda$ and $\gamma$ from a grid of 21 equidistant
-candidate values between 0 and 1, inclusively.
+$\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$. For the
+second model, we set $\alpha_k = 1 - \gamma$, $k = 1, \ldots, K$, to resemble
+\citeauthor{Friedman:1989tm}'s parameterization, and we estimated both $\lambda$
+and $\gamma$ from a grid of 21 equidistant candidate values between 0 and 1,
+inclusively.
+
+We did not include the \emph{RDA} classifier in our classification study because
+its training runtime was prohobitively slow on high-dimensional data in our
+preliminary experiments. As shown in Section \ref{sec:timing-comparisons}, the
+runtime of the \emph{RDA} classifier was drastically larger than that of the
+\emph{HDRDA} classifier for a tuning grid of size $25 = 5 \times
+5$. Consequently, a fair comparison between the \emph{RDA} and \emph{HDRDA}
+classifiers would require model selection of $441 = 21 \times 21$ different
+pairs of tuning parameters in the \emph{RDA} classifier. A tuning grid of this
+size yielded excessively slow training runtimes for the \emph{RDA}
+implementation from the {\tt klaR} R package.
 
 \subsection{Simulation Study}
 
