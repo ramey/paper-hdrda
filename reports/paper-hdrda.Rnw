@@ -36,30 +36,33 @@
 \author[cks]{Caleb K. Stein}
 \author[pdy]{Phil D. Young}
 \author[dmy]{Dean M. Young}
-\address[jar]{uStudio, Inc.}
+\address[jar]{uStudio Labs}
 \address[cks]{Myeloma Institute, University of Arkansas for Medical Sciences}
 \address[pdy]{Department of Management and Information Systems, Baylor University}
 \address[dmy]{Department of Statistical Science, Baylor University}
 
 \begin{abstract}
 
-\citeauthor{Friedman:1989tm} proposed the popular regularized discriminant
-analysis (RDA) classifier that utilizes a biased covariance-matrix estimator
-that partially pools the sample covariance matrices from linear and quadratic
-discriminant analysis and shrinks the resulting estimator towards a scaled
-identity matrix. The RDA classifier's two tuning parameters are typically
-estimated via a computationally burdensome cross-validation procedure that uses
-a grid search. We formulate a new RDA-based classifier for the small-sample,
-high-dimensional setting and then show that the classification decision rule is
-equivalent to a classifier in a subspace having a much lower dimension. As a
-result, the utilization of the dimension-reduction step yields a substantial
-reduction in computation during model selection. Also, our parameterization
-offers interpretability that was previously lacking with the RDA classifier. We
-demonstrate that our proposed classifier is often superior to several recently
-proposed sparse and regularized classifiers in terms of classification accuracy
-with three artificial and six real high-dimensional data sets. Finally, we
-provide an implementation of our proposed classifier in the {\tt sparsediscrim}
-R package, which is available on CRAN.
+We develop a new and computationally efficient implementation of
+\citeauthor{Friedman:1989tm}'s popular regularized discriminant analysis (RDA)
+classifier in the small-sample, high-dimensional setting. Our proposed
+high-dimensional RDA (HDRDA) classifier modifies \citeauthor{Friedman:1989tm}'s
+original formulation to achieve interpretability previously lacking. We are able
+to interpret the biased covariance matrix estimator employed in the HDRDA
+classifier as one that is estimated from all training observations regardless of
+class, solidifying the ``borrowing'' operation \citeauthor{Friedman:1989tm}'s
+RDA is claimed to have. Moreover, our formulation also differs from
+\citeauthor{Friedman:1989tm}'s in that we show our classifier is equivalent to
+one in a reduced feature space with dimension approximately equal to the
+training sample size. As a result, the matrix operations used in the HDRDA
+classifier are computationally linear in the number of features, making HDRDA
+well-suited for high-dimensional classification in practice. Timing comparisons
+between our HDRDA implementation in the {\tt sparsediscrim} R package and the
+standard RDA formulation in the {\tt klaR} R package demonstrate that as the
+number of features increases, the computational runtime of HDRDA is drastically
+smaller than RDA. We also demonstrate that HDRDA is often superior to several
+sparse and regularized classifiers in terms of classification accuracy with
+three artificial and six real high-dimensional data sets.
 
 \end{abstract}
 
@@ -156,91 +159,89 @@ results_microarray <- inner_join(avg_error_microarray, sd_error_microarray,
   spread(data_set, Table_Cells)
 @
 
-
 \section{Introduction}
 
-As machine-learning algorithms are increasingly utilized to automate data-driven
-decisions, researchers continue to develop a wealth of \emph{classifiers}
-employed in a variety of disciplines, such as medical research, facial
-recognition, remote sensing, and chemical analysis
-\citep*{Ching:2012fu,Li:2012ev,Zhang:2010va}. Despite the advances in
-classification to facilitate technological advancements, well-established
-classifiers often degrade in accuracy when applied to modern, high-dimensional
-data sets if the number of features $p$ exceeds the total sample size $N$, due
-to the \emph{curse of dimensionality} \citep{Bellman:1961tn}. For instance,
-linear discriminant analysis (\emph{LDA}) and quadratic discriminant analysis
-(\emph{QDA}) are popular because of their simplicity, speed of computation, and
-interpretability. However, both methods are incalculable when $p > N$ because
-the class sample covariance matrices are singular \citep*{Bouveyron:2007gx}.
-
-As a result, researchers have emphasized three standard approaches to modifying
-the \emph{LDA} and \emph{QDA} classifiers for application to high-dimensional
-data: 1) covariance-matrix regularization, 2) dimension reduction, and 3)
-parameter restrictions. Covariance-matrix regularization methods are often based
-on the well-known ridge-regression approach of \cite{Hoerl:1970cd}.
-Additionally, \cite{Ching:2012fu}, \cite{Zhang:2010va}, \cite{Ye:2009gd},
-\cite{Ji:2008wp}, \cite*{Guo:2007te}, \cite*{Srivastava:2007ud},
-\cite{Ye:2006vx}, and \cite{Ye:2005uu} have proposed regularization methods to
-improve the estimation of the class covariance matrices by adjusting the
-eigenvalues of the sample covariance matrices to ensure positive
-definiteness. Alternatively, dimension reduction typically transforms the
-original data in the high-dimensional space to a subspace having a much smaller
-dimension such that redundant and noisy information is removed
-\citep*{Fan:2012iq,Ye:2009gd,Bouveyron:2007gx,Ye:2006vx,Ye:2005hd,Antoniadis:2003bk}.
-Finally, \cite*{Mai:2012bf}, \cite{Fan:2012iq}, \cite*{Merchante:2012vk},
-\cite*{Clemmensen:2011kr}, \cite*{Huang:2010ju}, and \cite*{Dudoit:2002ev} have
-proposed restrictions on the population covariance matrices to reduce the number
-of parameters that must be estimated. For instance, \cite{Dudoit:2002ev} have
-assumed that the features within each class are independent so that the
-population covariance matrices are diagonal, resulting in positive-definite
-sample covariance matrices. For excellent overviews of the regularization
-problem in discriminant analysis and other techniques, see \cite{Murphy:2012uq}
-and \cite*{Mkhadri:1997gy}.
+In this paper, we consider the classification of small-sample, high-dimensional
+data, where the number of features $p$ exceeds the training sample size $N$. In
+this setting, well-established classifiers such as linear discriminant analysis
+(\emph{LDA}) and quadratic discriminant analysis (\emph{QDA}) become
+incalculable because the class and pooled covariance matrix estimators are
+singular \citep*{Murphy:2012uq, Bouveyron:2007gx, Mkhadri:1997gy}. To improve
+the estimation of the class covariance matrices estimated in the \emph{QDA}
+classifier and to ensure the covariance matrix estimators are nonsingular,
+\cite{Friedman:1989tm} proposed the regularized discriminant analysis
+(\emph{RDA}) classifier by incorporating a weighted average of the pooled sample
+covariance matrix and the class sample covariance matrix. To further improve the
+estimation of the class covariance matrix and to stabilize its inverse,
+\cite{Friedman:1989tm} also included a regularization component by shrinking the
+covariance matrix estimator towards the identity matrix, which yields a
+nonsingular estimator following the well-known ridge-regression approach of
+\cite{Hoerl:1970cd}. Despite its popularity, the ``borrowing'' operation
+employed in the \emph{RDA} classifier lacks interpretability
+\citep{Bensmail:1996fw}, and the \emph{RDA} classifier is computationally
+inefficient in that its matrix operations are cubic in the number of
+features.\footnote{TODO: Add a couple of references saying RDA is slooooow.} As
+a result, the \emph{RDA} classifier is impraticial for modern high-dimensional
+data sets because its matrix operations are cubic in the number of features, and
+the estimation of the \emph{RDA} classifier's two tuning parameters is
+computationally burdensome.
 
 Here, we present the high-dimensional \emph{RDA} (\emph{HDRDA}) classifier,
 which is intended for the $p > N$ case and builds on the classic \emph{RDA}
-classifier proposed by \cite{Friedman:1989tm}. In this paper, we study the
-classification performance of the \emph{HDRDA} classifier on six real
-high-dimensional data sets along with a simulation design that generalizes the
-experiments initially conducted by \cite{Guo:2007te}. We demonstrate that the
-\emph{HDRDA} classifier often attains superior classification accuracy to
-several recent classifiers designed for small-sample, high-dimensional data from
-\cite*{Tong:2012hw}, \cite{Witten:2011kc}, \cite*{Pang:2009ik}, and
-\cite{Guo:2007te}. We also include as a benchmark the random forest from
-\cite{Breiman:2001fb} because \cite*{FernandezDelgado:2014ul} have concluded
-that the random forest is often superior to other classifiers in benchmark
-studies. We show that our proposed classifier is competitive and often
+classifier proposed by \cite{Friedman:1989tm}. We reparameterize the \emph{RDA}
+classifier similar to that of \cite*{Hastie:2008dt} and \cite{Halbe:2007ea} and
+employ a biased covariance-matrix estimator that partially pools the individual
+sample covariance matrices from the \emph{QDA} classifier with the pooled sample
+covariance matrix from the \emph{LDA} classifier. We then shrink the resulting
+covariance-matrix estimator towards a scaled identity matrix to ensure positive
+definiteness. We show that the pooling parameter in the \emph{HDRDA} classifier
+determines the contribution of each training observation to the estimation of
+each class covariance matrix, enabling interpretability that has been previously
+lacking with the \emph{RDA} classifier \citep{Bensmail:1996fw}. Our
+parameterization differs from \cite*{Hastie:2008dt} and \cite{Halbe:2007ea} in
+that our formulation allows the flexibility of various covariance-matrix
+estimators proposed in the literature, including a variety of ridge-like
+estimators such as the one proposed by \cite{Srivastava:2007ww}.
+
+Next, we establish that the matrix operations corresponding to the null space of
+the pooled sample covariance matrix are redundant and can be discarded from the
+\emph{HDRDA} decision rule without loss of classificatory information by
+applying reasoning similar to that of \cite{Ye:2006tq}. As a result, we achieve
+a substantial reduction in dimension such that the matrix operations used in the
+\emph{HDRDA} classifier are computationally linear in the number of features.
+Furthermore, we demonstrate that the \emph{HDRDA} decision rule is invariant to
+adjustments to the approximately $p - N$ zero eigenvalues, so that the decision
+rule in the original feature space is equivalent to a decision rule in a lower
+dimension, such that matrix inverses and determinants of relatively small
+matrices can be rapidly computed. Finally, we show that several shrinkage
+methods that are special cases of the \emph{HDRDA} classifier have no effect on
+the approximately $p - N$ zero eigenvalues of the covariance-matrix estimators
+when $p > N$. Such techniques include work from \cite{Srivastava:2007ww},
+\cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
+\citet*{Xu:2009fl}.
+
+We provide an efficient algorithm along with pseudocode to estimate the
+\emph{HDRDA} classifier's tuning parameters in a grid search via
+cross-validation. Timing comparisons between our \emph{HDRDA} implementation in
+the {\tt sparsediscrim} R package available on CRAN and the standard \emph{RDA}
+formulation in the {\tt klaR} R package demonstrate that as the number of
+features increases, the computational runtime of the \emph{HDRDA} classifier is
+drastically smaller than \emph{RDA}. In fact, when $p = 1000$ and $N = 100$, the
+\emph{HDRDA} classifier is \textbf{XXX} times faster on average than the
+\emph{RDA} classifier.
+
+Finally, we study the classification performance of the \emph{HDRDA} classifier
+on six real high-dimensional data sets along with a simulation design that
+generalizes the experiments initially conducted by \cite{Guo:2007te}. We
+demonstrate that the \emph{HDRDA} classifier often attains superior
+classification accuracy to several recent classifiers designed for small-sample,
+high-dimensional data from \cite*{Tong:2012hw}, \cite{Witten:2011kc},
+\cite*{Pang:2009ik}, and \cite{Guo:2007te}. We also include as a benchmark the
+random forest from \cite{Breiman:2001fb} because \cite*{FernandezDelgado:2014ul}
+have concluded that the random forest is often superior to other classifiers in
+benchmark studies. We show that our proposed classifier is competitive and often
 outperforms the random forest in terms of classification accuracy in the
 small-sample, high-dimensional setting.
-
-Our proposed \emph{HDRDA} classifier employs a biased covariance-matrix
-estimator that partially pools the individual sample covariance matrices from
-the \emph{QDA} classifier with the pooled sample covariance matrix from the
-\emph{LDA} classifier. We then shrink the resulting covariance-matrix estimator
-towards a scaled identity matrix to ensure positive definiteness. By
-reparameterizing the \emph{RDA} classifier similar to that of
-\cite*{Hastie:2008dt} and \cite{Halbe:2007ea}, we show that the pooling
-parameter in the \emph{HDRDA} classifier determines the contribution of each
-training observation to the estimation of each class covariance matrix, enabling
-interpretability that has been previously lacking with the \emph{RDA} classifier
-\citep{Bensmail:1996fw}.
-
-Next, we achieve a substantial reduction in dimension that greatly reduces the
-computational effort during model selection when $p \gg N$ by applying reasoning
-similar to that of \cite{Ye:2006tq}. We establish that the matrix operations
-corresponding to the null space of the pooled sample covariance matrix are
-redundant and can be discarded from the \emph{HDRDA} decision rule without loss
-of classificatory information. Moreover, because the \emph{HDRDA} decision rule
-is invariant to adjustments to the zero eigenvalues, the decision rule in the
-original feature space is equivalent to a decision rule in a lower dimension,
-such that matrix inverses and determinants of relatively small matrices can be
-rapidly computed. Also, we provide an efficient algorithm along with pseudocode
-to estimate the \emph{HDRDA} classifier's tuning parameters in a grid search via
-cross-validation. Finally, we show that several shrinkage methods that are
-special cases of the \emph{HDRDA} classifier have no effect on the zero
-eigenvalues of the covariance-matrix estimators. Such techniques include work
-from \cite{Srivastava:2007ww}, \cite{Rao:1971ul}, and other methods studied by
-\cite{Ramey:2013ji} and \citet*{Xu:2009fl}.
 
 The remainder of this paper is organized as follows. In Section
 \ref{sec:preliminaries} we present the classification problem and necessary
@@ -262,17 +263,14 @@ discriminant analysis, we require the following notation. Let $\mathbb{R}_{a
 field $\mathbb{R}$. Denote by $\bm I_m$ the $m \times m$ identity matrix, and
 let $\bm 0_{m \times p}$ be the $m \times p$ matrix of zeros, such that $\bm
 0_m$ is understood to denote $\bm 0_{m \times m}$. Define $\bm 1_m \in
-\mathbb{R}_{m \times 1}$ as a vector of ones. Let $\bm A \oplus \bm B$ denote
-the direct sum of $\bm A \in \mathbb{R}_{r \times r}$ and $\bm B \in
-\mathbb{R}_{s \times s}$ \citep[Chapter 1]{Lutkepohl:1996uz}. Let $\bm A^{T}$,
-$\bm A^+$, and $\mathcal{N}(\bm A)$ denote the transpose, the Moore-Penrose
-pseudoinverse, and the null space of $\bm A \in \mathbb{R}_{m \times p}$,
-respectively. Denote by $\mathbb{R}_{p \times p}^{>}$ the cone of real $p \times
-p$ positive-definite matrices. Similarly, let $\mathbb{R}_{p \times p}^{\ge}$
-denote the cone of real $p \times p$ positive-semidefinite matrices. Let
-$V^{\perp}$ denote the orthogonal complement of a vector space $V \subset
-\mathbb{R}_{p \times 1}$. For $c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$
-and $0$ otherwise.
+\mathbb{R}_{m \times 1}$ as a vector of ones. Let $\bm A^{T}$, $\bm A^+$, and
+$\mathcal{N}(\bm A)$ denote the transpose, the Moore-Penrose pseudoinverse, and
+the null space of $\bm A \in \mathbb{R}_{m \times p}$, respectively. Denote by
+$\mathbb{R}_{p \times p}^{>}$ the cone of real $p \times p$ positive-definite
+matrices. Similarly, let $\mathbb{R}_{p \times p}^{\ge}$ denote the cone of real
+$p \times p$ positive-semidefinite matrices. Let $V^{\perp}$ denote the
+orthogonal complement of a vector space $V \subset \mathbb{R}_{p \times 1}$. For
+$c \in \mathbb{R}$, let $c^+ = 1/c$ if $c \ne 0$ and $0$ otherwise.
 
 \subsection{Discriminant Analysis}
 
@@ -432,7 +430,7 @@ For $\gamma > 0$, $\tilde{\bm \Sigma}_k$ is nonsingular such that $\tilde{\bm
 \eqref{eq:hdrda}. If $\gamma = 0$, we explicitly set $|\tilde{\bm \Sigma}_k|$
 equal to the product of the positive eigenvalues of $\tilde{\bm
   \Sigma}_k$. Following \cite{Friedman:1989tm}, we select $\lambda$ and $\gamma$
-from a grid of candidate models via cross-validation. We provide an
+from a grid of candidate models via cross-validation \citep{Hastie:2008dt}. We provide an
 implementation of \eqref{eq:hdrda} in the {\tt hdrda} function contained in the
 {\tt sparsediscrim} R package, which is available on CRAN.
 
@@ -535,16 +533,22 @@ we have that $\mathcal{N}\{\widehat{\bm \Sigma}_k(\lambda)\} \subset
 
 In Lemma \ref{lemma:rda-tilde-Sigma_k} below, we derive an alternative
 expression for $\tilde{\bm \Sigma}_k$ in terms of the matrix of eigenvectors of
-$\widehat{\bm \Sigma}$. Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be the
-eigendecomposition of $\widehat{\bm \Sigma}$ such that $\bm D \in \mathbb{R}_{p
-  \times p}^{\ge}$ is the diagonal matrix of eigenvalues of $\widehat{\bm \Sigma}$
-with $\bm D = \bm D_q \oplus \bm 0_{p-q}$, $\bm D_q \in \mathbb{R}_{q \times
-  q}^{>}$ is the diagonal matrix consisting of the positive eigenvalues of
-$\widehat{\bm \Sigma}$, the columns of $\bm U \in \mathbb{R}_{p \times p}$ are
-the corresponding orthonormal eigenvectors of $\widehat{\bm \Sigma}$, and
-rank$(\widehat{\bm \Sigma}) = q$. Then, we partition $\bm U = (\bm U_1,
-\bm U_2)$ such that $\bm U_1 \in \mathbb{R}_{p \times q}$ and $\bm U_2 \in
-\mathbb{R}_{p \times (p - q)}$.
+$\widehat{\bm \Sigma}$. Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be
+the eigendecomposition of $\widehat{\bm \Sigma}$ such that $\bm D \in
+\mathbb{R}_{p \times p}^{\ge}$ is the diagonal matrix of eigenvalues of
+$\widehat{\bm \Sigma}$ with
+\begin{align*}
+  \bm D = \begin{bmatrix}
+    \bm D_q & \bm 0 \\
+    \bm{0} & \bm 0_{p-q}
+    \end{bmatrix},
+\end{align*}
+$\bm D_q \in \mathbb{R}_{q \times q}^{>}$ is the diagonal matrix consisting of
+the positive eigenvalues of $\widehat{\bm \Sigma}$, the columns of $\bm U \in
+\mathbb{R}_{p \times p}$ are the corresponding orthonormal eigenvectors of
+$\widehat{\bm \Sigma}$, and rank$(\widehat{\bm \Sigma}) = q$. Then, we partition
+$\bm U = (\bm U_1, \bm U_2)$ such that $\bm U_1 \in \mathbb{R}_{p \times q}$ and
+$\bm U_2 \in \mathbb{R}_{p \times (p - q)}$.
 
 \begin{lemma}\label{lemma:rda-tilde-Sigma_k}
 Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be the eigendecomposition of
@@ -552,8 +556,12 @@ $\widehat{\bm \Sigma}$ as above, and suppose that rank$(\widehat{\bm \Sigma}) =
 q \le p$. Then, we have
 \begin{linenomath*}
 \begin{align}
-	\tilde{\bm \Sigma}_k &= \bm U(\bm W_k \oplus \gamma \bm I_{p-q})\bm U^{T}, \quad
-  k = 1, \ldots, K,\label{eq:rda-matrix}
+	\tilde{\bm \Sigma}_k &= \bm U
+    \begin{bmatrix}
+      \bm W_k & \bm 0 \\
+      \bm 0 & \gamma \bm I_{p-q}
+    \end{bmatrix}
+    \bm U^{T}, \quad k = 1, \ldots, K,\label{eq:rda-matrix}
 \intertext{where}
 \bm W_k &= \alpha_k \{(1 - \lambda) \bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 + \lambda \bm D_q\} + \gamma \bm I_{q}.\label{eq:Wk}
 \end{align}
@@ -562,10 +570,15 @@ q \le p$. Then, we have
 \begin{proof}
 From Lemma \ref{lemma:null-spaces}, the columns of $\bm U_2$ span the null space
 of $\widehat{\bm \Sigma}_k$, which implies that $\widehat{\bm \Sigma}_k \bm U_2
-= \bm 0_{p \times (p - q)}$. Hence, $\bm U^{T} \widehat{\bm \Sigma}_k \bm U =
-\bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 \oplus \bm 0_{p-q}$, $k = 1, \ldots,
-K$. Thus, $\bm U^{T} \tilde{\bm \Sigma}_k \bm U = \alpha_k \{(1 - \lambda) \bm
-U^{T} \widehat{\bm \Sigma}_k \bm U + \lambda \bm D\} + \gamma \bm I_p$, and
+= \bm 0_{p \times (p - q)}$. Hence,
+\begin{align*}
+  \bm U^{T} \widehat{\bm \Sigma}_k \bm U = \begin{bmatrix}
+    \bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 & \bm 0 \\
+    \bm 0 & \bm 0_{p-q}
+  \end{bmatrix}, \quad k = 1, \ldots, K.
+\end{align*}
+Thus, $\bm U^{T} \tilde{\bm \Sigma}_k \bm U = \alpha_k \{(1 - \lambda) \bm U^{T}
+\widehat{\bm \Sigma}_k \bm U + \lambda \bm D\} + \gamma \bm I_p$, and
 \eqref{eq:rda-matrix} holds because $\bm U$ is orthogonal.
 \end{proof}
 
@@ -622,10 +635,16 @@ the decision rule in \eqref{eq:hdrda} is equivalent to
 \end{linenomath*}
 \end{thm}
 \begin{proof}
-From \eqref{eq:rda-matrix}, we have that $\tilde{\bm \Sigma}_k^{+} = \bm U(
-\bm W_k^{-1} \oplus \gamma^{+} \bm I_{p-q} )\bm U^{T}$ and $|\tilde{\bm \Sigma}_k| =
-\gamma^{p-q}| \bm W_k |$, $k = 1, \ldots, K$. Therefore, for all $\bm x \in
-\mathbb{R}_{p \times 1}$, we have that
+From \eqref{eq:rda-matrix}, we have that
+\begin{align*}
+  \tilde{\bm \Sigma}_k^{+} = \bm U \begin{bmatrix}
+    \bm W_k^{-1} & \bm 0 \\
+    \bm 0 & \gamma^{+} \bm I_{p-q}
+  \end{bmatrix}
+  \bm U^{T}
+\end{align*}
+and $|\tilde{\bm \Sigma}_k| = \gamma^{p-q}| \bm W_k |$, $k = 1, \ldots,
+K$. Therefore, for all $\bm x \in \mathbb{R}_{p \times 1}$, we have that
 \begin{linenomath*}
 \begin{align*}
 	(\bm x - \xbar_k)^{T} \tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k| &= (\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k)\\
@@ -783,11 +802,17 @@ X_c^{T} \bm X_c$, we have the eigendecomposition $\widehat{\bm \Sigma} = \bm U
 of $\widehat{\bm \Sigma}$. Now, we can obtain $\bm M$ and $\bm D$ efficiently
 from the eigenvalue decomposition of the $N \times N$ matrix $\bm X_c \bm
 X_c^{T} = \bm M \bm D \bm M^{T}$. Next, we compute $\bm U = \bm X_c^{T} \bm M
-\bm D^{+/2}$, where $\bm D^{+/2} = \bm D_q^{-1/2} \oplus \bm 0_{N-q}$. We then
-determine $q$, the number of numerically nonzero eigenvalues present in $\bm D$,
-by calculating the number of eigenvalues that exceeds some tolerance value, say,
-$1 \times 10^{-6}$. We then extract $\bm U_1$ as the first $q$ columns of $\bm
-U$.
+\bm D^{+/2}$, where
+\begin{align*}
+  \bm D^{+/2} = \begin{bmatrix}
+    \bm D_q^{-1/2} & \bm 0 \\
+    \bm 0 & \bm 0_{N-q}
+  \end{bmatrix}.
+\end{align*}
+We then determine $q$, the number of numerically nonzero eigenvalues present in
+$\bm D$, by calculating the number of eigenvalues that exceeds some tolerance
+value, say, $1 \times 10^{-6}$. We then extract $\bm U_1$ as the first $q$
+columns of $\bm U$.
 
 As a result of the compact SVD, we need calculate $\bm X_c \bm U_1$ only once
 per cross-validation fold, requiring $O(p q N) \approx O(p N^2)$ calculations.
@@ -821,12 +846,49 @@ X_{test} - \xbar_k \bm 1_k')' \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm X_{test} -
 \xbar_k \bm 1_k')$. The diagonal elements of the resulting matrix contain the
 individual quadratic form of each test observation, $\bm x_t$.
 
+\section{Timing Comparisons between RDA and HDRDA}
+\label{sec:timing-comparisons}
+
+In this section, we demonstrate that the computational performance of the
+training and model selection employed in the \emph{HDRDA} classifier is
+substantially faster than that of the \emph{RDA} classifier on small-sample,
+high-dimensional data sets. The relative difference in runtime between the two
+classifiers drastically increases as the number of features increases. To
+compare the two classifiers, we generate 25 observations from each of $K=4$
+multivariate normal populations with mean vectors $\bm \mu_1 = -3 \cdot \bm
+1_p$, $\bm \mu_2 = -\bm 1_p$, $\bm \mu_3 = \bm 1_p$, and $\bm \mu_4 = 3 \cdot
+\bm 1_p$. We set the covariance matrix of each population to the $p \times p$
+identity matrix. For each data set generated, we estimate the $\lambda$ and
+$\gamma$ parameters for both classifiers using a grid of 21 equidistant
+candidate values between 0 and 1, inclusively. We set $\alpha_k = 1 - \gamma$,
+$k = 1, \ldots, K$, in the \emph{HDRDA} classifier to resemble
+\citeauthor{Friedman:1989tm}'s \emph{RDA} parameterization. At each pair of
+$\lambda$ and $\gamma$, we compute the $V$-fold cross-validation error rate with
+$V = 10$ \citep{Hastie:2008dt}. The optimal model is the pair of $\lambda$ and
+$\gamma$ that minimizes the $V$-fold cross-validation error rate.
+
+Here, our goal is to compare the computational runtime of the model selection
+for both classifiers. We compare the runtime of both classifiers by increasing
+the number of features from $p = 500$ to $p = 5000$ in increments of 500. We
+generate 100 data sets for each value of $p$ and compute the training and model
+selection runtime of both classifiers. Our timing comparisons are based on our
+\emph{HDRDA} implementation in the {\tt sparsediscrim} R package with the
+standard \emph{RDA} implementation in the {\tt klaR} R package. All timing
+comparisons were conducted on an Amazon Elastic Compute Cloud (EC2) {\tt
+  c4.4xlarge} instance using version 3.3.1 of the open-source statistical
+software {\tt R}. Our analyses can be reproduced using the code available in the
+\url{https://github.com/ramhiser/paper-hdrda} repository.
+
+\subsection{Timing Comparison Results}
+
+TODO
+
 \section{Classification Study}
 \label{sec:sims}
 
 In this section, we compare our proposed classifier with four classifiers
 recently proposed for small-sample, high-dimensional data along with the
-random-forest classifier from \cite{Breiman:2001fb} using version 3.2.2 of the
+random-forest classifier from \cite{Breiman:2001fb} using version 3.3.1 of the
 open-source statistical software {\tt R}. Within our study, we included
 penalized linear discriminant analysis from \cite{Witten:2011kc}, implemented in
 the {\tt penalizedLDA} package. We also considered shrunken centroids
@@ -844,9 +906,9 @@ of the random-forest classifier from the {\tt randomForest} package with 250
 trees and 100 maximum nodes. For each classifer we explicitly set prior
 probabilities as equal, if applicable. All other classifier options were set to
 their default settings. Below, we refer to each classifier by the first author's
-surname. All simulations were conducted on an Amazon Elastic Compute Cloud (EC2)
-{\tt c4.4xlarge} instance. Our analyses can be reproduced using the code
-available in the \url{https://github.com/ramhiser/paper-hdrda} repository.
+surname. All simulations were conducted on an Amazon EC2 {\tt c4.4xlarge}
+instance. Our analyses can be reproduced using the code available in the
+\url{https://github.com/ramhiser/paper-hdrda} repository.
 
 For the \emph{HDRDA} classifier in \eqref{eq:hdrda-decomposed}, we examined the
 classification performance of two models. For the first \emph{HDRDA} model, we
@@ -855,11 +917,22 @@ set $\alpha_k = 1$, $k = 1, \ldots, K$, so that the covariance-matrix estimator
 $\lambda$ from a grid of 21 equidistant candidate values between 0 and 1,
 inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the
 values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of
-$\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$
-\citep{Hastie:2008dt}. For the second model, we set $\alpha_k = 1 - \gamma$, $k
-= 1, \ldots, K$, to resemble \citeauthor{Friedman:1989tm}'s parameterization,
-and we estimated both $\lambda$ and $\gamma$ from a grid of 21 equidistant
-candidate values between 0 and 1, inclusively.
+$\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$. For the
+second model, we set $\alpha_k = 1 - \gamma$, $k = 1, \ldots, K$, to resemble
+\citeauthor{Friedman:1989tm}'s parameterization, and we estimated both $\lambda$
+and $\gamma$ from a grid of 21 equidistant candidate values between 0 and 1,
+inclusively.
+
+We did not include the \emph{RDA} classifier in our classification study because
+its training runtime was prohobitively slow on high-dimensional data in our
+preliminary experiments. As shown in Section \ref{sec:timing-comparisons}, the
+runtime of the \emph{RDA} classifier was drastically larger than that of the
+\emph{HDRDA} classifier for a tuning grid of size $25 = 5 \times
+5$. Consequently, a fair comparison between the \emph{RDA} and \emph{HDRDA}
+classifiers would require model selection of $441 = 21 \times 21$ different
+pairs of tuning parameters in the \emph{RDA} classifier. A tuning grid of this
+size yielded excessively slow training runtimes for the \emph{RDA}
+implementation from the {\tt klaR} R package.
 
 \subsection{Simulation Study}
 
@@ -870,7 +943,14 @@ classification literature, including the studies by \cite{Ramey:2013ji} and
 from \cite{Guo:2007te},
 \begin{linenomath*}
 \begin{align}
-  \bm\Sigma_k = \bm\Sigma^{(\rho_k)} \oplus \bm\Sigma^{(-\rho_k)} \oplus \ldots \oplus \bm\Sigma^{(\rho_k)},\label{eq:block-sigma}
+  \bm\Sigma_k = \begin{bmatrix}
+    \bm\Sigma^{(\rho_k)} & \bm 0_{100} & \bm 0_{100} & \cdots & \cdots & \cdots \\
+    \bm 0_{100} & \bm\Sigma^{(-\rho_k)} & \bm 0_{100} & \bm 0_{100} & \cdots & \vdots \\
+    \bm 0_{100} & \bm 0_{100} & \bm\Sigma^{(\rho_k)} & \bm 0_{100} & \cdots & \vdots \\
+    \vdots & \bm 0_{100} & \bm 0_{100} & \bm\Sigma^{(-\rho_k)} & \bm 0_{100} & \vdots \\
+    \vdots & \vdots & \vdots & \bm 0_{100} & \ddots & \vdots \\
+    \cdots & \cdots & \cdots & \cdots & \cdots & \cdots \\
+  \end{bmatrix},\label{eq:block-sigma}
 \end{align}
 \end{linenomath*}
 where the $(i,j)$th entry of the block matrix $\bm\Sigma^{(\rho_k)} \in
