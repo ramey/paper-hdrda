@@ -36,7 +36,7 @@
 \author[cks]{Caleb K. Stein}
 \author[pdy]{Phil D. Young}
 \author[dmy]{Dean M. Young}
-\address[jar]{uStudio Labs}
+\address[jar]{Novi Labs}
 \address[cks]{Myeloma Institute, University of Arkansas for Medical Sciences}
 \address[pdy]{Department of Management and Information Systems, Baylor University}
 \address[dmy]{Department of Statistical Science, Baylor University}
@@ -926,29 +926,79 @@ multivariate normal populations with mean vectors $\bm \mu_1 = -3 \cdot \bm
 1_p$, $\bm \mu_2 = -\bm 1_p$, $\bm \mu_3 = \bm 1_p$, and $\bm \mu_4 = 3 \cdot
 \bm 1_p$. We set the covariance matrix of each population to the $p \times p$
 identity matrix. For each data set generated, we estimate the $\lambda$ and
-$\gamma$ parameters for both classifiers using a grid of 21 equidistant
-candidate values between 0 and 1, inclusively. We set $\alpha_k = 1 - \gamma$,
-$k = 1, \ldots, K$, in the \emph{HDRDA} classifier to resemble
+$\gamma$ parameters for both classifiers using a grid of 5 equidistant candidate
+values between 0 and 1, inclusively. We set $\alpha_k = 1 - \gamma$, $k = 1,
+\ldots, K$, in the \emph{HDRDA} classifier to resemble
 \citeauthor{Friedman:1989tm}'s \emph{RDA} parameterization. At each pair of
-$\lambda$ and $\gamma$, we compute the $V$-fold cross-validation error rate with
-$V = 10$ \citep{Hastie:2008dt}. The optimal model is the pair of $\lambda$ and
-$\gamma$ that minimizes the $V$-fold cross-validation error rate.
+$\lambda$ and $\gamma$, we compute the 10-fold cross-validation error rate
+\citep{Hastie:2008dt}. Then, we select the optimal model that minimizes the 10-fold
+cross-validation error rate.
 
 Here, our goal is to compare the computational runtime of the model selection
-for both classifiers. We compare the runtime of both classifiers by increasing
-the number of features from $p = 500$ to $p = 5000$ in increments of 500. We
-generate 100 data sets for each value of $p$ and compute the training and model
-selection runtime of both classifiers. Our timing comparisons are based on our
-\emph{HDRDA} implementation in the {\tt sparsediscrim} R package with the
-standard \emph{RDA} implementation in the {\tt klaR} R package. All timing
-comparisons were conducted on an Amazon Elastic Compute Cloud (EC2) {\tt
-  c4.4xlarge} instance using version 3.3.1 of the open-source statistical
-software {\tt R}. Our analyses can be reproduced using the code available in the
+for both classifiers as a function of the number of features $p$. We compare the
+runtime of both classifiers by increasing the number of features from $p = 500$
+to $p = 5000$ in increments of 500. We generate 100 data sets for each value of
+$p$ and compute the training and model selection runtime of both
+classifiers. Our timing comparisons are based on our \emph{HDRDA} implementation
+in the {\tt sparsediscrim} R package and the standard \emph{RDA} implementation
+in the {\tt klaR} R package. All timing comparisons were conducted on an Amazon
+Elastic Compute Cloud (EC2) {\tt c4.4xlarge} instance using version 3.3.1 of the
+open-source statistical software {\tt R}. Our timing comparisons can be
+reproduced with the code available in the
 \url{https://github.com/ramhiser/paper-hdrda} repository.
 
 \subsection{Timing Comparison Results}
 
-TODO
+In Figure \ref{fig:timing-results}, we plot the runtime of the model selections
+for both the \emph{HDRDA} and \emph{RDA} classifiers as a function of the number
+of features $p$. In the left panel of Figure \ref{fig:timing-results}, we
+observe that the \emph{HDRDA} classifier is substantially faster than the
+\emph{RDA} classifier as $p$ increases. Figure \ref{fig:timing-results} suggests
+that the usage of a matrix inverse and determinant in the {\tt klaR} R package's
+discriminant function yielded training and model-selection timings that exceeded
+linear growth in $p$. Because our implementation in the \emph{HDRDA} classifier
+removes the inverse and determinants from the classifier, the \emph{HDRDA}
+classifier is computationally more efficient than the \emph{RDA} classifier,
+especially as $p$ increases. The variance in the \emph{RDA} classifier's runtime
+also appeared to increase as $p$ increased. To quantify how much beyond linear
+growth in $p$, we fit a regression line quadratic in $p$ to the \emph{RDA}
+runtimes and plotted the fit in Figure \ref{fig:timing-results}. We attempted to
+fit a cubic polynomial in $p$ to the \emph{RDA} timings, but the cubic term was
+insignificant with significant quadratic and linear terms. We also fit two
+polynomials to the \emph{RDA} timings with orders 2.807 and 2.376, which
+correspond to the asymptotic computational runtime of two well-known algorithms
+for computing a matrix inverse: the Strassen and Coppersmith-Winograd
+algorithms, respectively \footnote{TODO: Citations needed}. In both cases, the
+polynomials were statistically significiant at the 0.05 level. We displayed the
+quadratic fit in Figure \ref{fig:timing-results} because it fit the timings best
+for $p = 500$ to $p = 2000$. The fits for $2000 \le p \le 5000$ were similar.
+
+In the left panel of Figure \ref{fig:timing-results}, we also fit a linear
+regression model that was linear in $p$ to the \emph{HDRDA} runtimes. In the
+right panel, we repeated the same scatterplot and linear fit with the timings
+restricted to the observed range of \emph{HDRDA} timings. The outliers in the
+\emph{HDRDA} timings were primarily due to the inherent computing variability in
+our {\tt c4.4xlarge} instance.
+
+Clearly, the model training and selection employed in \emph{HDRDA} is
+substantially faster than that of \emph{RDA}. To investigate the relative timing
+comparisons between the two classifiers, we consider the ratio of mean timings
+of the \emph{RDA} classifier to the \emph{HDRDA} classifier for each value of
+$p$. We employed nonparametric bootstrapping\footnote{TODO: Citation needed} to
+estimate the mean ratio along with 95\% confidence intervals. In Figure
+\ref{fig:timing-comparison-bootstrap}, the bootstrap sampling distributions for
+the ratio of mean timings are given. First, we observe that the mean relative
+timings increases as $p$ increases. For smaller dimensions, the relative
+difference in computing is sizable with the average ratio of the mean timings
+equal to \Sexpr{bootstrap_summary_p500$avg_ratio} for $p = 500$ and a 95\%
+confidence interval of (\Sexpr{bootstrap_summary_p500$lower_ci},
+\Sexpr{bootstrap_summary_p500$upper_ci}). Furthermore, the ratio of mean
+computing times suggests that the \emph{RDA} classifier is impractical for
+higher dimensions. For instance, when $p = 5000$ the ratio of mean computing
+times increases to \Sexpr{bootstrap_summary_p5000$avg_ratio} with a 95\%
+confidence interval of (\Sexpr{bootstrap_summary_p5000$lower_ci},
+\Sexpr{bootstrap_summary_p5000$upper_ci}).
+
 \[ \left[\text{Insert Figure \ref{fig:timing-results} approximately here }\right] \]
 
 \[ \left[\text{Insert Figure \ref{fig:timing-comparison-bootstrap} approximately here }\right] \]
@@ -1284,17 +1334,22 @@ superior to other classifiers, we observed that the random-forest classifier was
 indeed competitive but was typically outperformed by classifiers developed for
 small-sample, high-dimensional data.
 
-The \emph{HDRDA} implementation of \eqref{eq:hdrda-decomposed} in the {\tt
-  sparsediscrim} R package was comparable to that of the diagonal classifiers in
-terms of computational runtime. Given the \emph{RDA} classifier from
-\cite{Friedman:1989tm} has been shown to have excellent performance in the
-high-dimensional setting \citep{Webb:2011vu} but is limited by its
-computationally intense model-selection procedure, our work enables the
-\emph{RDA} classifier to be employed with small-sample, high-dimensional data in
-practice. This result is reassuring because the \emph{RDA} classifier remains
-widely popular in the literature. In fact, variants of the RDA classifier have
-been applied to microarray data
-\citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te}, facial recognition
+We demonstrated that the \emph{HDRDA} implementation of
+\eqref{eq:hdrda-decomposed} in the {\tt sparsediscrim} R package can be used in
+practice with high-dimensional data sets. For instance, in our timing
+comparisons we demonstrated that training and model selection could be employed
+on data sets having 5,000 features in 3 seconds on average. We contrast our
+implementation to the the poor computational performance of the in the {\tt
+  klaR} R package, which took approximately 25 minutes on average to train the
+\emph{RDA} classifier on a data set having 5,000 features. Given the \emph{RDA}
+classifier has been shown to have excellent performance in the high-dimensional
+setting \citep{Webb:2011vu} but is limited by its computationally intense
+model-selection procedure, our work enables the \emph{RDA} classifier to be
+employed with small-sample, high-dimensional data in practice. This result is
+reassuring because the \emph{RDA} classifier remains widely popular in the
+literature. In fact, variants of the RDA classifier have been applied to
+microarray data \citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te}, facial
+recognition
 \citep{Ching:2012fu,Zhang:2010va,Dai:2007vd,Lu:2005hq,Pima:2004vw,Lu:2003we},
 handwritten digit recognition \citep{Bouveyron:2007gx}, remote sensing
 \citep{Tadjudin:1999fk}, seismic detection \citep{Anderson:2002kg}, and chemical
