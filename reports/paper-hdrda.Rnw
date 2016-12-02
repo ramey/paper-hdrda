@@ -245,13 +245,15 @@ covariance matrix estimator towards the identity matrix, which yields a
 nonsingular estimator following the well-known ridge-regression approach of
 \cite{Hoerl:1970cd}. Despite its popularity, the ``borrowing'' operation
 employed in the \emph{RDA} classifier lacks interpretability
-\citep{Bensmail:1996fw}, and the \emph{RDA} classifier is computationally
-inefficient in that its matrix operations are cubic in the number of
-features.\footnote{TODO: Add a couple of references saying RDA is slooooow.} As
-a result, the \emph{RDA} classifier is impraticial for modern high-dimensional
-data sets because its matrix operations are cubic in the number of features, and
-the estimation of the \emph{RDA} classifier's two tuning parameters is
-computationally burdensome.
+\citep{Bensmail:1996fw}. Furthermore, the \emph{RDA} classifier is impractical
+for high-dimensional data sets because it computes the inverse and determinant
+of the covariance matrices for each class. Both matrix calculations are
+computationally expensive because the number of operations grows at a polynomial
+rate in the number of features. Moreover, the \emph{RDA} classifier model
+selection of its two tuning parameters is computationally burdensome because the
+matrix inverse and determinant of the covariance matrices across multiple
+cross-validation folds for each class and for each candidate tuning-parameter
+model.
 
 Here, we present the high-dimensional \emph{RDA} (\emph{HDRDA}) classifier,
 which is intended for the $p > N$ case and builds on the classic \emph{RDA}
@@ -293,9 +295,11 @@ cross-validation. Timing comparisons between our \emph{HDRDA} implementation in
 the {\tt sparsediscrim} R package available on CRAN and the standard \emph{RDA}
 formulation in the {\tt klaR} R package demonstrate that as the number of
 features increases, the computational runtime of the \emph{HDRDA} classifier is
-drastically smaller than \emph{RDA}. In fact, when $p = 1000$ and $N = 100$, the
-\emph{HDRDA} classifier is \textbf{XXX} times faster on average than the
-\emph{RDA} classifier.
+drastically smaller than \emph{RDA}. In fact, when $p = 5000$, we show that the
+\emph{HDRDA} classifier is \Sexpr{bootstrap_summary_p5000$avg_ratio} times
+faster on average than the \emph{RDA} classifier. In this scenario, the
+\emph{HDRDA} classifier's training and model selection requires 3 seconds on
+average, while that of the \emph{RDA} classifier requires 25 minutes on average.
 
 Finally, we study the classification performance of the \emph{HDRDA} classifier
 on six real high-dimensional data sets along with a simulation design that
@@ -959,11 +963,13 @@ discriminant function yielded training and model-selection timings that exceeded
 linear growth in $p$. Because our implementation in the \emph{HDRDA} classifier
 removes the inverse and determinants from the classifier, the \emph{HDRDA}
 classifier is computationally more efficient than the \emph{RDA} classifier,
-especially as $p$ increases. The variance in the \emph{RDA} classifier's runtime
-also appeared to increase as $p$ increased. To quantify how much beyond linear
-growth in $p$, we fit a regression line quadratic in $p$ to the \emph{RDA}
-runtimes and plotted the fit in Figure \ref{fig:timing-results}. We attempted to
-fit a cubic polynomial in $p$ to the \emph{RDA} timings, but the cubic term was
+especially as $p$ increases. We contrast our implementation to the the poor
+computational performance of the in the {\tt klaR} R package, which took
+approximately 25 minutes on average to train the \emph{RDA} classifier on a data
+set having 5,000 features. To quantify how much beyond linear growth in $p$, we
+fit a regression line quadratic in $p$ to the \emph{RDA} runtimes and plotted
+the fit in Figure \ref{fig:timing-results}. We attempted to fit a cubic
+polynomial in $p$ to the \emph{RDA} timings, but the cubic term was
 insignificant with significant quadratic and linear terms. We also fit two
 polynomials to the \emph{RDA} timings with orders 2.807 and 2.376, which
 correspond to the asymptotic computational runtime of two well-known algorithms
