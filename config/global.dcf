@@ -7,7 +7,8 @@ load_libraries: TRUE
 libraries: parallel, futile.logger, reshape2, plyr, ggplot2, stringr,
         datamicroarray, multtest, sparsediscrim, rda, penalizedLDA,
         xtable, Hmisc, mixtools, gridExtra, sparseLDA, e1071, klaR,
-        kernlab, randomForest, itertools2, dplyr, tidyr, ggplot2
+        kernlab, randomForest, itertools2, dplyr, tidyr, ggplot2,
+        microbenchmark
 as_factors: FALSE
 data_tables: FALSE
 version: 0.6

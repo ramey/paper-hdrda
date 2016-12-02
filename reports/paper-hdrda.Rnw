@@ -159,6 +159,73 @@ results_microarray <- inner_join(avg_error_microarray, sd_error_microarray,
   spread(data_set, Table_Cells)
 @
 
+<<munge_timing_comparisons>>=
+# HDRDA vs RDA Timing Comparison Results
+
+# Benchmarks are given in nanoseconds, which are converted to seconds
+timings <- bind_rows(lapply(timing_results, as.data.frame), .id="p") %>%
+  mutate(p=as.integer(p),
+         expr=as.character(expr),
+         Classifier=ifelse(startsWith(expr, "hdrda"), "HDRDA", "RDA"),
+         Classifier=factor(Classifier),
+         time=time / 1e9) %>%
+  select(-expr) %>%
+  filter(p %% 500 == 0) %>%
+  tbl_df %>%
+  group_by(p, Classifier) %>%
+  mutate(wls_weights=1 / sd(time)) %>%
+  ungroup
+
+# Create DF for two facets in same plot
+# First plot shows HDRDA vs RDA
+# Second plot zooms in on HDRDA results
+timings$Plot <- "Comparison of HDRDA and RDA"
+timings_hdrda <- timings %>%
+    filter(Classifier == "HDRDA") %>%
+    mutate(Plot="HDRDA")
+timings_combined <- bind_rows(timings, timings_hdrda)
+
+# Build data frame to show relative timings in table
+timing_ratios <- timings %>%
+    group_by(p, Classifier) %>%
+    summarize(median_time=median(time)) %>%
+    tidyr::spread(Classifier, median_time) %>%
+      mutate(ratio_time=RDA / HDRDA) %>%
+      select(-HDRDA, -RDA)
+@
+
+<<bootstrap_relative_timing_comparisons>>=
+ratio_means <- function(df, num_reps=1000) {
+  bootstrap_reps <- replicate(n=num_reps, {
+    df %>%
+      group_by(Classifier) %>%
+      sample_frac(size=1.0, replace=TRUE) %>%
+      summarize(mean_time=mean(time)) %>%
+      tidyr::spread(Classifier, mean_time) %>%
+      mutate(ratio_means=RDA / HDRDA) %>%
+      select(-HDRDA, -RDA)
+  }, simplify=FALSE)
+  bind_rows(bootstrap_reps)
+}
+
+set.seed(42)
+timing_ratios_bootstrap <- timings %>%
+    mutate(p=factor(p)) %>%
+    group_by(p) %>%
+    do(ratio_means(., num_reps=1000))
+
+timing_bootstrap_summary <- timing_ratios_bootstrap %>%
+  group_by(p) %>%
+  summarize(avg_ratio=mean(ratio_means),
+            lower_ci=quantile(ratio_means, probs=0.025),
+            upper_ci=quantile(ratio_means, probs=0.975))
+bootstrap_summary_p500 <- timing_bootstrap_summary %>%
+  filter(p == "500")
+bootstrap_summary_p5000 <- timing_bootstrap_summary %>%
+  filter(p == "5000")
+
+@
+
 \section{Introduction}
 
 In this paper, we consider the classification of small-sample, high-dimensional
