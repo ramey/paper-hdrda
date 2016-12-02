@@ -949,6 +949,9 @@ software {\tt R}. Our analyses can be reproduced using the code available in the
 \subsection{Timing Comparison Results}
 
 TODO
+\[ \left[\text{Insert Figure \ref{fig:timing-results} approximately here }\right] \]
+
+\[ \left[\text{Insert Figure \ref{fig:timing-comparison-bootstrap} approximately here }\right] \]
 
 \section{Classification Study}
 \label{sec:sims}
@@ -1327,6 +1330,35 @@ rda_contours(lambda = 1)
 \caption{Contours of five multivariate normal populations as a function of the
   pooling parameter $\lambda$.}
 \label{fig:hdrda-contours}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+<<timing_results, fig.width=8, fig.height=8, dpi=200>>=
+p <- ggplot(timings_combined, aes(x=p, y=time, color=Classifier))
+p <- p + geom_point() + geom_jitter(width=140, height=0) + facet_wrap(~ Plot, scales="free_y")
+p <- p + geom_smooth(method="lm", formula=y ~ poly(x, 2), se=FALSE)
+p <- p + scale_color_manual(values=c("#D55E00", "#0072B2"))
+p <- p + xlab("Number of Features") + ylab("Model Selection Time (seconds)")
+p + theme_bw()
+@
+\caption{Timing comparisons (in seconds) between HDRDA and RDA classifiers.}
+\label{fig:timing-results}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+<<relative_timings, fig.width=8, fig.height=8, dpi=200>>=
+p <- ggplot(timing_ratios_bootstrap, aes(ratio_means, fill=p))
+p <- p + geom_histogram() + facet_wrap(~ p, scale="free_x")
+p <- p + xlab("Ratio of Mean RDA Runtime to Mean HDRDA Runtime") + ylab("Bootstrap Replications")
+p + theme_bw()
+@
+\caption{Distribution of ratios of mean \emph{RDA} runtime to mean \emph{HDRDA}
+  runtime across 1000 bootstrap replications.}
+\label{fig:timing-comparison-bootstrap}
 \end{figure}
 
 \clearpage
