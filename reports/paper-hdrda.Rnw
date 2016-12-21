@@ -43,26 +43,22 @@
 
 \begin{abstract}
 
-We develop a new and computationally efficient implementation of
-\citeauthor{Friedman:1989tm}'s popular regularized discriminant analysis (RDA)
-classifier in the small-sample, high-dimensional setting. Our proposed
-high-dimensional RDA (HDRDA) classifier modifies \citeauthor{Friedman:1989tm}'s
-original formulation to achieve interpretability previously lacking. We are able
+We develop a new and computationally efficient regularized discriminant analysis (RDA)
+classifier for the small-sample, high-dimensional setting.  We are able
 to interpret the biased covariance matrix estimator employed in the HDRDA
 classifier as one that is estimated from all training observations regardless of
-class, solidifying the ``borrowing'' operation \citeauthor{Friedman:1989tm}'s
-RDA is claimed to have. Moreover, our formulation also differs from
+class. Moreover, our classifier also differs from
 \citeauthor{Friedman:1989tm}'s in that we show our classifier is equivalent to
-one in a reduced feature space with dimension approximately equal to the
+a classifier in a reduced feature space with dimension approximately equal to the
 training sample size. As a result, the matrix operations used in the HDRDA
 classifier are computationally linear in the number of features, making HDRDA
-well-suited for high-dimensional classification in practice. Timing comparisons
+well-suited for high-dimensional classification in practice. We demonstrate that HDRDA is often superior to several
+sparse and regularized classifiers in terms of classification accuracy with
+three artificial and six real high-dimensional data sets.  Also, timing comparisons
 between our HDRDA implementation in the {\tt sparsediscrim} R package and the
 standard RDA formulation in the {\tt klaR} R package demonstrate that as the
 number of features increases, the computational runtime of HDRDA is drastically
-smaller than RDA. We also demonstrate that HDRDA is often superior to several
-sparse and regularized classifiers in terms of classification accuracy with
-three artificial and six real high-dimensional data sets.
+smaller than RDA. 
 
 \end{abstract}
 
@@ -256,8 +252,7 @@ cross-validation folds for each class and for each candidate tuning-parameter
 model.
 
 Here, we present the high-dimensional \emph{RDA} (\emph{HDRDA}) classifier,
-which is intended for the $p > N$ case and builds on the classic \emph{RDA}
-classifier proposed by \cite{Friedman:1989tm}. We reparameterize the \emph{RDA}
+which is intended for the case when $p > N$ . We reparameterize the \emph{RDA}
 classifier similar to that of \cite*{Hastie:2008dt} and \cite{Halbe:2007ea} and
 employ a biased covariance-matrix estimator that partially pools the individual
 sample covariance matrices from the \emph{QDA} classifier with the pooled sample
@@ -289,7 +284,7 @@ when $p > N$. Such techniques include work from \cite{Srivastava:2007ww},
 \cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
 \citet*{Xu:2009fl}.
 
-We provide an efficient algorithm along with pseudocode to estimate the
+We also provide an efficient algorithm along with pseudocode to estimate the
 \emph{HDRDA} classifier's tuning parameters in a grid search via
 cross-validation. Timing comparisons between our \emph{HDRDA} implementation in
 the {\tt sparsediscrim} R package available on CRAN and the standard \emph{RDA}
@@ -519,24 +514,7 @@ estimators proposed in the literature can be obtained when one selects $\gamma$
 accordingly. For instance, with $\gamma = \tr\{ \widehat{\bm \Sigma} \} /
 \min(N, p)$, we obtain the estimator from \cite{Srivastava:2007ww}.
 
-Perhaps the most well-known of the ridge-like estimators is from
-\cite{Friedman:1989tm}, who proposed regularized discriminant analysis (RDA) by
-incorporating a weighted average of the sample covariance matrix $\widehat{ \bm
-  \Sigma}_k$ and the pooled sample covariance matrix $\widehat{\bm \Sigma}$ to
-estimate $\bm \Sigma_k$ with
-\begin{linenomath*}
-\begin{align}
-    \widehat{\bm \Sigma}_k(\lambda) = n_k^{-1}(\lambda) \bm S_k(\lambda) \quad
-    (k = 1, \ldots, K),\label{eq:sig-lambda}
-\end{align}
-\end{linenomath*}
-where $\lambda \in [0, 1]$, $n_k(\lambda) = (1 - \lambda) n_k + \lambda N$, $
-\bm S_k = n_k \widehat{\bm \Sigma}_k$, $\bm S = \sum_{k=1}^K \bm S_k$, and $ \bm
-S_k(\lambda) = (1 - \lambda) \bm S_k + \lambda \bm S$. If $\lambda = 0$,
-\eqref{eq:sig-lambda} is equal to $\widehat{\bm \Sigma}_k$ in \eqref{eq:qda}.
-Alternatively, if $\lambda = 1$, then \eqref{eq:sig-lambda} reduces to
-\eqref{eq:pooled-cov}. To further improve the estimation of $\bm \Sigma_k$ and
-to stabilize the inverse of \eqref{eq:sig-lambda}, \cite{Friedman:1989tm}
+\cite{Friedman:1989tm}
 proposed the biased covariance-matrix estimator
 \begin{linenomath*}
 \begin{align}
@@ -545,11 +523,11 @@ proposed the biased covariance-matrix estimator
 \end{linenomath*}
 where $\gamma \in [0, 1]$ is a regularization parameter that controls the
 shrinkage of \eqref{eq:sig-rda} towards $\bm I_p$ and is weighted by the average
-of the eigenvalues of \eqref{eq:sig-lambda}. Finally, \cite{Friedman:1989tm}
+of the eigenvalues of \eqref{eq:sig-lambda}. \cite{Friedman:1989tm}
 established the RDA classifier by substituting \eqref{eq:sig-rda} into
 \eqref{eq:qda}.
 
-Our proposed \emph{HDRDA} classifier resembles \eqref{eq:sig-rda} but yields an
+Our proposed \emph{HDRDA} classifier yields an
 interpretation of the pooling parameter $\lambda$ as discussed above. Moreover,
 as we discuss below, our formulation of the \emph{HDRDA} classifier lends itself
 to rapid estimation in high-dimensional classification.
@@ -729,7 +707,7 @@ Because $\gamma$ is constant for $k = 1, \ldots, K$, we can omit the $(p - q)
 $\bm U_2^{T} (\bm x - \xbar_k)$ is constant for $k = 1, \ldots, K$.
 \end{proof}
 
-Thus, we can avoid the time-consuming inverses and determinants of $p \times p$
+Using Theorem 1, we can avoid the time-consuming inverses and determinants of $p \times p$
 covariance matrices in \eqref{eq:hdrda} and instead calculate these same
 operations on $\bm W_k \in \mathbb{R}_{q \times q}$ in
 \eqref{eq:hdrda-decomposed}. The substantial computational improvements arise
@@ -770,10 +748,7 @@ follows from the well-known Sherman-Woodbury formula \citep[Theorem
 \bm A^{-1}$.
 \end{proof}
 
-The application of the Sherman-Woodbury formula requires that $\bm \Gamma_k$ be
-nonsingular. This assumption is not met when $(\lambda, \gamma) = (0, 0)$
-because $\bm \Gamma_k = \bm 0_q$. Here, we use the formulation in
-\eqref{eq:hdrda-decomposed} instead. Also, notice that if $\alpha_k$ is constant
+Also, notice that if $\alpha_k$ is constant
 across the $K$ classes, then $\bm \Gamma_k$ in \eqref{eq:Gamma_k} is independent
 of $k$. Consequently, $|\bm \Gamma_k|$ is constant across the $K$ classes and
 need not be calculated in \eqref{eq:hdrda-decomposed}.
@@ -907,10 +882,7 @@ time-consuming matrix operation involved in computing $\bm W_k^{-1}$ and $|\bm
 W_k|$ is $\bm X_k \bm U_1 \in \mathbb{R}_{n_k \times q}$, which is independent
 of $\lambda$ and $\gamma$. The subsequent operations in calculating $\bm
 W_k^{-1}$ and $|\bm W_k|$ can be simply updated for different pairs of $\lambda$
-and $\gamma$ without repeating the costly computations. When calculating the
-discriminant scores of each test observation in $\bm X_{test}$, rather than
-calculating each score individually, we can more efficiently calculate the
-quadratic forms via a single matrix operation. That is, rather than calculating
+and $\gamma$ without repeating the costly computations. Also, rather than calculating
 $(\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k)$
 individually for each row $\bm x$ of $\bm X_{test}$, we can calculate $(\bm
 X_{test} - \xbar_k \bm 1_k')' \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm X_{test} -
@@ -924,25 +896,24 @@ In this section, we demonstrate that the computational performance of the
 training and model selection employed in the \emph{HDRDA} classifier is
 substantially faster than that of the \emph{RDA} classifier on small-sample,
 high-dimensional data sets. The relative difference in runtime between the two
-classifiers drastically increases as the number of features increases. To
-compare the two classifiers, we generate 25 observations from each of $K=4$
+classifiers drastically increases as $p$ increases. To
+compare the two classifiers, we generated 25 observations from each of $K=4$
 multivariate normal populations with mean vectors $\bm \mu_1 = -3 \cdot \bm
 1_p$, $\bm \mu_2 = -\bm 1_p$, $\bm \mu_3 = \bm 1_p$, and $\bm \mu_4 = 3 \cdot
 \bm 1_p$. We set the covariance matrix of each population to the $p \times p$
-identity matrix. For each data set generated, we estimate the $\lambda$ and
-$\gamma$ parameters for both classifiers using a grid of 5 equidistant candidate
+identity matrix. For each data set generated, we estimated the parameters $\lambda$ and
+$\gamma$ for both classifiers using a grid of 5 equidistant candidate
 values between 0 and 1, inclusively. We set $\alpha_k = 1 - \gamma$, $k = 1,
-\ldots, K$, in the \emph{HDRDA} classifier to resemble
-\citeauthor{Friedman:1989tm}'s \emph{RDA} parameterization. At each pair of
-$\lambda$ and $\gamma$, we compute the 10-fold cross-validation error rate
-\citep{Hastie:2008dt}. Then, we select the optimal model that minimizes the 10-fold
+\ldots, K$, in the \emph{HDRDA} classifier. At each pair of
+$\lambda$ and $\gamma$, we computed the 10-fold cross-validation error rate
+\citep{Hastie:2008dt}. Then, we selected the optimal model that minimized the 10-fold
 cross-validation error rate.
 
-Here, our goal is to compare the computational runtime of the model selection
-for both classifiers as a function of the number of features $p$. We compare the
+Here, our goal was to compare the computational runtime of the model selection
+for both classifiers as a function of $p$. We compared the
 runtime of both classifiers by increasing the number of features from $p = 500$
-to $p = 5000$ in increments of 500. We generate 100 data sets for each value of
-$p$ and compute the training and model selection runtime of both
+to $p = 5000$ in increments of 500. We generated 100 data sets for each value of
+$p$ and computed the training and model selection runtime of both
 classifiers. Our timing comparisons are based on our \emph{HDRDA} implementation
 in the {\tt sparsediscrim} R package and the standard \emph{RDA} implementation
 in the {\tt klaR} R package. All timing comparisons were conducted on an Amazon
@@ -953,9 +924,8 @@ reproduced with the code available in the
 
 \subsection{Timing Comparison Results}
 
-In Figure \ref{fig:timing-results}, we plot the runtime of the model selections
-for both the \emph{HDRDA} and \emph{RDA} classifiers as a function of the number
-of features $p$. In the left panel of Figure \ref{fig:timing-results}, we
+In Figure \ref{fig:timing-results}, we plotted the runtime of the model selections
+for both the \emph{HDRDA} and \emph{RDA} classifiers as a function of $p$. In the left panel of Figure \ref{fig:timing-results}, we
 observe that the \emph{HDRDA} classifier is substantially faster than the
 \emph{RDA} classifier as $p$ increases. Figure \ref{fig:timing-results} suggests
 that the usage of a matrix inverse and determinant in the {\tt klaR} R package's
@@ -968,40 +938,26 @@ computational performance of the in the {\tt klaR} R package, which took
 approximately 25 minutes on average to train the \emph{RDA} classifier on a data
 set having 5,000 features. To quantify how much beyond linear growth in $p$, we
 fit a regression line quadratic in $p$ to the \emph{RDA} runtimes and plotted
-the fit in Figure \ref{fig:timing-results}. We attempted to fit a cubic
-polynomial in $p$ to the \emph{RDA} timings, but the cubic term was
-insignificant with significant quadratic and linear terms. We also fit two
-polynomials to the \emph{RDA} timings with orders 2.807 and 2.376, which
-correspond to the asymptotic computational runtime of two well-known algorithms
-for computing a matrix inverse: the Strassen and Coppersmith-Winograd
-algorithms, respectively \footnote{TODO: Citations needed}. In both cases, the
-polynomials were statistically significiant at the 0.05 level. We displayed the
+the fit in Figure \ref{fig:timing-results}. We displayed the
 quadratic fit in Figure \ref{fig:timing-results} because it fit the timings best
 for $p = 500$ to $p = 2000$. The fits for $2000 \le p \le 5000$ were similar.
 
-In the left panel of Figure \ref{fig:timing-results}, we also fit a linear
-regression model that was linear in $p$ to the \emph{HDRDA} runtimes. In the
-right panel, we repeated the same scatterplot and linear fit with the timings
-restricted to the observed range of \emph{HDRDA} timings. The outliers in the
-\emph{HDRDA} timings were primarily due to the inherent computing variability in
-our {\tt c4.4xlarge} instance.
-
 Clearly, the model training and selection employed in \emph{HDRDA} is
 substantially faster than that of \emph{RDA}. To investigate the relative timing
-comparisons between the two classifiers, we consider the ratio of mean timings
+comparisons between the two classifiers, we considered the ratio of mean timings
 of the \emph{RDA} classifier to the \emph{HDRDA} classifier for each value of
 $p$. We employed nonparametric bootstrapping\footnote{TODO: Citation needed} to
 estimate the mean ratio along with 95\% confidence intervals. In Figure
 \ref{fig:timing-comparison-bootstrap}, the bootstrap sampling distributions for
 the ratio of mean timings are given. First, we observe that the mean relative
-timings increases as $p$ increases. For smaller dimensions, the relative
-difference in computing is sizable with the average ratio of the mean timings
+timings increased as $p$ increased. For smaller dimensions, the relative
+difference in computing was sizable with the average ratio of the mean timings
 equal to \Sexpr{bootstrap_summary_p500$avg_ratio} for $p = 500$ and a 95\%
 confidence interval of (\Sexpr{bootstrap_summary_p500$lower_ci},
 \Sexpr{bootstrap_summary_p500$upper_ci}). Furthermore, the ratio of mean
-computing times suggests that the \emph{RDA} classifier is impractical for
+computing times suggested that the \emph{RDA} classifier is impractical for
 higher dimensions. For instance, when $p = 5000$ the ratio of mean computing
-times increases to \Sexpr{bootstrap_summary_p5000$avg_ratio} with a 95\%
+times increased to \Sexpr{bootstrap_summary_p5000$avg_ratio} with a 95\%
 confidence interval of (\Sexpr{bootstrap_summary_p5000$lower_ci},
 \Sexpr{bootstrap_summary_p5000$upper_ci}).
 
@@ -1043,7 +999,7 @@ set $\alpha_k = 1$, $k = 1, \ldots, K$, so that the covariance-matrix estimator
 $\lambda$ from a grid of 21 equidistant candidate values between 0 and 1,
 inclusively. Similarly, we estimated $\gamma$ from a grid consisting of the
 values $10^{-1}, \ldots, 10^4$, and $10^5$. We selected optimal estimates of
-$\lambda$ and $\gamma$ using $V$-fold cross-validation with $V = 10$. For the
+$\lambda$ and $\gamma$ using $10$-fold cross-validation. For the
 second model, we set $\alpha_k = 1 - \gamma$, $k = 1, \ldots, K$, to resemble
 \citeauthor{Friedman:1989tm}'s parameterization, and we estimated both $\lambda$
 and $\gamma$ from a grid of 21 equidistant candidate values between 0 and 1,
@@ -1093,7 +1049,7 @@ original design from \cite{Guo:2007te} comprised two $p$-dimensional
 multivariate normal populations with a common block-diagonal covariance matrix.
 
 Although the design is indeed standard, the simulation configuration lacks
-artifacts observed commonly in real data, such as skewness and extreme
+artifacts commonly observed in real data, such as skewness and extreme
 outliers. As a result, we wished to investigate the effect of outliers on the
 high-dimensional classifiers. To accomplish this goal, we generalized the
 block-diagonal simulation configuration by sampling from a $p$-dimensional
@@ -1120,7 +1076,7 @@ features of $\bm \mu_2$ were set to 1/2, while the rest were set to 0, i.e.,
 $\bm \mu_2 = (\underbrace{1/2, \ldots, 1/2}_{100}, \underbrace{0, \ldots, 0}_{p
   - 100})$. For simplicity, we defined $\bm \mu_3 = -\bm \mu_2$. The three
 populations differed in their mean vectors in the first 100 features
-corresponding to the first block. No difference in the means occurred in the
+corresponding to the first block, and no difference in the means occurred in the
 remaining blocks.
 
 From each of the $K=3$ populations, we sampled 25 training observations ($n_k =
@@ -1137,7 +1093,7 @@ covariance matrices, we put $\rho_1 = 0.1$, $\rho_2 = 0.5$, and $\rho_3 = 0.9$
 
 \subsubsection{Simulation Results}
 
-In Figure \ref{fig:sim-results}, we observe each classifier's average
+In Figure \ref{fig:sim-results}, we observed each classifier's average
 classification error rates for the values of $\epsilon$ and $p$. Unsurprisingly,
 the average error rate increased for each classifier as the contamination
 probability $\epsilon$ increased regardless of the value of $p$. Sensitivity to
@@ -1165,7 +1121,7 @@ with the \emph{HDRDA} classifiers or the random-forest classifier.
 \[ \left[\text{Insert Figure \ref{fig:sim-results-by-p} approximately here }\right] \]
 
 In Figure \ref{fig:sim-results-by-p} we again examine the simulation results as
-a function of the number of features $p$ for a subset of the values of
+a function of $p$ for a subset of the values of
 $\epsilon$. This set of plots allows us to investigate the effect of feature
 dimensionality on classification performance. When no outliers were present
 (i.e., $\epsilon=0$), the random-forest classifier was outperformed by all other
@@ -1231,7 +1187,7 @@ tumor (MPNST), 4 samples of fibrosarcoma (FS), and 21 samples of malignant
 fibrous histiocytoma (MFH). \cite{Nakayama:2007fl} determined from their data
 that these 10 types fell into 4 broader groups: (1) SS; (2) MLS; (3) Lipoma,
 WDLS, and part of DDLS; (4) Spindle cell and pleomorophic sarcomas including
-DDLS, MFS, LMS, MPNST, FS, and MFH. Following \cite{Witten:2011kc}, we restrict
+DDLS, MFS, LMS, MPNST, FS, and MFH. Following \cite{Witten:2011kc}, we restricted
 our analysis to the five tumor types having at least 15 observations.
 
 \subsubsection{\cite{Shipp:2002ka} Data Set}
@@ -1276,11 +1232,11 @@ Similar to \cite{Witten:2011kc}, we report the average test error rates obtained
 over 100 random training-test partitions in Table \ref{tab:microarray-results}
 along with standard deviations of the test error rates in parentheses. The
 \emph{HDRDA} and Guo classifiers were superior in classification performance for
-the majority of the simulations. The \emph{HDRDA} classifiers had the best
+the majority of the simulations. The \emph{HDRDA} classifiers yielded the best
 classification accuracy on the Chowdary and Shipp data sets. Although the random
 forest's accuracy slightly exceeded the \emph{HDRDA} classifiers on the Tian
 data set, our proposed classifiers outperformed the other competing classifiers
-considered here. Moreover, the \emph{HDRDA} classifiers had comparable
+considered here. Moreover, the \emph{HDRDA} classifiers yielded comparable
 performance on five of the six data sets.
 
 \[ \left[\text{Insert Table \ref{tab:microarray-results} approximately here }\right] \]
@@ -1344,10 +1300,10 @@ We demonstrated that the \emph{HDRDA} implementation of
 \eqref{eq:hdrda-decomposed} in the {\tt sparsediscrim} R package can be used in
 practice with high-dimensional data sets. For instance, in our timing
 comparisons we demonstrated that training and model selection could be employed
-on data sets having 5,000 features in 3 seconds on average. We contrast our
+on data sets having 5,000 features in three seconds on average. We contrast our
 implementation to the the poor computational performance of the in the {\tt
   klaR} R package, which took approximately 25 minutes on average to train the
-\emph{RDA} classifier on a data set having 5,000 features. Given the \emph{RDA}
+\emph{RDA} classifier on a data set having 5,000 features. Given that the \emph{RDA}
 classifier has been shown to have excellent performance in the high-dimensional
 setting \citep{Webb:2011vu} but is limited by its computationally intense
 model-selection procedure, our work enables the \emph{RDA} classifier to be
@@ -1367,9 +1323,9 @@ work would reduce the dimension $q$ further to a lower dimension $q_L < q$ using
 some criterion proposed, perhaps similar to that employed in principal
 components analysis. While unclear whether the classification performance would
 improve via such a method, the efficiency of the training and model selection
-would certainly improve. Moreover, if $q_L = 2$ or $3$ was selected, the
-potential for low-dimensional graphical displays of high-dimensional data could
-be accomplished.
+would certainly improve. Moreover, if $q_L = 2$ or $3$ for low-dimensional graphical displays of high-dimensional data can
+be obtained.
+
 
 We thank Mrs. Joy Young for her numerous recommendations that enhanced the
 quality of our writing.
