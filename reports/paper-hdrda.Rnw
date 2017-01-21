@@ -30,7 +30,7 @@
 
 \begin{frontmatter}
 
-\title{High-Dimensional Regularized Discriminant Analysis}
+\title{Computationally Efficient High-Dimensional Regularized Discriminant Analysis}
 
 \author[jar]{John A. Ramey\cortext[cor1]{Corresponding author}}
 \author[cks]{Caleb K. Stein}
@@ -72,6 +72,7 @@ Regularized discriminant analysis\sep High-dimensional classification\sep Covari
 \linenumbers
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
+library(knitr)
 # Round digits throughout document including \Sexpr statements.
 # See Yihui's response here:
 # http://stackoverflow.com/questions/11062497/how-to-avoid-using-round-in-every-sexpr
