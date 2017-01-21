@@ -4,12 +4,10 @@ recursive_loading: FALSE
 munging: FALSE
 logging: FALSE
 load_libraries: TRUE
-libraries: parallel, futile.logger, reshape2, plyr, ggplot2, stringr,
-        datamicroarray, multtest, sparsediscrim, rda, penalizedLDA,
-        xtable, Hmisc, mixtools, gridExtra, sparseLDA, e1071, klaR,
-        kernlab, randomForest, itertools2, dplyr, tidyr, ggplot2,
-        microbenchmark
+libraries: parallel, futile.logger, reshape2, plyr, ggplot2, stringr, datamicroarray, multtest,
+           sparsediscrim, rda, penalizedLDA, xtable, Hmisc, mixtools, gridExtra, sparseLDA, e1071, klaR,
+           kernlab, randomForest, itertools2, dplyr, tidyr, ggplot2, microbenchmark
 as_factors: FALSE
 data_tables: FALSE
-version: 0.6
+version: 0.7
 attach_internal_libraries: TRUE
