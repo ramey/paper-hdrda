@@ -43,22 +43,26 @@
 
 \begin{abstract}
 
-We develop a new and computationally efficient regularized discriminant analysis (RDA)
-classifier for the small-sample, high-dimensional setting.  We are able
-to interpret the biased covariance matrix estimator employed in the HDRDA
-classifier as one that is estimated from all training observations regardless of
-class. Moreover, our classifier also differs from
-\citeauthor{Friedman:1989tm}'s in that we show our classifier is equivalent to
-a classifier in a reduced feature space with dimension approximately equal to the
-training sample size. As a result, the matrix operations used in the HDRDA
-classifier are computationally linear in the number of features, making HDRDA
-well-suited for high-dimensional classification in practice. We demonstrate that HDRDA is often superior to several
-sparse and regularized classifiers in terms of classification accuracy with
-three artificial and six real high-dimensional data sets.  Also, timing comparisons
-between our HDRDA implementation in the {\tt sparsediscrim} R package and the
-standard RDA formulation in the {\tt klaR} R package demonstrate that as the
-number of features increases, the computational runtime of HDRDA is drastically
-smaller than RDA.
+Regularized discriminant analysis (\emph{RDA}) proposed by
+\cite{Friedman:1989tm} is a widely popular classifier that lacks
+interpretability and is impractical for high-dimensional data sets.  Here, we
+present an interpretable and computationally efficient classifier called
+high-dimensional \emph{RDA} (\emph{HDRDA}), designed for the small-sample,
+high-dimensional setting. For \emph{HDRDA}, we show that each training
+observation regardless of class contributes to the class covariance matrix,
+resulting in interpretable estimator that \emph{borrows} from the pooled sample
+covariance matrix. Moreover, we show that \emph{HDRDA} is equivalent to a
+classifier in a reduced feature space with dimension approximately equal to the
+training sample size. As a result, the matrix operations employed by
+\emph{HDRDA} are computationally linear in the number of features, making the
+classifier well-suited for high-dimensional classification in practice. We
+demonstrate that \emph{HDRDA} is often superior to several sparse and
+regularized classifiers in terms of classification accuracy with three
+artificial and six real high-dimensional data sets. Also, timing comparisons
+between our \emph{HDRDA} implementation in the {\tt sparsediscrim} R package
+and the standard \emph{RDA} formulation in the {\tt klaR} R package demonstrate
+that as the number of features increases, the computational runtime of
+\emph{HDRDA} is drastically smaller than \emph{RDA}.
 
 \end{abstract}
 
@@ -518,18 +522,16 @@ The choice of $\alpha_k$ in \eqref{eq:hdrda-cov} is one of convenience and
 allows the flexibility of various covariance-matrix estimators proposed in the
 literature. In practice, we generally are not interested in estimating
 $\alpha_k$ because the estimation of $K$ additional tuning parameters via
-cross-validation is counterproductive to our goal of improving the \emph{RDA}
-classifier's computational efficiency. By setting $\alpha_k$ equal to an
-appropriate constant, the \emph{HDRDA} covariance-matrix estimator includes or
+cross-validation is counterproductive to our goal of computational efficiency.
+By setting $\alpha_k$ equal to an appropriate constant, the \emph{HDRDA} covariance-matrix estimator includes or
 resembles a large family of estimators. Notice that if $\alpha_k = 1$ and
 $\lambda = 1$, \eqref{eq:hdrda-cov} is equivalent to the standard ridge-like
-covariance-matrix estimator in \eqref{eq:ridge-estimator}, and various
+covariance-matrix estimator in \eqref{eq:ridge-estimator}. Other
 estimators proposed in the literature can be obtained when one selects $\gamma$
 accordingly. For instance, with $\gamma = \tr\{ \widehat{\bm \Sigma} \} /
 \min(N, p)$, we obtain the estimator from \cite{Srivastava:2007ww}.
 
-\cite{Friedman:1989tm}
-proposed the biased covariance-matrix estimator
+\cite{Friedman:1989tm} proposed the biased covariance-matrix estimator
 \begin{linenomath*}
 \begin{align}
     \widehat{\bm \Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm \Sigma}_k(\lambda) + \gamma \frac{\tr\{\widehat{\bm \Sigma}_k(\lambda)\}}{p} \bm I_p,\label{eq:sig-rda}
