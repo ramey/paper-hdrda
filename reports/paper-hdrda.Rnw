@@ -58,7 +58,7 @@ three artificial and six real high-dimensional data sets.  Also, timing comparis
 between our HDRDA implementation in the {\tt sparsediscrim} R package and the
 standard RDA formulation in the {\tt klaR} R package demonstrate that as the
 number of features increases, the computational runtime of HDRDA is drastically
-smaller than RDA. 
+smaller than RDA.
 
 \end{abstract}
 
@@ -189,6 +189,19 @@ timing_ratios <- timings %>%
     tidyr::spread(Classifier, median_time) %>%
       mutate(ratio_time=RDA / HDRDA) %>%
       select(-HDRDA, -RDA)
+
+
+timings_summary <- timings %>%
+  group_by(Classifier, p) %>%
+  summarize(mean_runtime=mean(time), sd_runtime=sd(time))
+
+# RDA Mean Runtime in Minutes when p = 5000
+rda_mean_time_p5000 <- timings_summary %>% filter(Classifier == "RDA", p == 5000)
+rda_mean_time_p5000 <- rda_mean_time_p5000$mean_runtime / 60
+
+# HDRDA Mean Runtime in Seconds when p = 5000
+hdrda_mean_time_p5000 <- timings_summary %>% filter(Classifier == "HDRDA", p == 5000)
+hdrda_mean_time_p5000 <- hdrda_mean_time_p5000$mean_runtime
 @
 
 <<bootstrap_relative_timing_comparisons>>=
@@ -894,7 +907,7 @@ individual quadratic form of each test observation, $\bm x_t$.
 \label{sec:timing-comparisons}
 
 In this section, we demonstrate that the computational performance of the
-training and model selection employed in the \emph{HDRDA} classifier is
+model selection employed in the \emph{HDRDA} classifier is
 substantially faster than that of the \emph{RDA} classifier on small-sample,
 high-dimensional data sets. The relative difference in runtime between the two
 classifiers drastically increases as $p$ increases. To
@@ -907,11 +920,10 @@ $\gamma$ for both classifiers using a grid of 5 equidistant candidate
 values between 0 and 1, inclusively. We set $\alpha_k = 1 - \gamma$, $k = 1,
 \ldots, K$, in the \emph{HDRDA} classifier. At each pair of
 $\lambda$ and $\gamma$, we computed the 10-fold cross-validation error rate
-\citep{Hastie:2008dt}. Then, we selected the optimal model that minimized the 10-fold
+\citep{Hastie:2008dt}. Then, we selected the model that minimized the 10-fold
 cross-validation error rate.
 
-Here, our goal was to compare the computational runtime of the model selection
-for both classifiers as a function of $p$. We compared the
+We compared the
 runtime of both classifiers by increasing the number of features from $p = 500$
 to $p = 5000$ in increments of 500. We generated 100 data sets for each value of
 $p$ and computed the training and model selection runtime of both
@@ -920,41 +932,42 @@ in the {\tt sparsediscrim} R package and the standard \emph{RDA} implementation
 in the {\tt klaR} R package. All timing comparisons were conducted on an Amazon
 Elastic Compute Cloud (EC2) {\tt c4.4xlarge} instance using version 3.3.1 of the
 open-source statistical software {\tt R}. Our timing comparisons can be
-reproduced with the code available in the
-\url{https://github.com/ramhiser/paper-hdrda} repository.
+reproduced with the code available at
+\url{https://github.com/ramhiser/paper-hdrda}.
 
 \subsection{Timing Comparison Results}
 
-In Figure \ref{fig:timing-results}, we plotted the runtime of the model selections
-for both the \emph{HDRDA} and \emph{RDA} classifiers as a function of $p$. In the left panel of Figure \ref{fig:timing-results}, we
-observe that the \emph{HDRDA} classifier is substantially faster than the
-\emph{RDA} classifier as $p$ increases. Figure \ref{fig:timing-results} suggests
-that the usage of a matrix inverse and determinant in the {\tt klaR} R package's
-discriminant function yielded training and model-selection timings that exceeded
-linear growth in $p$. Because our implementation in the \emph{HDRDA} classifier
-removes the inverse and determinants from the classifier, the \emph{HDRDA}
-classifier is computationally more efficient than the \emph{RDA} classifier,
-especially as $p$ increases. We contrast our implementation to the the poor
-computational performance of the in the {\tt klaR} R package, which took
-approximately 25 minutes on average to train the \emph{RDA} classifier on a data
-set having 5,000 features. To quantify how much beyond linear growth in $p$, we
-fit a regression line quadratic in $p$ to the \emph{RDA} runtimes and plotted
-the fit in Figure \ref{fig:timing-results}. We displayed the
-quadratic fit in Figure \ref{fig:timing-results} because it fit the timings best
-for $p = 500$ to $p = 2000$. The fits for $2000 \le p \le 5000$ were similar.
+In Figure \ref{fig:timing-results}, we plotted the runtime of the model
+selections for both the \emph{HDRDA} and \emph{RDA} classifiers as a function
+of $p$. We observed that the \emph{HDRDA} classifier was substantially faster
+than the \emph{RDA} classifier as $p$ increased. In the left panel of Figure
+\ref{fig:timing-results}, we fit a quadratic regression line to the \emph{RDA}
+runtimes and a simple linear regression model to the \emph{HDRDA} runtimes.
+For improved understanding, in the right panel we repeated the same scatterplot
+and linear fit with the timings restricted to the observed range of the
+\emph{HDRDA} timings. Figure \ref{fig:timing-results} suggests that the usage
+of a matrix inverse and determinant in the {\tt klaR} R package's discriminant
+function yielded model-selection timings that exceeded linear growth in
+$p$. Because the \emph{HDRDA} classifier removes inverse and determinants, it
+was computationally more efficient than the \emph{RDA} classifier, especially
+as $p$ increased. In fact, when $p = 5000$ the \emph{RDA} classifier required
+\Sexpr{rda_mean_time_p5000} minutes on average to perform model selection,
+while the \emph{HDRDA} classifier selected its optimal model in
+\Sexpr{hdrda_mean_time_p5000} seconds on average. Clearly, the model selection
+employed by the \emph{HDRDA} classifier is substantially faster than that of
+the \emph{RDA} classifier.
 
-Clearly, the model training and selection employed in \emph{HDRDA} is
-substantially faster than that of \emph{RDA}. To investigate the relative timing
-comparisons between the two classifiers, we considered the ratio of mean timings
-of the \emph{RDA} classifier to the \emph{HDRDA} classifier for each value of
-$p$. We employed nonparametric bootstrapping\footnote{TODO: Citation needed} to
-estimate the mean ratio along with 95\% confidence intervals. In Figure
-\ref{fig:timing-comparison-bootstrap}, the bootstrap sampling distributions for
-the ratio of mean timings are given. First, we observe that the mean relative
-timings increased as $p$ increased. For smaller dimensions, the relative
-difference in computing was sizable with the average ratio of the mean timings
-equal to \Sexpr{bootstrap_summary_p500$avg_ratio} for $p = 500$ and a 95\%
-confidence interval of (\Sexpr{bootstrap_summary_p500$lower_ci},
+We quantified the relative timing comparisons between the two classifiers by
+calculating the ratio of mean timings of the \emph{RDA} classifier to the
+\emph{HDRDA} classifier for each value of $p$. We employed nonparametric
+bootstrapping to estimate the mean ratio along with 95\% confidence
+intervals. In Figure \ref{fig:timing-comparison-bootstrap}, the bootstrap
+sampling distributions for the ratio of mean timings are given. First, we
+observe that the mean relative timings increased as $p$ increased. For smaller
+dimensions, the relative difference in computing was sizable with the average
+ratio of the mean timings equal to \Sexpr{bootstrap_summary_p500$avg_ratio} for
+$p = 500$ and a 95\% confidence interval of
+(\Sexpr{bootstrap_summary_p500$lower_ci},
 \Sexpr{bootstrap_summary_p500$upper_ci}). Furthermore, the ratio of mean
 computing times suggested that the \emph{RDA} classifier is impractical for
 higher dimensions. For instance, when $p = 5000$ the ratio of mean computing
@@ -1075,7 +1088,7 @@ We generated $K=3$ populations from \eqref{eq:contaminated-pdf} with $\bm
 $\bm \mu_1 = \bm 0_p$. Next, comparable to \cite{Guo:2007te}, the first 100
 features of $\bm \mu_2$ were set to 1/2, while the rest were set to 0, i.e.,
 $\bm \mu_2 = (\underbrace{1/2, \ldots, 1/2}_{100}, \underbrace{0, \ldots, 0}_{p
-  - 100})$. For simplicity, we defined $\bm \mu_3 = -\bm \mu_2$. The three
+  - 100})$. For simplicity, we defined $\bm \mu_3 = -\bm \mu_2$. The 3
 populations differed in their mean vectors in the first 100 features
 corresponding to the first block, and no difference in the means occurred in the
 remaining blocks.
@@ -1301,7 +1314,7 @@ We demonstrated that the \emph{HDRDA} implementation of
 \eqref{eq:hdrda-decomposed} in the {\tt sparsediscrim} R package can be used in
 practice with high-dimensional data sets. For instance, in our timing
 comparisons we demonstrated that training and model selection could be employed
-on data sets having 5,000 features in three seconds on average. We contrast our
+on data sets having 5,000 features in 3 seconds on average. We contrast our
 implementation to the the poor computational performance of the in the {\tt
   klaR} R package, which took approximately 25 minutes on average to train the
 \emph{RDA} classifier on a data set having 5,000 features. Given that the \emph{RDA}
@@ -1318,13 +1331,12 @@ handwritten digit recognition \citep{Bouveyron:2007gx}, remote sensing
 \citep{Tadjudin:1999fk}, seismic detection \citep{Anderson:2002kg}, and chemical
 spectra \citep*{Wu:1996us,Aeberhard:1993fp}.
 
-The dimension reduction that we have employed in this paper has reduced the
+The dimension reduction employed in this paper has reduced the
 dimension to rank$(\widehat{\bm \Sigma}) = q$. An interesting extension of our
-work would reduce the dimension $q$ further to a lower dimension $q_L < q$ using
-some criterion proposed, perhaps similar to that employed in principal
+work would reduce the dimension $q$ further to a lower dimension $q_L < q$, perhaps using a criterion similar to that of principal
 components analysis. While unclear whether the classification performance would
 improve via such a method, the efficiency of the training and model selection
-would certainly improve. Moreover, if $q_L = 2$ or $3$ for low-dimensional graphical displays of high-dimensional data can
+would certainly improve. Moreover, if $q_L = 2$ or $3$, low-dimensional graphical displays of high-dimensional data could
 be obtained.
 
 
