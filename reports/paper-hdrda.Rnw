@@ -531,22 +531,22 @@ estimators proposed in the literature can be obtained when one selects $\gamma$
 accordingly. For instance, with $\gamma = \tr\{ \widehat{\bm \Sigma} \} /
 \min(N, p)$, we obtain the estimator from \cite{Srivastava:2007ww}.
 
-\cite{Friedman:1989tm} proposed the biased covariance-matrix estimator
+When $\alpha_k = 1 - \gamma$, \eqref{eq:hdrda-cov} resembles the biased covariance-matrix estimator
 \begin{linenomath*}
 \begin{align}
-    \widehat{\bm \Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm \Sigma}_k(\lambda) + \gamma \frac{\tr\{\widehat{\bm \Sigma}_k(\lambda)\}}{p} \bm I_p,\label{eq:sig-rda}
+    \widehat{\bm \Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm \Sigma}_k^{(RDA)}(\lambda) + \gamma \frac{\tr\left\{\widehat{\bm \Sigma}_k^{(RDA)}(\lambda)\right\}}{p} \bm I_p \label{eq:sig-rda}
 \end{align}
 \end{linenomath*}
-where $\gamma \in [0, 1]$ is a regularization parameter that controls the
-shrinkage of \eqref{eq:sig-rda} towards $\bm I_p$ and is weighted by the average
-of the eigenvalues of \eqref{eq:sig-lambda}. \cite{Friedman:1989tm}
-established the RDA classifier by substituting \eqref{eq:sig-rda} into
-\eqref{eq:qda}.
-
-Our proposed \emph{HDRDA} classifier yields an
-interpretation of the pooling parameter $\lambda$ as discussed above. Moreover,
-as we discuss below, our formulation of the \emph{HDRDA} classifier lends itself
-to rapid estimation in high-dimensional classification.
+employed in the \emph{RDA} classifier, where $\widehat{\bm
+  \Sigma}_k^{(RDA)}(\lambda)$ is a pooled estimator of $\bm \Sigma_k$ and
+$\gamma \in [0, 1]$ is a regularization parameter that controls the shrinkage of
+\eqref{eq:sig-rda} towards $\bm I_p$ weighted by the average of the eigenvalues
+of $\widehat{\bm \Sigma}_k^{(RDA)}(\lambda)$. Despite the similarity of
+\eqref{eq:sig-rda} to the \emph{HDRDA} covariance-matrix estimator in
+\eqref{eq:hdrda-cov}, the \emph{RDA} classifier is impractical for
+high-dimensional data because the inverse and determinant of \eqref{eq:sig-rda}
+must be calculated when substituted into \eqref{eq:qda}. Furthermore,
+\eqref{eq:sig-rda} has no clear interpretation.
 
 \section{Properties of the HDRDA Classifier}
 \label{sec:hdrda-properties}
@@ -764,10 +764,12 @@ follows from the well-known Sherman-Woodbury formula \citep[Theorem
 \bm A^{-1}$.
 \end{proof}
 
-Also, notice that if $\alpha_k$ is constant
-across the $K$ classes, then $\bm \Gamma_k$ in \eqref{eq:Gamma_k} is independent
-of $k$. Consequently, $|\bm \Gamma_k|$ is constant across the $K$ classes and
-need not be calculated in \eqref{eq:hdrda-decomposed}.
+Notice that $\bm \Gamma_k$ is singular when $(\lambda, \gamma) = (0, 0)$
+because $\bm \Gamma_k = \bm 0_q$, in which case we use the formulation in
+\eqref{eq:hdrda-decomposed} instead. Also, notice that if $\alpha_k$ is
+constant across the $K$ classes, then $\bm \Gamma_k$ in \eqref{eq:Gamma_k} is
+independent of $k$. Consequently, $|\bm \Gamma_k|$ is constant across the $K$
+classes and need not be calculated in \eqref{eq:hdrda-decomposed}.
 
 \subsection{Model Selection}
 
