@@ -1288,61 +1288,56 @@ applied to real data.
 \section{Discussion}
 \label{sec:discussion}
 
-We have compared our proposed \emph{HDRDA} classifier to the random-forest and
-Witten classifiers as well as the Pang, Tong, and Guo classifiers, each of which
-assumes independence of the features conditional on class membership. Despite
-the rapid computational performance of diagonal classifiers and the reduction in
-the number of parameters to estimate, \cite{Mai:2012bf} and \cite{Fan:2012iq}
-have noted that diagonal classifiers can often yield inferior classification
-performance when compared to other classification methods. In fact, we have
-shown that the \emph{HDRDA} classifier often yields superior classification
-accuracy when compared to the diagonal classifiers considered using six
-small-sample, high-dimensional data sets, confirming the assertions of
-\cite{Mai:2012bf} and \cite{Fan:2012iq}. Furthermore, we have demonstrated that
-\emph{HDRDA} classifiers are more robust to the presence of outliers than the
-diagonal classifiers.
+We have demonstrated that our proposed \emph{HDRDA} classifier is competitive
+with and often superior to random forests as well as the Witten, Pang, Tong, and
+Guo classifiers. In fact, we have shown that the \emph{HDRDA} classifier often
+yields superior classification accuracy when applied to small-sample,
+high-dimensional data sets, confirming the assertions of \cite{Mai:2012bf} and
+\cite{Fan:2012iq} that diagonal classifiers often yield inferior classification
+performance when compared to other classification methods. Furthermore, we have
+demonstrated that \emph{HDRDA} classifiers are more robust to the presence of
+outliers than the diagonal classifiers despite their rapid computational
+performance and their reduction in the number of parameters to estimate.
 
 We also considered the popular penalized linear discriminant analysis from
 \cite{Witten:2011kc} because it was specifically designed for high-dimensional
 gene-expression data. We had expected its classification performance to be
 competitive within our classification study and perhaps superior. Contrarily,
-its underperformance in our empirical studies show that it is sensitive to
-outliers and unable to achieve comparable results with other classifiers
-designed for small-sample, high-dimensional data. Also, despite the claims of
-\cite{FernandezDelgado:2014ul} that the random forest classifier is typically
-superior to other classifiers, we observed that the random-forest classifier was
-indeed competitive but was typically outperformed by classifiers developed for
-small-sample, high-dimensional data.
+our empirical studies suggests that the classifier is sensitive to outliers and
+unable to achieve comparable results with other classifiers designed for
+small-sample, high-dimensional data. Also, despite the claims of
+\cite{FernandezDelgado:2014ul} that random forests are typically superior to
+other classifiers, we observed that they were indeed competitive but were
+typically outperformed by classifiers developed for small-sample,
+high-dimensional data.
 
-We demonstrated that the \emph{HDRDA} implementation of
-\eqref{eq:hdrda-decomposed} in the {\tt sparsediscrim} R package can be used in
-practice with high-dimensional data sets. For instance, in our timing
-comparisons we demonstrated that training and model selection could be employed
-on data sets having 5,000 features in 3 seconds on average. We contrast our
-implementation to the the poor computational performance of the in the {\tt
-  klaR} R package, which took approximately 25 minutes on average to train the
-\emph{RDA} classifier on a data set having 5,000 features. Given that the \emph{RDA}
-classifier has been shown to have excellent performance in the high-dimensional
-setting \citep{Webb:2011vu} but is limited by its computationally intense
-model-selection procedure, our work enables the \emph{RDA} classifier to be
-employed with small-sample, high-dimensional data in practice. This result is
-reassuring because the \emph{RDA} classifier remains widely popular in the
-literature. In fact, variants of the RDA classifier have been applied to
-microarray data \citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te}, facial
-recognition
-\citep{Ching:2012fu,Zhang:2010va,Dai:2007vd,Lu:2005hq,Pima:2004vw,Lu:2003we},
+We demonstrated that our \emph{HDRDA} implementation in the {\tt sparsediscrim}
+R package can be used in practice with high-dimensional data sets. In our timing
+comparisons we showed that \emph{HDRDA} model selection could be employed on
+data sets with $p = 5000$ in \Sexpr{hdrda_mean_time_p5000} seconds on
+average. Contrarily, the \emph{RDA} classifier implemented in the {\tt klaR} R
+package required \Sexpr{rda_mean_time_p5000} minutes on average to perform model
+selection on data sets with $p = 5000$. Given that the \emph{RDA} classifier has
+been shown to have excellent performance in the high-dimensional setting
+\citep{Webb:2011vu} but is limited by its computationally intense
+model-selection procedure, our work replaces the \emph{RDA} classifier for
+high-dimensional data in practice. This result is reassuring because the
+\emph{RDA} classifier remains widely popular in the literature. In fact,
+variants of the RDA classifier have been applied to microarray data
+\citep{Ching:2012fu,Li:2012ev,Tai:2007bk,Guo:2007te}, facial recognition
+\citep{Zhang:2010va,Dai:2007vd,Lu:2005hq,Pima:2004vw,Lu:2003we},
 handwritten digit recognition \citep{Bouveyron:2007gx}, remote sensing
 \citep{Tadjudin:1999fk}, seismic detection \citep{Anderson:2002kg}, and chemical
-spectra \citep*{Wu:1996us,Aeberhard:1993fp}.
+spectra \citep{Wu:1996us,Aeberhard:1993fp}.
 
-The dimension reduction employed in this paper has reduced the
-dimension to rank$(\widehat{\bm \Sigma}) = q$. An interesting extension of our
-work would reduce the dimension $q$ further to a lower dimension $q_L < q$, perhaps using a criterion similar to that of principal
-components analysis. While unclear whether the classification performance would
-improve via such a method, the efficiency of the training and model selection
-would certainly improve. Moreover, if $q_L = 2$ or $3$, low-dimensional graphical displays of high-dimensional data could
-be obtained.
-
+The dimension reduction employed in this paper has reduced the dimension to
+rank$(\widehat{\bm \Sigma}) = q$. An interesting extension of our work would
+reduce the dimension $q$ further to a lower dimension $q_L < q$, perhaps using a
+criterion similar to that of principal components analysis. While unclear
+whether the classification performance would improve via such a method, the
+efficiency of the model selection would certainly improve. Moreover, if $q_L =
+2$ or $3$, low-dimensional graphical displays of high-dimensional data could be
+obtained.
 
 We thank Mrs. Joy Young for her numerous recommendations that enhanced the
 quality of our writing.
