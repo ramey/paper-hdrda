@@ -1,7 +1,7 @@
 \documentclass[review,authoryear]{elsarticle}
 
 \usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib}
-\usepackage{algorithm2e, url, lineno}
+\usepackage{algorithm2e, url}
 
 \bibpunct{(}{)}{;}{a}{,}{,}
 
@@ -30,7 +30,7 @@
 
 \begin{frontmatter}
 
-\title{Computationally Efficient High-Dimensional Regularized Discriminant Analysis}
+\title{High-Dimensional Regularized Discriminant Analysis}
 
 \author[jar]{John A. Ramey\cortext[cor1]{Corresponding author}}
 \author[cks]{Caleb K. Stein}
@@ -43,26 +43,7 @@
 
 \begin{abstract}
 
-Regularized discriminant analysis (\emph{RDA}), proposed by
-\cite{Friedman:1989tm}, is a widely popular classifier that lacks
-interpretability and is impractical for high-dimensional data sets.  Here, we
-present an interpretable and computationally efficient classifier called
-high-dimensional \emph{RDA} (\emph{HDRDA}), designed for the small-sample,
-high-dimensional setting. For \emph{HDRDA}, we show that each training
-observation, regardless of class, contributes to the class covariance matrix,
-resulting in an interpretable estimator that \emph{borrows} from the pooled
-sample covariance matrix. Moreover, we show that \emph{HDRDA} is equivalent to
-a classifier in a reduced-feature space with dimension approximately equal to
-the training sample size. As a result, the matrix operations employed by
-\emph{HDRDA} are computationally linear in the number of features, making the
-classifier well-suited for high-dimensional classification in practice. We
-demonstrate that \emph{HDRDA} is often superior to several sparse and
-regularized classifiers in terms of classification accuracy with three
-artificial and six real high-dimensional data sets. Also, timing comparisons
-between our \emph{HDRDA} implementation in the {\tt sparsediscrim} R package
-and the standard \emph{RDA} formulation in the {\tt klaR} R package demonstrate
-that as the number of features increases, the computational runtime of
-\emph{HDRDA} is drastically smaller than that of \emph{RDA}.
+Regularized discriminant analysis (\emph{RDA}) is a widely popular classifier that lacks interpretability and is impractical for high-dimensional data. Here, we present a competing classifier called high-dimensional \emph{RDA} (\emph{HDRDA}), designed for the small-sample, high-dimensional setting. For \emph{HDRDA}, we show that each training observation, regardless of class, contributes to the class covariance matrix, resulting in an interpretable estimator that \emph{borrows} from the pooled sample covariance matrix. Moreover, we show that \emph{HDRDA} is equivalent to a classifier in a reduced-feature space with dimension approximately equal to the sample size. Consequently, the matrix operations employed by \emph{HDRDA} are linear in the number of features. Timing comparisons between \emph{HDRDA} and RDA establish that as the number of features increases, the computational runtime of \emph{HDRDA} is drastically smaller than that of \emph{RDA}. Also, we demonstrate that \emph{HDRDA} often attains superior classification accuracy to several sparse and regularized classifiers using three artificial and six real high-dimensional datasets.
 
 \end{abstract}
 
@@ -72,8 +53,6 @@ Regularized discriminant analysis\sep High-dimensional classification\sep Covari
 \end{keyword}
 
 \end{frontmatter}
-
-\linenumbers
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
 library(knitr)
@@ -384,22 +363,18 @@ normal distribution with known mean vectors $\bm \mu_k \in \mathbb{R}_{p \times
   p}^{>}$, $k = 1, 2, \ldots, K$. Because $\bm \mu_k$ and $\bm \Sigma_k$ are
 typically unknown, we assign an unlabeled observation $\bm x$ to class
 $\omega_k$ with the sample \emph{QDA} classifier
-\begin{linenomath*}
 \begin{align}
 	D_{QDA}(\bm x) = \argmin_{k} (\bm x - \xbar_k)^{T}\widehat{\bm
     \Sigma}_k^{-1}(\bm x - \xbar_k) + \log |\widehat{\bm \Sigma}_k|, \label{eq:qda}
 \end{align}
-\end{linenomath*}
 where $\xbar_k$ and $\widehat{\bm \Sigma}_k$ are the maximum-likelihood
 estimators (MLEs) of $\bm \mu_k$ and $\bm \Sigma_k$, respectively. If we assume
 further that $\bm \Sigma_k = \bm \Sigma$, $k = 1, \ldots, K$, then the pooled
 sample covariance matrix $\widehat{\bm \Sigma}$ is substituted for $\widehat{
   \bm \Sigma}_k$ in \eqref{eq:qda}, where
-\begin{linenomath*}
 \begin{align}
 	\widehat{\bm \Sigma} = N^{-1} \sum_{k=1}^K n_k \widehat{\bm \Sigma}_k \label{eq:pooled-cov}
 \end{align}
-\end{linenomath*}
 is the MLE for $\bm \Sigma$. Here, \eqref{eq:qda} reduces to the sample
 \emph{LDA} classifier. We omit the log-determinant because it is constant across
 the $K$ classes.
@@ -421,11 +396,9 @@ proposed in the literature to adjust the eigenvalues of $\widehat{\bm \Sigma}_k$
 so that \eqref{eq:qda} is calculable and provides reduced variability for
 $\widehat{\bm \Sigma}_k^{-1}$. A common form of the covariance-matrix
 regularization applies a shrinkage factor $\gamma > 0$, so that
-\begin{linenomath*}
 \begin{align}
 	\widehat{\bm \Sigma}_k(\gamma) = \widehat{\bm \Sigma}_k + \gamma \bm I_p, \label{eq:ridge-estimator}
 \end{align}
-\end{linenomath*}
 similar to a method employed in ridge regression \citep{Hoerl:1970cd}. Equation
 \eqref{eq:ridge-estimator} effectively \emph{shrinks} the sample covariance
 matrix $\widehat{\bm \Sigma}_k$ toward $\bm I_p$, thereby increasing the
@@ -442,17 +415,14 @@ covariance-matrix estimator $\widehat{\bm \Sigma}_k(\lambda)$ and demonstrating
 its clear interpretation as a linear combination of the crossproducts of the
 training observations centered by their respective class sample means. We define
 the convex combination
-\begin{linenomath*}
 \begin{align}
   \widehat{\bm \Sigma}_k(\lambda) \coloneqq (1 - \lambda) \widehat{\bm \Sigma}_k + \lambda
   \widehat{\bm \Sigma}, \quad k = 1, \ldots, K,\label{eq:sig-lambda-alternative}
 \end{align}
-\end{linenomath*}
 where $\lambda \in [0, 1]$ is the \emph{pooling} parameter. By rewriting
 \eqref{eq:sig-lambda-alternative} in terms of the observations $\bm x_i$, $i =
 1, \ldots, N$, each centered by its class sample mean, we attain a clear
 interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is,
-\begin{linenomath*}
 \begin{align}
 	\widehat{\bm \Sigma}_k(\lambda)
   &= \left( 1 - \lambda + \frac{\lambda n_k}{N} \right) \widehat{\bm \Sigma}_k +  \frac{\lambda}{N} \sum_{\substack{k' = 1\\k' \ne k}}^K n_{k'} \widehat{\bm \Sigma}_{k'} \nonumber \\
@@ -461,7 +431,6 @@ interpretation of $\widehat{\bm \Sigma}_k(\lambda)$. That is,
   \bm x_i \bm x_i^{T} \nonumber \\
 	&= \sum_{i=1}^N c_{ik}(\lambda) \bm x_i \bm x_i^{T},\label{eq:sig-lambda-alternative2}
 \end{align}
-\end{linenomath*}
 where $c_{ik}(\lambda) = \lambda N^{-1} + (1 - \lambda)n_k^{-1}I(y_i = k)$.
 From \eqref{eq:sig-lambda-alternative2}, we see that $\lambda$ weights the
 contribution of each of the $N$ observations in estimating $\bm \Sigma_k$ from
@@ -494,11 +463,9 @@ proposed that increase eigenvalues (approximately) equal to 0. To further
 improve the estimation of $\bm \Sigma_k$ and to stabilize the estimator's
 inverse, we define the eigenvalue adjustment of
 \eqref{eq:sig-lambda-alternative} as
-\begin{linenomath*}
 \begin{align}
 	\tilde{\bm \Sigma}_k \coloneqq \alpha_k \widehat{\bm \Sigma}_k(\lambda) + \gamma \bm I_p,\label{eq:hdrda-cov}
 \end{align}
-\end{linenomath*}
 where $\alpha_k \ge 0$ and $\gamma \ge 0$ is an eigenvalue-shrinkage
 constant. Thus, the \emph{pooling} parameter $\lambda$ controls the amount of
 estimation information borrowed from $\widehat{\bm \Sigma}$ to estimate $\bm
@@ -510,11 +477,9 @@ Similarly, if $\alpha_k = 1 - \gamma$, then \eqref{eq:hdrda-cov} has a form
 comparable to the \emph{RDA} classifier from \cite{Friedman:1989tm}.
 Substituting \eqref{eq:hdrda-cov} into \eqref{eq:qda}, we define the
 \emph{HDRDA} classifier as
-\begin{linenomath*}
 \begin{align}
 	D_{HDRDA}(\bm x) = \argmin_{k}  (\bm x - \xbar_k)^{T}\tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k|. \label{eq:hdrda}
 \end{align}
-\end{linenomath*}
 For $\gamma > 0$, $\tilde{\bm \Sigma}_k$ is nonsingular such that $\tilde{\bm
   \Sigma}_k^{-1}$ can be substituted for $\tilde{\bm \Sigma}_k^{+}$ in
 \eqref{eq:hdrda}. If $\gamma = 0$, we explicitly set $|\tilde{\bm \Sigma}_k|$
@@ -538,11 +503,9 @@ $\gamma$ accordingly. For instance, with $\gamma = \tr\{ \widehat{\bm \Sigma} \}
 / \min(N, p)$, we obtain the estimator from \cite{Srivastava:2007ww}.
 
 When $\alpha_k = 1 - \gamma$, \eqref{eq:hdrda-cov} resembles the biased covariance-matrix estimator
-\begin{linenomath*}
 \begin{align}
     \widehat{\bm \Sigma}_k(\lambda, \gamma) = (1 - \gamma) \widehat{\bm \Sigma}_k^{(RDA)}(\lambda) + \gamma \frac{\tr\left\{\widehat{\bm \Sigma}_k^{(RDA)}(\lambda)\right\}}{p} \bm I_p \label{eq:sig-rda}
 \end{align}
-\end{linenomath*}
 employed in the \emph{RDA} classifier, where $\widehat{\bm
   \Sigma}_k^{(RDA)}(\lambda)$ is a pooled estimator of $\bm \Sigma_k$ and
 $\gamma \in [0, 1]$ is a regularization parameter that controls the shrinkage of
@@ -625,7 +588,6 @@ $\bm U_2 \in \mathbb{R}_{p \times (p - q)}$.
 Let $\widehat{\bm \Sigma} = \bm U \bm D \bm U^{T}$ be the eigendecomposition of
 $\widehat{\bm \Sigma}$ as above, and suppose that rank$(\widehat{\bm \Sigma}) =
 q \le p$. Then, we have
-\begin{linenomath*}
 \begin{align}
 	\tilde{\bm \Sigma}_k &= \bm U
     \begin{bmatrix}
@@ -636,7 +598,6 @@ q \le p$. Then, we have
 \intertext{where}
 \bm W_k &= \alpha_k \{(1 - \lambda) \bm U_1^{T} \widehat{\bm \Sigma}_k \bm U_1 + \lambda \bm D_q\} + \gamma \bm I_{q}.\label{eq:Wk}
 \end{align}
-\end{linenomath*}
 \end{lemma}
 \begin{proof}
 From Lemma \ref{lemma:null-spaces}, the columns of $\bm U_2$ span the null space
@@ -699,11 +660,9 @@ equivalent, more computationally efficient decision rule.
 Let $\tilde{\bm \Sigma}_k$ and $\bm W_k$ be defined as in \eqref{eq:rda-matrix}
 and \eqref{eq:Wk}, respectively, and let $\bm U_1$ be defined as above. Then,
 the decision rule in \eqref{eq:hdrda} is equivalent to
-\begin{linenomath*}
 \begin{align}
 		D_{HDRDA}(\bm x) &= \argmin_k  (\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k) + \log | \bm W_k |. \label{eq:hdrda-decomposed}
 \end{align}
-\end{linenomath*}
 \end{thm}
 \begin{proof}
 From \eqref{eq:rda-matrix}, we have that
@@ -716,13 +675,11 @@ From \eqref{eq:rda-matrix}, we have that
 \end{align*}
 and $|\tilde{\bm \Sigma}_k| = \gamma^{p-q}| \bm W_k |$, $k = 1, \ldots,
 K$. Therefore, for all $\bm x \in \mathbb{R}_{p \times 1}$, we have that
-\begin{linenomath*}
 \begin{align*}
 	(\bm x - \xbar_k)^{T} \tilde{\bm \Sigma}_k^{+}(\bm x - \xbar_k)  + \log |\tilde{\bm \Sigma}_k| &= (\bm x - \xbar_k)^{T} \bm U_1 \bm W_k^{-1} \bm U_1^{T} (\bm x - \xbar_k)\\
 	&+ \gamma^{+} (\bm x - \xbar_k)^{T} \bm U_2 \bm U_2^{T} (\bm x - \xbar_k) + \log | \bm W_k |\\
   &+ (p - q) \log \gamma.
 \end{align*}
-\end{linenomath*}
 Because $\gamma$ is constant for $k = 1, \ldots, K$, we can omit the $(p - q)
 \log \gamma$ term and particularly avoid the calculation of $\log 0$ for $\gamma
 = 0$. Then, the proof follows from Lemma \ref{lemma:RDA-constant-term} because
@@ -744,7 +701,6 @@ size $n_k \times n_k$.
 \begin{proposition}\label{proposition:hdrda-W_k}
 Let $\bm W_k$ be defined as above. Then, $|\bm W_k| = |\bm \Gamma_k| |\bm Q_k|$
 and
-\begin{linenomath*}
 \begin{align}
 		\bm W_k^{-1} &= \bm \Gamma_k^{-1} - n_k^{-1} \alpha_k(1 - \lambda) \bm \Gamma_k^{-1} \bm U_1^{T} \bm X_k^{T} \bm Q_k^{-1} \bm X_k \bm U_1 \bm \Gamma_k^{-1},\label{eq:W_k_inv}
     \intertext{where}
@@ -752,7 +708,6 @@ and
     \intertext{and}
     \bm \Gamma_k &= \alpha_k \lambda \bm D_q + \gamma \bm I_q\label{eq:Gamma_k}.
 \end{align}
-\end{linenomath*}
 \end{proposition}
 \begin{proof}
 First, we write $\bm W_k = n_k^{-1} \alpha_k (1 - \lambda) \bm U_1^{T} \bm
@@ -1045,7 +1000,6 @@ from \cite{Guo:2007te}. This design is widely used within the high-dimensional
 classification literature, including the studies by \cite{Ramey:2013ji} and
 \cite{Witten:2011kc}. First, we consider the block-diagonal covariance matrix
 from \cite{Guo:2007te},
-\begin{linenomath*}
 \begin{align}
   \bm\Sigma_k = \begin{bmatrix}
     \bm\Sigma^{(\rho_k)} & \bm 0_{100} & \bm 0_{100} & \cdots & \cdots & \cdots \\
@@ -1056,14 +1010,11 @@ from \cite{Guo:2007te},
     \cdots & \cdots & \cdots & \cdots & \cdots & \cdots \\
   \end{bmatrix},\label{eq:block-sigma}
 \end{align}
-\end{linenomath*}
 where the $(i,j)$th entry of the block matrix $\bm\Sigma^{(\rho_k)} \in
 \mathbb{R}_{100 \times 100}$ is
-\begin{linenomath*}
 \begin{align*}
 \bm\Sigma_{ij}^{(\rho_k)} = \{ \rho_k^{|i - j|} \}_{1 \le i,j \le 100}.
 \end{align*}
-\end{linenomath*}
 The block-diagonal covariance structure in \eqref{eq:block-sigma} resembles
 gene-expression data: within each block of pathways, genes are correlated, and
 the correlation decays as a function of the distance between any two genes. The
@@ -1078,11 +1029,9 @@ block-diagonal simulation configuration by sampling from a $p$-dimensional
 multivariate contaminated normal distribution.  Denoting the PDF of the
 $p$-dimensional multivariate normal distribution by $N_p(\bm x | \bm \mu, \bm
 \Sigma)$, we write the PDF of the $k$th class as
-\begin{linenomath*}
 \begin{align}
   p(\bm x | \omega_k) = (1 - \epsilon) N_p(\bm x | \bm \mu_k, \bm \Sigma_k) + \epsilon N_p(\bm x | \bm \mu_k, \eta \bm \Sigma_k),\label{eq:contaminated-pdf}
 \end{align}
-\end{linenomath*}
 where $\epsilon \in [0, 1]$ is the probability that an observation is
 contaminated (i.e., drawn from a distribution with larger variance) and $\eta >
 1$ scales the covariance matrix $\bm \Sigma_k$ to increase the extremity of
