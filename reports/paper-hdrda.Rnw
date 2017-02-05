@@ -43,7 +43,22 @@
 
 \begin{abstract}
 
-Regularized discriminant analysis (\emph{RDA}) is a widely popular classifier that lacks interpretability and is impractical for high-dimensional data. Here, we present a competing classifier called high-dimensional \emph{RDA} (\emph{HDRDA}), designed for the small-sample, high-dimensional setting. For \emph{HDRDA}, we show that each training observation, regardless of class, contributes to the class covariance matrix, resulting in an interpretable estimator that \emph{borrows} from the pooled sample covariance matrix. Moreover, we show that \emph{HDRDA} is equivalent to a classifier in a reduced-feature space with dimension approximately equal to the sample size. Consequently, the matrix operations employed by \emph{HDRDA} are linear in the number of features. Timing comparisons between \emph{HDRDA} and RDA establish that as the number of features increases, the computational runtime of \emph{HDRDA} is drastically smaller than that of \emph{RDA}. Also, we demonstrate that \emph{HDRDA} often attains superior classification accuracy to several sparse and regularized classifiers using three artificial and six real high-dimensional datasets.
+Regularized discriminant analysis (\emph{RDA}) is a widely popular classifier
+that lacks interpretability and is impractical for high-dimensional data. Here,
+we present a competing classifier called high-dimensional \emph{RDA}
+(\emph{HDRDA}), designed for the small-sample, high-dimensional setting. For
+\emph{HDRDA}, we show that each training observation, regardless of class,
+contributes to the class covariance matrix, resulting in an interpretable
+estimator that \emph{borrows} from the pooled sample covariance
+matrix. Moreover, we show that \emph{HDRDA} is equivalent to a classifier in a
+reduced-feature space with dimension approximately equal to the sample
+size. Consequently, the matrix operations employed by \emph{HDRDA} are linear
+in the number of features. Timing comparisons between \emph{HDRDA} and RDA
+establish that as the number of features increases, the computational runtime
+of \emph{HDRDA} is drastically smaller than that of \emph{RDA}. Also, we
+demonstrate that \emph{HDRDA} often attains superior classification accuracy to
+several sparse and regularized classifiers using three artificial and six real
+high-dimensional datasets.
 
 \end{abstract}
 
@@ -1291,8 +1306,11 @@ efficiency of the model selection would certainly improve. Moreover, if $q_L =
 2$ or $3$, low-dimensional graphical displays of high-dimensional data could be
 obtained.
 
-We thank Mrs. Joy Young for her numerous recommendations that enhanced the
-quality of our writing.
+\section{Acknowledgements}
+
+This research did not receive any specific grant from funding agencies in the
+public, commercial, or not-for-profit sectors. We thank Mrs. Joy Young for her
+numerous recommendations that enhanced the quality of our writing.
 
 \bibliographystyle{elsarticle-harv}
 \bibliography{rda}
