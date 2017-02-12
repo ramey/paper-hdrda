@@ -27,4 +27,4 @@ all: $(PDFS)
 
 clean:
 	@echo "Cleaning Up"
-	rm -f *.tex *.bbl *.blg *.aux *.out *.log *.spl *tikzDictionary demo* *.synctex.gz
+	rm -f *.bbl *.blg *.aux *.out *.log *.spl *tikzDictionary demo* *.synctex.gz
