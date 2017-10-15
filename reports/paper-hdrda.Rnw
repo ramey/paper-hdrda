@@ -1,9 +1,18 @@
-\documentclass[review,authoryear]{elsarticle}
+\documentclass[]{interact}
 
-\usepackage{graphicx, amsmath, amssymb, bm, mathtools, amsthm, natbib}
+\usepackage{graphicx, mathtools, amssymb, bm, amsthm}
 \usepackage{algorithm2e, url}
 
-\bibpunct{(}{)}{;}{a}{,}{,}
+% Journal Specific
+
+% natbib.sty for citation and bibliography support
+\usepackage[numbers,sort&compress]{natbib}
+\bibpunct[, ]{[}{]}{,}{n}{,}{,}
+\renewcommand\bibfont{\fontsize{10}{12}\selectfont}
+\makeatletter% @ becomes a letter
+\def\NAT@def@citea{\def\@citea{\NAT@separator}}% Suppress spaces between citations using natbib.sty
+\makeatother% @ becomes a symbol again
+
 
 \newcommand{\xbar}{\bar{\bm x}}
 \newcommand{\tr}{\text{tr}}
@@ -14,32 +23,23 @@
 \newtheorem{proposition}{Proposition}
 \newtheorem{thm}{Theorem}
 
-%----------------Page dimensions ----------------
-\oddsidemargin 0.0in
-\evensidemargin 0.0in
-\topmargin -0.75in
-\leftmargin 0in
-\headheight 0.0in
-\headsep 0.5in
-\footskip 0.5in
-\footnotesep 0.0in
-\textwidth 6.5in
-\textheight 9.5in
-
 \begin{document}
 
-\begin{frontmatter}
+%\articletype{ARTICLE TEMPLATE} % Specify the article type or omit as appropriate
 
 \title{High-Dimensional Regularized Discriminant Analysis}
 
-\author[jar]{John A. Ramey\cortext[cor1]{Corresponding author}}
-\author[cks]{Caleb K. Stein}
-\author[pdy]{Phil D. Young}
-\author[dmy]{Dean M. Young}
-\address[jar]{Novi Labs}
-\address[cks]{Myeloma Institute, University of Arkansas for Medical Sciences}
-\address[pdy]{Department of Management and Information Systems, Baylor University}
-\address[dmy]{Department of Statistical Science, Baylor University}
+% \author{
+% \name{John.~A. Ramey\textsuperscript{a}\thanks{CONTACT John.~A. Ramey. Email: johnramey@gmail.com}, Caleb~K. Stein\textsuperscript{b}, Phil~D. Young\textsuperscript{c}, and Dean~M. Young\textsuperscript{d}}
+% \affil{\textsuperscript{a}Novi Labs, Austin, TX, USA; \textsuperscript{b}Myeloma Institute, University of Arkansas for Medical Sciences, Little Rock, AR, USA; \textsuperscript{c}Department of Management and Information Systems, Baylor University, Waco, TX, USA; \textsuperscript{d}Department of Statistical Science, Baylor University, Waco, TX, USA;}
+%}
+
+\author{
+\name{A.~N. Author\textsuperscript{a}\thanks{CONTACT A.~N. Author. Email: latex.helpdesk@tandf.co.uk} and John Smith\textsuperscript{b}}
+\affil{\textsuperscript{a}Taylor \& Francis, 4 Park Square, Milton Park, Abingdon, UK; \textsuperscript{b}Institut f\"{u}r Informatik, Albert-Ludwigs-Universit\"{a}t, Freiburg, Germany}
+}
+
+
 
 \begin{abstract}
 
@@ -62,12 +62,12 @@ high-dimensional datasets.
 
 \end{abstract}
 
-\begin{keyword}
-Regularized discriminant analysis\sep High-dimensional classification\sep Covariance-matrix regularization\sep Singular value decomposition\sep Multivariate analysis\sep Dimension reduction
-\MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
-\end{keyword}
+% TODO: Are these codes needed?
+% \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
+\begin{keywords}
+Regularized discriminant analysis; High-dimensional classification; Covariance-matrix regularization; Singular value decomposition; Multivariate analysis; Dimension reduction
+\end{keywords}
 
-\end{frontmatter}
 
 <<knitr_setup, include=FALSE, echo=FALSE, cache=FALSE>>=
 library(knitr)
