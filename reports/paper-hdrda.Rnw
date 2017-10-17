@@ -64,9 +64,7 @@ high-dimensional datasets.
 
 \end{abstract}
 
-% TODO:
-% 1. Update plots to TIFF format with correct parameters.
-% 2. Are MSC codes needed?: \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
+% TODO: Are MSC codes needed?: \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
 
 
 \begin{keywords}
@@ -81,9 +79,9 @@ library(knitr)
 # http://stackoverflow.com/questions/11062497/how-to-avoid-using-round-in-every-sexpr
 options(digits=3)
 
-opts_chunk$set(fig.align='default', dev='png', message=FALSE, warning=FALSE,
-               cache=TRUE, echo=FALSE, autodep=TRUE, fig.width=12,
-               fig.height=12, out.width="\\linewidth")
+opts_chunk$set(fig.align='default', dev=c("tiff", "png"),
+               message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, autodep=TRUE,
+               dpi=300, fig.width=12, fig.height=12, out.width="\\linewidth")
 @
 
 <<setup>>=
@@ -1335,7 +1333,7 @@ print(xtable_out, include.rownames=FALSE, sanitize.text.function = function(x) {
 \clearpage
 
 \begin{figure}
-<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', dpi=200, fig.show='hold'>>=
+<<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', fig.show='hold'>>=
 rda_contours(lambda = 0)
 rda_contours(lambda = 0.2)
 rda_contours(lambda = 0.4)
@@ -1351,7 +1349,7 @@ rda_contours(lambda = 1)
 \clearpage
 
 \begin{figure}
-<<timing_results, fig.width=8, fig.height=8, dpi=200>>=
+<<timing_results, fig.width=8, fig.height=8>>=
 p <- ggplot(timings_combined, aes(x=p, y=time, color=Classifier))
 p <- p + geom_point() + geom_jitter(width=140, height=0) + facet_wrap(~ Plot, scales="free_y")
 p <- p + geom_smooth(method="lm", formula=y ~ poly(x, 2), se=FALSE)
@@ -1366,9 +1364,9 @@ p + theme_bw()
 \clearpage
 
 \begin{figure}
-<<relative_timings, fig.width=8, fig.height=8, dpi=200>>=
+<<relative_timings, fig.width=8, fig.height=8>>=
 p <- ggplot(timing_ratios_bootstrap, aes(ratio_means, fill=p))
-p <- p + geom_histogram() + facet_wrap(~ p, scale="free_x")
+p <- p + geom_histogram() + facet_wrap(~ p, scale="free_x", labeller="label_both")
 p <- p + xlab("Ratio of Mean RDA Runtime to Mean HDRDA Runtime") + ylab("Bootstrap Replications")
 p + theme_bw()
 @
@@ -1380,7 +1378,7 @@ p + theme_bw()
 \clearpage
 
 \begin{figure}
-<<sim_results, fig.width=8, fig.height=8, dpi=200>>=
+<<sim_results, fig.width=8, fig.height=8>>=
 p <- ggplot(results_contaminated, aes(x=contamination_prob, y=Error))
 p <- p + geom_line(aes(color=Classifier, linetype=Classifier), size=0.65)
 p <- p + facet_wrap(~ p, labeller = "label_both")
@@ -1396,7 +1394,7 @@ p + theme_bw()
 \clearpage
 
 \begin{figure}
-<<sim_results_by_p, fig.width=8, fig.height=8, dpi=200>>=
+<<sim_results_by_p, fig.width=8, fig.height=8>>=
 p2 <- results_contaminated %>%
   mutate(p=as.numeric(as.character(p)),
          contamination_prob=round(contamination_prob, digits=2)) %>%
