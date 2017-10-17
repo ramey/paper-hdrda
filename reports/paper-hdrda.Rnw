@@ -2,6 +2,7 @@
 
 \usepackage{graphicx, mathtools, amssymb, bm, amsthm}
 \usepackage{algorithm2e, url}
+\usepackage{setspace}
 
 % Journal Specific
 
@@ -10,8 +11,8 @@
 \bibpunct[, ]{[}{]}{,}{n}{,}{,}
 \renewcommand\bibfont{\fontsize{10}{12}\selectfont}
 \makeatletter% @ becomes a letter
-\def\NAT@def@citea{\def\@citea{\NAT@separator}}% Suppress spaces between citations using natbib.sty
-\makeatother% @ becomes a symbol again
+\def\NAT@def@citea{\def\@citea{\NAT@separator}} % Suppress spaces between citations using natbib.sty
+\makeatother % @ becomes a symbol again
 
 
 \newcommand{\xbar}{\bar{\bm x}}
@@ -25,21 +26,19 @@
 
 \begin{document}
 
-%\articletype{ARTICLE TEMPLATE} % Specify the article type or omit as appropriate
+% Specify the article type or omit as appropriate
+\articletype{Submission}
 
 \title{High-Dimensional Regularized Discriminant Analysis}
 
-% \author{
-% \name{John.~A. Ramey\textsuperscript{a}\thanks{CONTACT John.~A. Ramey. Email: johnramey@gmail.com}, Caleb~K. Stein\textsuperscript{b}, Phil~D. Young\textsuperscript{c}, and Dean~M. Young\textsuperscript{d}}
-% \affil{\textsuperscript{a}Novi Labs, Austin, TX, USA; \textsuperscript{b}Myeloma Institute, University of Arkansas for Medical Sciences, Little Rock, AR, USA; \textsuperscript{c}Department of Management and Information Systems, Baylor University, Waco, TX, USA; \textsuperscript{d}Department of Statistical Science, Baylor University, Waco, TX, USA;}
-%}
-
 \author{
-\name{A.~N. Author\textsuperscript{a}\thanks{CONTACT A.~N. Author. Email: latex.helpdesk@tandf.co.uk} and John Smith\textsuperscript{b}}
-\affil{\textsuperscript{a}Taylor \& Francis, 4 Park Square, Milton Park, Abingdon, UK; \textsuperscript{b}Institut f\"{u}r Informatik, Albert-Ludwigs-Universit\"{a}t, Freiburg, Germany}
+\name{John A. Ramey\textsuperscript{a}\thanks{CONTACT John A. Ramey. Email: johnramey@gmail.com}, Caleb K. Stein\textsuperscript{b}, Phil D. Young\textsuperscript{c}, and Dean M. Young\textsuperscript{d}}
+\affil{\textsuperscript{a}Novi Labs, Austin, TX, USA; \textsuperscript{b}Myeloma Institute, University of Arkansas for Medical Sciences, Little Rock, AR, USA; \textsuperscript{c}Department of Management and Information Systems, Baylor University, Waco, TX, USA; \textsuperscript{d}Department of Statistical Science, Baylor University, Waco, TX, USA}
 }
 
+\maketitle
 
+\doublespacing
 
 \begin{abstract}
 
@@ -62,8 +61,12 @@ high-dimensional datasets.
 
 \end{abstract}
 
-% TODO: Are these codes needed?
-% \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
+% TODO:
+% 1. Word count
+% 2. Update plots to TIFF format with correct parameters.
+% 3. Are MSC codes needed?: \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
+
+
 \begin{keywords}
 Regularized discriminant analysis; High-dimensional classification; Covariance-matrix regularization; Singular value decomposition; Multivariate analysis; Dimension reduction
 \end{keywords}
@@ -294,7 +297,7 @@ methods that are special cases of the \emph{HDRDA} classifier have no effect on
 the approximately $p - N$ zero eigenvalues of the covariance-matrix estimators
 when $p > N$. Such techniques include work from \cite{Srivastava:2007ww},
 \cite{Rao:1971ul}, and other methods studied by \cite{Ramey:2013ji} and
-\citet*{Xu:2009fl}.
+\cite{Xu:2009fl}.
 
 We also provide an efficient algorithm along with pseudocode to estimate the
 \emph{HDRDA} classifier's tuning parameters in a grid search via
@@ -1140,7 +1143,7 @@ Repeating this process 100 times, we computed the average of the error-rate
 estimates for each classifier. We next provide a concise description of each
 high-dimensional data set examined in our classification study.
 
-\subsubsection{\cite{Chiaretti:2004gq} Data Set}
+\subsubsection{Chiaretti Data Set}
 
 \cite{Chiaretti:2004gq} measured the gene-expression profiles for 128
 individuals with acute lymphoblastic leukemia (ALL) using Affymetrix human 95Av2
@@ -1149,7 +1152,7 @@ classes such that $n_1 = 74$ observations were without cytogenetic abnormalities
 and $n_2 = 37$ observations had a detected BCR/ABL gene. The robust multichip
 average normalization method was applied to all 12,625 gene-expression levels.
 
-\subsubsection{\cite{Chowdary:2006kf} Data Set}
+\subsubsection{Chowdary Data Set}
 
 \cite{Chowdary:2006kf} investigated 52 matched pairs of tissues from colon and
 breast tumors using Affymetrix U133A arrays and ribonucleic-acid (RNA)
@@ -1160,7 +1163,7 @@ $K = 2$ classes with $n_1 = 62$ and $n_2 = 42$. A purpose of the study was to
 determine whether the disease state could be identified using 22,283
 gene-expression profiles.
 
-\subsubsection{\cite{Nakayama:2007fl} Data Set}
+\subsubsection{Nakayama Data Set}
 
 \cite{Nakayama:2007fl} acquired 105 gene-expression samples of 10 types of
 soft-tissue tumors through an oligonucleotide microarray, including 16 samples
@@ -1175,7 +1178,7 @@ WDLS, and part of DDLS; (4) Spindle cell and pleomorophic sarcomas including
 DDLS, MFS, LMS, MPNST, FS, and MFH. Following \cite{Witten:2011kc}, we
 restricted our analysis to the five tumor types having at least 15 observations.
 
-\subsubsection{\cite{Shipp:2002ka} Data Set}
+\subsubsection{Shipp Data Set}
 
 According to \cite{Shipp:2002ka}, approximately 30\%-40\% of adult non-Hodgkin
 lymphomas are diffuse large B-cell lymphomas (DLBCLs). However, only a small
@@ -1191,7 +1194,7 @@ patients treated with cyclophosphamide, adriamycin, vincristine, and prednisone
 (CHOP)-based chemotherapy. Among the 58 DLBCL patient samples, 32 are from cured
 patients while 26 are from patients with fatal or refractory disease.
 
-\subsubsection{\cite{Singh:2002fh} Data Set}
+\subsubsection{Singh Data Set}
 
 \cite{Singh:2002fh} have examined 235 radical prostatectomy specimens from
 surgery patients between 1995 and 1997. The authors used oligonucleotide
@@ -1200,7 +1203,7 @@ sequence tags. They have reported that 102 of the radical prostatectomy
 specimens are of high quality: 52 prostate tumor samples and 50 non-tumor
 prostate samples.
 
-\subsubsection{\cite{Tian:2003ht} Data Set}
+\subsubsection{Tian Data Set}
 
 \cite{Tian:2003ht} investigated the purified plasma cells from the bone marrow
 of control patients along with patients with newly diagnosed multiple
@@ -1317,6 +1320,18 @@ numerous recommendations that enhanced the quality of our writing.
 
 \clearpage
 
+<<classification_results, results='asis'>>=
+table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses. The classifier with the minimum average error rate for each data set is in bold.'
+
+xtable_out <- xtable(results_microarray,
+                     caption=table_caption,
+                     label='tab:microarray-results')
+print(xtable_out, include.rownames=FALSE, sanitize.text.function = function(x) { x },
+      scalebox='0.85') # scales the table to fit the page
+@
+
+\clearpage
+
 \begin{figure}
 <<hdrda_contours, fig.width=8, fig.height=8, out.width='.33\\linewidth', dpi=200, fig.show='hold'>>=
 rda_contours(lambda = 0)
@@ -1396,16 +1411,5 @@ p2 + theme_bw()
   \Sexpr{max_sim_se}.}
 \label{fig:sim-results-by-p}
 \end{figure}
-
-\clearpage
-
-<<classification_results, results='asis'>>=
-table_caption <- 'The average of the test error rates obtained on gene-expression data sets over 100 random training-test partitions. Standard deviations of the test error rates are given in the parentheses. The classifier with the minimum average error rate for each data set is in bold.'
-
-xtable_out <- xtable(results_microarray,
-                     caption=table_caption,
-                     label='tab:microarray-results')
-print(xtable_out, include.rownames=FALSE, sanitize.text.function = function(x) { x })
-@
 
 \end{document}
