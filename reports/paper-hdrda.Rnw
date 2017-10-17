@@ -1,3 +1,6 @@
+% Word Count for journal: 7,059
+% detex paper-hdrda.tex | wc -w
+
 \documentclass[]{interact}
 
 \usepackage{graphicx, mathtools, amssymb, bm, amsthm}
@@ -62,9 +65,8 @@ high-dimensional datasets.
 \end{abstract}
 
 % TODO:
-% 1. Word count
-% 2. Update plots to TIFF format with correct parameters.
-% 3. Are MSC codes needed?: \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
+% 1. Update plots to TIFF format with correct parameters.
+% 2. Are MSC codes needed?: \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
 
 
 \begin{keywords}
