@@ -64,9 +64,6 @@ high-dimensional datasets.
 
 \end{abstract}
 
-% TODO: Are MSC codes needed?: \MSC[2010] 62H30\sep 65F15\sep 65F20\sep 65F22
-
-
 \begin{keywords}
 Regularized discriminant analysis; High-dimensional classification; Covariance-matrix regularization; Singular value decomposition; Multivariate analysis; Dimension reduction
 \end{keywords}
