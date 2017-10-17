@@ -79,7 +79,7 @@ library(knitr)
 # http://stackoverflow.com/questions/11062497/how-to-avoid-using-round-in-every-sexpr
 options(digits=3)
 
-opts_chunk$set(fig.align='default', dev=c("tiff", "png"),
+opts_chunk$set(fig.align='default', dev="postscript",
                message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, autodep=TRUE,
                dpi=300, fig.width=12, fig.height=12, out.width="\\linewidth")
 @
