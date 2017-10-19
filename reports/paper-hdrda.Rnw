@@ -55,7 +55,7 @@ estimator that \emph{borrows} from the pooled sample covariance
 matrix. Moreover, we show that \emph{HDRDA} is equivalent to a classifier in a
 reduced-feature space with dimension approximately equal to the sample
 size. Consequently, the matrix operations employed by \emph{HDRDA} are linear
-in the number of features. Timing comparisons between \emph{HDRDA} and RDA
+in the number of features. Timing comparisons between \emph{HDRDA} and \emph{RDA}
 establish that as the number of features increases, the computational runtime
 of \emph{HDRDA} is drastically smaller than that of \emph{RDA}. Also, we
 demonstrate that \emph{HDRDA} often attains superior classification accuracy to
